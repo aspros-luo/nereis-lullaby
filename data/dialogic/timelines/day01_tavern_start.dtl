@@ -1,0 +1,15 @@
+春季第一日。\
+\
+边境的寒冷终于开始退去。
+mite: 今天应该不会太忙。\
+\
+希望老板不要又让我留下打扫到深夜。
+hunter: 小姑娘。\
+\
+还是老样子。\
+\
+一杯麦酒。
+- 麦酒
+	do TavernManager.serve_normal()
+- 月影特饮
+	do TavernManager.serve_special()

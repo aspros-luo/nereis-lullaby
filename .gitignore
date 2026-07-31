@@ -1,0 +1,18 @@
+# Godot
+.godot/
+
+# Import files
+*.import
+
+# Export
+.export/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

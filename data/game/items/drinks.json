@@ -1,0 +1,15 @@
+{
+	"ale": {
+		"id": "ale",
+		"name": "普通麦酒",
+		"corruption": 0,
+		"relation": 1
+	},
+
+	"moon_wine": {
+		"id": "moon_wine",
+		"name": "月影特饮",
+		"corruption": 1,
+		"relation": 2
+	}
+}

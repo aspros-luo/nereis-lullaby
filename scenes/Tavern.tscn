@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cp2urgjhg6f0y"]
+
+[ext_resource type="Script" uid="uid://ctpdnbl6ygs2k" path="res://scripts/systems/Tavern.gd" id="1_f7s0u"]
+
+[node name="Tavern" type="Node" unique_id=1019812962]
+script = ExtResource("1_f7s0u")

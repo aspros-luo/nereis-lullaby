@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://f58m6osg5bi0"]
+
+[ext_resource type="Script" uid="uid://bfjyg1bd261rf" path="res://scripts/systems/Morning.gd" id="1_1gwy7"]
+
+[node name="Morning" type="Node" unique_id=581528714]
+script = ExtResource("1_1gwy7")
+
+[node name="UI" type="Control" parent="." unique_id=1970252265]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 500.0
+offset_bottom = 200.0
+
+[node name="Title" type="Label" parent="UI" unique_id=1718077244]
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 100.0
+
+[node name="ForestButton" type="Button" parent="UI" unique_id=1391054295]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 50.0
+offset_right = 150.0
+offset_bottom = 70.0
+
+[node name="FarmButton" type="Button" parent="UI" unique_id=1815742930]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 75.0
+offset_right = 150.0
+offset_bottom = 95.0
+
+[node name="LivestockButton" type="Button" parent="UI" unique_id=818717613]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 150.0
+offset_bottom = 120.0
+
+[node name="TavernButton" type="Button" parent="UI" unique_id=742154397]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 125.0
+offset_right = 150.0
+offset_bottom = 145.0

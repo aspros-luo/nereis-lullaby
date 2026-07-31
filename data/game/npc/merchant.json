@@ -1,0 +1,9 @@
+{
+	"id": "merchant",
+	"name": "旅行商人",
+	"type": "key",
+	"relation": 0,
+	"trust": 0,
+	"corruption": 0,
+	"flags": []
+}

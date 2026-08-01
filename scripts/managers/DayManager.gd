@@ -1,5 +1,10 @@
 extends Node
 
+
+var current_day:int = 1
+
+
+
 func _ready():
 
 	print(
@@ -10,12 +15,18 @@ func _ready():
 
 func start_day():
 
+
+	current_day = GameManager.current_day
+
+
 	print(
 		"Day %s Start"
-		% GameManager.current_day
+		% current_day
 	)
 
+
 	start_morning()
+
 
 
 func start_morning():
@@ -54,6 +65,8 @@ func start_tavern():
 		"res://scenes/Tavern.tscn"
 	)
 
+
+
 func start_night():
 
 
@@ -71,16 +84,6 @@ func start_night():
 
 
 	end_day()
-
-
-	PhaseManager.change_phase(
-		PhaseManager.Phase.NIGHT
-	)
-
-
-	print(
-		"Night Start"
-	)
 
 
 

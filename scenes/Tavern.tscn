@@ -1,6 +1,42 @@
 [gd_scene format=3 uid="uid://cp2urgjhg6f0y"]
 
 [ext_resource type="Script" uid="uid://ctpdnbl6ygs2k" path="res://scripts/systems/Tavern.gd" id="1_f7s0u"]
+[ext_resource type="Script" uid="uid://l2l61lgjip77" path="res://scripts/ui/TavernUI.gd" id="2_vjnjn"]
 
 [node name="Tavern" type="Node" unique_id=1019812962]
 script = ExtResource("1_f7s0u")
+
+[node name="TavernUI" type="Control" parent="." unique_id=446612859]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_vjnjn")
+
+[node name="Panel" type="Panel" parent="TavernUI" unique_id=185764787]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBox" type="VBoxContainer" parent="TavernUI/Panel" unique_id=2132747684]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GuestLabel" type="Label" parent="TavernUI/Panel/VBox" unique_id=1336978979]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="TavernUI/Panel/VBox" unique_id=530625032]
+layout_mode = 2
+
+[node name="NormalDrinkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1083870167]
+layout_mode = 2
+
+[node name="TalkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=724512069]
+layout_mode = 2
+
+[node name="SpecialDrinkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1218592177]
+layout_mode = 2
+
+[node name="NextGuestButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1000762452]
+layout_mode = 2

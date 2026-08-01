@@ -67,8 +67,29 @@ func start_night():
 	)
 
 
+	await get_tree().create_timer(1.0).timeout
+
+
+	end_day()
+
+
+	PhaseManager.change_phase(
+		PhaseManager.Phase.NIGHT
+	)
+
+
+	print(
+		"Night Start"
+	)
+
+
 
 func end_day():
+
+
+	print(
+		"Day End"
+	)
 
 
 	GameManager.current_day += 1

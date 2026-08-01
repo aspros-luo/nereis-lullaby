@@ -1,6 +1,12 @@
 extends Node
 
 
+signal session_started
+
+
+signal guest_changed
+
+
 var guests:Array = []
 
 
@@ -10,12 +16,19 @@ var current_guest_index:int = 0
 
 func start_session():
 
+
 	print(
 		"Tavern Session Start"
 	)
 
 
 	load_today_guests()
+
+
+	session_started.emit()
+
+
+	guest_changed.emit()
 
 
 
@@ -58,6 +71,7 @@ func load_today_guests():
 
 func get_current_guest():
 
+
 	if current_guest_index < guests.size():
 
 		return guests[current_guest_index]
@@ -84,9 +98,12 @@ func next_guest():
 			get_current_guest()
 		)
 
+		guest_changed.emit()
+
 
 
 func end_session():
+
 
 	print(
 		"Tavern Closed"

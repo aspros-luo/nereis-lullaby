@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://diqj0c3gnkfs6"]
+
+[ext_resource type="Script" uid="uid://bdyh0gm1yt8vl" path="res://scripts/ui/NPCInteractionUI.gd" id="1_5q43m"]
+
+[node name="NPCInteractionUI" type="Control" unique_id=2068901334]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5q43m")
+
+[node name="Panel" type="Panel" parent="." unique_id=1436574629]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=926816487]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="Panel/VBoxContainer" unique_id=934572885]
+layout_mode = 2
+
+[node name="TalkButton" type="Button" parent="Panel/VBoxContainer" unique_id=571880184]
+layout_mode = 2
+text = "交谈"
+
+[node name="NormalDrinkButton" type="Button" parent="Panel/VBoxContainer" unique_id=1738156300]
+layout_mode = 2
+text = "端上麦酒"
+
+[node name="SpecialDrinkButton" type="Button" parent="Panel/VBoxContainer" unique_id=293538416]
+layout_mode = 2
+text = "端上月影"
+
+[node name="StatusButton" type="Button" parent="Panel/VBoxContainer" unique_id=559189689]
+layout_mode = 2
+text = "状态"
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer" unique_id=586422084]
+layout_mode = 2
+text = "结束对话"

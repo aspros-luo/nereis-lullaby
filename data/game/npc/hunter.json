@@ -1,9 +1,22 @@
 {
 	"id": "hunter",
+
 	"name": "老猎人",
-	"type": "daily",
+
+
+	"type": "key",
+
+
 	"relation": 0,
+
 	"trust": 0,
+
+
 	"corruption": 0,
+
+
+	"knowledge": 0,
+
+
 	"flags": []
 }

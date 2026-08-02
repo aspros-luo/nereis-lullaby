@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://ctpdnbl6ygs2k" path="res://scripts/systems/Tavern.gd" id="1_f7s0u"]
 [ext_resource type="Script" uid="uid://l2l61lgjip77" path="res://scripts/ui/TavernUI.gd" id="2_vjnjn"]
+[ext_resource type="Script" uid="uid://dde6q5guykwg3" path="res://scripts/systems/TavernSpawner.gd" id="3_dg26j"]
+[ext_resource type="PackedScene" uid="uid://7gabn3l1t135" path="res://scenes/TavernNPC.tscn" id="4_grwn0"]
+[ext_resource type="PackedScene" uid="uid://diqj0c3gnkfs6" path="res://scenes/NPCInteractionUI.tscn" id="5_grwn0"]
 
 [node name="Tavern" type="Node" unique_id=1019812962]
 script = ExtResource("1_f7s0u")
 
 [node name="TavernUI" type="Control" parent="." unique_id=446612859]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -23,20 +27,11 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="GuestLabel" type="Label" parent="TavernUI/Panel/VBox" unique_id=1336978979]
-layout_mode = 2
-
 [node name="StatusLabel" type="Label" parent="TavernUI/Panel/VBox" unique_id=530625032]
 layout_mode = 2
 
-[node name="NormalDrinkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1083870167]
-layout_mode = 2
+[node name="TavernSpawner" type="Node2D" parent="." unique_id=1258887507]
+script = ExtResource("3_dg26j")
+npc_scene = ExtResource("4_grwn0")
 
-[node name="TalkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=724512069]
-layout_mode = 2
-
-[node name="SpecialDrinkButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1218592177]
-layout_mode = 2
-
-[node name="NextGuestButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1000762452]
-layout_mode = 2
+[node name="NPCInteractionUI" parent="." unique_id=2068901334 instance=ExtResource("5_grwn0")]

@@ -1,9 +1,22 @@
 {
 	"id": "merchant",
+
 	"name": "旅行商人",
-	"type": "key",
+
+
+	"type": "normal",
+
+
 	"relation": 0,
+
 	"trust": 0,
+
+
 	"corruption": 0,
+
+
+	"knowledge": 0,
+
+
 	"flags": []
 }

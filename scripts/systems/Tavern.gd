@@ -10,3 +10,5 @@ func _ready():
 
 
 	TavernManager.open_tavern()
+	
+	$TavernSpawner.spawn_tonight_guests()

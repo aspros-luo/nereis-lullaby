@@ -22,6 +22,7 @@ offset_left = 100.0
 offset_top = 50.0
 offset_right = 150.0
 offset_bottom = 70.0
+text = "森林"
 
 [node name="FarmButton" type="Button" parent="UI" unique_id=1815742930]
 layout_mode = 0
@@ -29,6 +30,7 @@ offset_left = 100.0
 offset_top = 75.0
 offset_right = 150.0
 offset_bottom = 95.0
+text = "农场"
 
 [node name="LivestockButton" type="Button" parent="UI" unique_id=818717613]
 layout_mode = 0
@@ -36,6 +38,7 @@ offset_left = 100.0
 offset_top = 100.0
 offset_right = 150.0
 offset_bottom = 120.0
+text = "live stock"
 
 [node name="TavernButton" type="Button" parent="UI" unique_id=742154397]
 layout_mode = 0
@@ -43,3 +46,4 @@ offset_left = 100.0
 offset_top = 125.0
 offset_right = 150.0
 offset_bottom = 145.0
+text = "去酒馆"

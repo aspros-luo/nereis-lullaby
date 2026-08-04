@@ -1,28 +1,23 @@
 {
-	"id": "hero",
+	"id":"hero",
 
-	"name": "失忆的青年",
+	"name":"失忆的青年",
 
+	"class":"HeroNPC",
 
-	"type": "key",
+	"permanent_state":
+	{
+		"memory":0,
 
+		"humanity":100
+	},
 
-	"relation": 0,
+	"temporary_state":
+	{
+		"talk_count":0,
 
-	"trust": 0,
+		"drink_count":0,
 
-
-	"corruption": 0,
-
-
-	"knowledge": 0,
-
-
-	"memory": 0,
-
-
-	"humanity": 100,
-
-
-	"flags": []
+		"drunk":false
+	}
 }

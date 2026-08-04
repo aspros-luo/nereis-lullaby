@@ -10,6 +10,7 @@ var current_npc_id:String = ""
 
 func _ready():
 
+
 	hide()
 
 
@@ -34,34 +35,46 @@ func _ready():
 
 
 	$Panel/VBoxContainer/CloseButton.pressed.connect(
-		hide
+		close
 	)
 
 
 
 
-func open(npc_id:String):
+
+func open(id:String):
 
 
-	current_npc_id=npc_id
+	current_npc_id=id
 
 
-	var npc=NpcManager.get_npc(
-		npc_id
-	)
+	var npc = NPCManager.get_npc(id)
 
 
 	if npc:
 
-		name_label.text=npc["name"]
+
+		name_label.text = npc.npc_name
+
 
 
 	show()
+
+	print(
+		"NPC UI SHOW",
+		visible
+	)
+
+	NPCInteractionSystem.start_interaction(
+		id
+	)
+
 
 
 
 
 func _on_talk_pressed():
+
 
 	print(
 		"Talk:",
@@ -69,12 +82,20 @@ func _on_talk_pressed():
 	)
 
 
-	hide()
+	var result = NPCInteractionSystem.talk()
+
+
+	print(
+		"Result:",
+		result
+	)
+
 
 
 
 
 func _on_normal_drink_pressed():
+
 
 	print(
 		"Serve normal drink:",
@@ -82,12 +103,22 @@ func _on_normal_drink_pressed():
 	)
 
 
-	hide()
+	var result = NPCInteractionSystem.drink(
+		"normal"
+	)
+
+
+	print(
+		"Result:",
+		result
+	)
+
 
 
 
 
 func _on_special_drink_pressed():
+
 
 	print(
 		"Serve special drink:",
@@ -95,12 +126,22 @@ func _on_special_drink_pressed():
 	)
 
 
-	hide()
+	var result = NPCInteractionSystem.drink(
+		"special"
+	)
+
+
+	print(
+		"Result:",
+		result
+	)
+
 
 
 
 
 func _on_status_pressed():
+
 
 	print(
 		"Check NPC:",
@@ -108,4 +149,18 @@ func _on_status_pressed():
 	)
 
 
+	NPCManager.debug_npc(
+		current_npc_id
+	)
+
+
+
+
+
+func close():
+
+
 	hide()
+
+
+	NPCInteractionSystem.end()

@@ -73,13 +73,13 @@ func serve_drink(
 	)
 
 
-	NpcManager.change_relation(
+	NPCManager.change_relation(
 		npc_id,
 		drink["relation"]
 	)
 
 
-	NpcManager.add_corruption(
+	NPCManager.add_corruption(
 		npc_id,
 		drink["corruption"]
 	)

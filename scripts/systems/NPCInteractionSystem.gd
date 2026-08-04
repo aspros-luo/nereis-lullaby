@@ -1,0 +1,197 @@
+extends Node
+
+
+var current_npc:NPCBase = null
+
+
+
+signal interaction_result(result)
+
+
+
+# =========================
+# 开始交互
+# =========================
+
+func start_interaction(
+	id:String
+):
+
+
+	current_npc = NPCManager.get_npc(id)
+
+
+
+	if current_npc == null:
+
+
+		print(
+			"NPC Missing:",
+			id
+		)
+
+		return
+
+
+
+	print(
+		"Start Interaction:",
+		current_npc.npc_name
+	)
+
+
+	show_options()
+
+
+
+
+
+# =========================
+# 显示选项
+# =========================
+
+func show_options():
+
+
+	if current_npc == null:
+
+		return
+
+
+	print(
+		"Interaction Options:"
+	)
+
+	print(
+		"1. Talk"
+	)
+
+	print(
+		"2. Drink"
+	)
+
+	print(
+		"3. Special"
+	)
+
+
+
+
+
+# =========================
+# 对话
+# =========================
+
+func talk():
+
+
+	if current_npc == null:
+
+		return
+
+
+
+	var result = current_npc.talk()
+
+
+
+	print(
+		"Talk Result:",
+		result
+	)
+
+
+	interaction_result.emit(
+		result
+	)
+
+
+
+	return result
+
+
+
+
+
+# =========================
+# 喝酒
+# =========================
+
+func drink(
+	type:String="normal"
+):
+
+
+	if current_npc == null:
+
+		return
+
+
+
+	var result = current_npc.drink(
+		type
+	)
+
+
+
+	print(
+		"Drink Result:",
+		result
+	)
+
+
+	interaction_result.emit(
+		result
+	)
+
+
+
+	return result
+
+
+
+
+
+# =========================
+# 特殊行为
+# =========================
+
+func special():
+
+
+	if current_npc == null:
+
+		return
+
+
+
+	var result = current_npc.trade()
+
+
+
+	print(
+		"Special Result:",
+		result
+	)
+
+
+	interaction_result.emit(
+		result
+	)
+
+
+
+	return result
+
+
+
+
+
+# =========================
+# 结束
+# =========================
+
+func end():
+
+
+	current_npc=null

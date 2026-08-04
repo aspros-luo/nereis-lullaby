@@ -24,11 +24,12 @@ ActionManager="*uid://cnkfh7byxxbtb"
 ResourceManager="*uid://bo4wuvorl5wls"
 TavernManager="*uid://bbbm77rti1jkg"
 TavernSession="*uid://o1ahwymetwyo"
-NpcManager="*uid://ciolf55ig4pu4"
+NPCManager="*uid://ciolf55ig4pu4"
 WorldState="*uid://wu370goe7fld"
 NarrativeManager="*uid://8cmusxtdapti"
 DrinkManager="*uid://cl1f744ro4id6"
 Dialogic="*uid://ds2q0uclmolvu"
+NPCInteractionSystem="*uid://crj84xc0t3grr"
 
 [dialogic]
 

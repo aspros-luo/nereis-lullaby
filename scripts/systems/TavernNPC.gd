@@ -4,7 +4,9 @@ extends Area2D
 var npc_id:String = ""
 
 
-var npc_data:Dictionary = {}
+var npc:NPCBase
+
+
 
 
 
@@ -13,22 +15,36 @@ func setup(
 ):
 
 
-	npc_id=id
+	npc_id = id
 
 
-	npc_data = NpcManager.get_npc(id)
+	npc = NPCManager.get_npc(
+		id
+	)
 
 
-	if npc_data:
+	if npc:
 
 
-		$Label.text = npc_data["name"]
+		$Label.text = npc.npc_name
+
+
+	else:
+
+
+		print(
+			"NPC Not Found:",
+			id
+		)
+
 
 
 	print(
 		"Tavern NPC Spawn:",
 		id
 	)
+
+
 
 
 
@@ -58,10 +74,6 @@ func _on_input_event(
 
 			interact()
 
-
-
-
-
 func interact():
 
 
@@ -69,16 +81,21 @@ func interact():
 		"Interact NPC:",
 		npc_id
 	)
-	
-	get_tree().current_scene.get_node(
+
+
+	var ui = get_tree().current_scene.get_node(
 		"NPCInteractionUI"
-	).open(
-		npc_id
 	)
 
-	#
-	# 后续：
-	#
-	# EventManager
-	# Dialogic
-	#
+
+	if ui:
+
+		ui.open(
+			npc_id
+		)
+
+	else:
+
+		print(
+			"NPCInteractionUI Missing"
+		)

@@ -1,22 +1,21 @@
 {
-	"id": "merchant",
+	"id":"merchant",
 
-	"name": "旅行商人",
+	"name":"旅行商人",
 
+	"class":"MerchantNPC",
 
-	"type": "normal",
+	"permanent_state":
+	{
+		"trust":10
+	},
 
+	"temporary_state":
+	{
+		"talk_count":0,
 
-	"relation": 0,
+		"drink_count":0,
 
-	"trust": 0,
-
-
-	"corruption": 0,
-
-
-	"knowledge": 0,
-
-
-	"flags": []
+		"drunk":false
+	}
 }

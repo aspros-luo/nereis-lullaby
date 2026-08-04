@@ -1,22 +1,23 @@
 {
-	"id": "hunter",
+	"id":"hunter",
 
-	"name": "老猎人",
+	"name":"老猎人",
 
+	"class":"HunterNPC",
 
-	"type": "key",
+	"permanent_state":
+	{
+		"trust":20,
 
+		"knows_forest_secret":false
+	},
 
-	"relation": 0,
+	"temporary_state":
+	{
+		"talk_count":0,
 
-	"trust": 0,
+		"drink_count":0,
 
-
-	"corruption": 0,
-
-
-	"knowledge": 0,
-
-
-	"flags": []
+		"drunk":false
+	}
 }

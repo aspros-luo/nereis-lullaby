@@ -53,30 +53,12 @@ func load_today_guests():
 	guests.clear()
 
 
-
-	#
-	# 注意：
-	# 这里保存的是ID
-	# 不是显示名字
-	#
-	guests.append(
-		"hunter"
-	)
+	guests.append("hunter")
+	guests.append("merchant")
+	guests.append("hero")
 
 
-	guests.append(
-		"merchant"
-	)
-
-
-	guests.append(
-		"hero"
-	)
-
-
-
-	current_guest_index=0
-
+	current_guest_index = 0
 
 
 	print(
@@ -86,18 +68,14 @@ func load_today_guests():
 
 	for id in guests:
 
-
-		var npc = NpcManager.get_npc(id)
+		var npc = NPCManager.get_npc(id)
 
 
 		if npc:
 
-
 			print(
-				npc["name"]
+				npc.npc_name
 			)
-
-
 
 
 #
@@ -130,7 +108,7 @@ func get_current_guest_data():
 		return null
 
 
-	return NpcManager.get_npc(id)
+	return NPCManager.get_npc(id)
 
 
 
@@ -160,14 +138,14 @@ func serve_normal_drink():
 	#
 	# 普通酒效果
 	#
-	NpcManager.change_relation(
+	NPCManager.change_relation(
 		id,
 		1
 	)
 
 
 
-	NpcManager.change_trust(
+	NPCManager.change_trust(
 		id,
 		1
 	)
@@ -175,7 +153,7 @@ func serve_normal_drink():
 
 
 
-	var npc = NpcManager.get_npc(id)
+	var npc = NPCManager.get_npc(id)
 
 
 	print(
@@ -212,7 +190,7 @@ func serve_special_drink():
 	#
 	# 特调影响
 	#
-	NpcManager.add_corruption(
+	NPCManager.add_corruption(
 		id,
 		5
 	)

@@ -81,11 +81,39 @@ func initialize(data:Dictionary):
 
 func talk()->String:
 
+
+	if not state.temporary.has("talk_count"):
+
+		state.temporary["talk_count"]=0
+
+
+	state.temporary["talk_count"] += 1
+
+
 	return "normal_talk"
 
 
 
 func drink(type:String)->String:
+
+
+	if not state.temporary.has("drink_count"):
+
+		state.temporary["drink_count"]=0
+
+
+	state.temporary["drink_count"] += 1
+
+
+
+	if state.temporary["drink_count"] >= 3:
+
+
+		state.temporary["drunk"]=true
+
+
+
+	return "drink"
 
 	return "drink"
 
@@ -182,6 +210,36 @@ func get_temporary(
 
 
 func daily_resolve():
+
+
+	print(
+		npc_name,
+		" resolving..."
+	)
+
+
+	if state.temporary.get(
+		"talk_count",
+		0
+	) >= 2:
+
+
+		add_permanent(
+			"trust",
+			1
+		)
+
+
+	if state.temporary.get(
+		"drink_count",
+		0
+	) >= 3:
+
+
+		add_permanent(
+			"fear",
+			1
+		)
 
 	pass
 

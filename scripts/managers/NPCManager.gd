@@ -168,22 +168,39 @@ func drink(
 func daily_resolve():
 
 
+	print(
+		"NPC Daily Resolve Start"
+	)
+
+
 	for npc in npcs.values():
+
 
 		npc.daily_resolve()
 
 
-
+	print(
+		"NPC Daily Resolve End"
+	)
 
 
 func reset_daily():
 
 
+	print(
+		"NPC Daily Reset Start"
+	)
+
+
 	for npc in npcs.values():
+
 
 		npc.reset_daily()
 
 
+	print(
+		"NPC Daily Reset End"
+	)
 
 
 

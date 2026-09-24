@@ -10,7 +10,6 @@
 script = ExtResource("1_f7s0u")
 
 [node name="TavernUI" type="Control" parent="." unique_id=446612859]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -30,8 +29,16 @@ offset_bottom = 40.0
 [node name="StatusLabel" type="Label" parent="TavernUI/Panel/VBox" unique_id=530625032]
 layout_mode = 2
 
+[node name="EndDayButton" type="Button" parent="TavernUI/Panel/VBox" unique_id=1876039930]
+layout_mode = 2
+text = "结束一天"
+
 [node name="TavernSpawner" type="Node2D" parent="." unique_id=1258887507]
 script = ExtResource("3_dg26j")
 npc_scene = ExtResource("4_grwn0")
 
 [node name="NPCInteractionUI" parent="." unique_id=2068901334 instance=ExtResource("5_grwn0")]
+offset_left = 247.0
+offset_top = 1.0
+offset_right = 247.0
+offset_bottom = 1.0

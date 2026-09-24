@@ -253,8 +253,4 @@ func end_session():
 		"Tavern Closed"
 	)
 
-
-	session_finished.emit()
-
-
 	DayManager.start_night()

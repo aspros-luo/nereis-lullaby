@@ -184,7 +184,28 @@ func special():
 	return result
 
 
+func debug():
 
+	if current_npc == null:
+
+		return
+
+
+	print("================")
+	print(current_npc.npc_name)
+
+	print(
+		"Permanent:",
+		current_npc.state.permanent
+	)
+
+
+	print(
+		"Temporary:",
+		current_npc.state.temporary
+	)
+
+	print("================")
 
 
 # =========================

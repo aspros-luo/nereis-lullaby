@@ -79,15 +79,24 @@ func start_night():
 		"Night Start"
 	)
 
-
-	await get_tree().create_timer(1.0).timeout
-
-
-	end_day()
+var ending_day=false
 
 
 
 func end_day():
+
+
+	if ending_day:
+
+		print(
+			"Day ending blocked"
+		)
+
+		return
+
+
+
+	ending_day=true
 
 
 	print(
@@ -95,7 +104,18 @@ func end_day():
 	)
 
 
-	GameManager.current_day += 1
+	NPCManager.daily_resolve()
+
+	NPCManager.reset_daily()
+
+
+	GameManager.current_day +=1
+
+
+	await get_tree().create_timer(0.2).timeout
+
+
+	ending_day=false
 
 
 	start_day()

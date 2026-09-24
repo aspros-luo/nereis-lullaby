@@ -1,6 +1,9 @@
 extends Control
 
 
+var day_end_clicked := false
+
+
 
 func _ready():
 
@@ -9,15 +12,33 @@ func _ready():
 	)
 
 
-	update_status()
+	$Panel/VBox/EndDayButton.pressed.connect(
+		_on_end_day_pressed
+	)
 
 
 
-func update_status():
 
 
-	if has_node(
-		"Panel/VBox/StatusLabel"
-	):
+func _on_end_day_pressed():
 
-		$Panel/VBox/StatusLabel.text = "酒馆营业中"
+
+	if day_end_clicked:
+
+		print(
+			"End Day already clicked"
+		)
+
+		return
+
+
+
+	day_end_clicked=true
+
+
+	print(
+		"Player Leave Tavern"
+	)
+
+
+	DayManager.end_day()

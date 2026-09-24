@@ -16,20 +16,16 @@ func talk()->String:
 	state.temporary["talk_count"] += 1
 
 
-
-	if state.permanent.get(
-		"memory",
-		0
-	) < 100:
+	if state.permanent.has("memory"):
 
 
-		add_permanent(
-			"memory",
-			1
-		)
+		if state.permanent["memory"] < 100:
 
 
-		return "hero_memory_fragment"
+			state.permanent["memory"] += 1
+
+
+			return "hero_memory_fragment"
 
 
 
@@ -40,6 +36,12 @@ func talk()->String:
 
 
 func drink(type:String)->String:
+
+
+	state.temporary["drink_count"] += 1
+
+
+	return "hero_drink"
 
 
 	state.temporary["drink_count"] += 1

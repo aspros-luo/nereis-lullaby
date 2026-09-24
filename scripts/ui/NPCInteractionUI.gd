@@ -148,10 +148,11 @@ func _on_status_pressed():
 		current_npc_id
 	)
 
+	NPCInteractionSystem.debug()
 
-	NPCManager.debug_npc(
-		current_npc_id
-	)
+	#NPCManager.debug_npc(
+		#current_npc_id
+	#)
 
 
 

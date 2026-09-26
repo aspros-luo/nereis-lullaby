@@ -1,121 +1,102 @@
 extends Node
 
 
-var current_day:int = 1
+enum DayFlow {
+	IDLE,
+	MORNING,
+	TAVERN,
+	ENDING
+}
 
+
+var current_day:int = 1
+var flow:DayFlow = DayFlow.IDLE
 
 
 func _ready():
 
-	print(
-		"DayManager Ready"
-	)
-
+	print("DayManager Ready")
 
 
 func start_day():
 
-
 	current_day = GameManager.current_day
+	flow = DayFlow.MORNING
 
-
-	print(
-		"Day %s Start"
-		% current_day
-	)
-
+	print("Day %s Start" % current_day)
 
 	start_morning()
 
 
-
 func start_morning():
 
+	if flow == DayFlow.ENDING:
+		return
+
+	flow = DayFlow.MORNING
 
 	PhaseManager.change_phase(
 		PhaseManager.Phase.MORNING
 	)
 
-
-	print(
-		"Morning Start"
-	)
-
+	print("Morning Start")
 
 	get_tree().change_scene_to_file(
 		"res://scenes/Morning.tscn"
 	)
 
 
-
 func start_tavern():
 
+	if flow == DayFlow.ENDING:
+		print("Tavern start blocked: day is ending")
+		return
+
+	flow = DayFlow.TAVERN
 
 	PhaseManager.change_phase(
 		PhaseManager.Phase.TAVERN
 	)
 
-
-	print(
-		"Tavern Start"
-	)
-
+	print("Tavern Start")
 
 	get_tree().change_scene_to_file(
 		"res://scenes/Tavern.tscn"
 	)
 
 
-
 func start_night():
 
+	if flow == DayFlow.ENDING:
+		return
 
 	PhaseManager.change_phase(
 		PhaseManager.Phase.NIGHT
 	)
 
+	print("Night Start")
 
-	print(
-		"Night Start"
-	)
-
-var ending_day=false
-
+	end_day()
 
 
 func end_day():
 
-
-	if ending_day:
-
-		print(
-			"Day ending blocked"
-		)
-
+	if flow == DayFlow.ENDING:
+		print("Day ending blocked")
 		return
 
+	flow = DayFlow.ENDING
 
-
-	ending_day=true
-
-
-	print(
-		"Day End"
-	)
-
+	print("Day End")
 
 	NPCManager.daily_resolve()
-
 	NPCManager.reset_daily()
 
+	GameManager.current_day += 1
 
-	GameManager.current_day +=1
-
-
-	await get_tree().create_timer(0.2).timeout
-
-
-	ending_day=false
-
+	print(
+		"Next Day:",
+		GameManager.current_day
+	)
 
 	start_day()

@@ -2,121 +2,59 @@ class_name NPCBase
 extends Node
 
 
-# =========================
+# ==================================================
 # 基础信息
-# =========================
+# ==================================================
 
 var id:String = ""
-
 var npc_name:String = ""
 
+
+# NPC 唯一状态对象。
+# 永久状态与每日临时状态全部通过 state 管理。
 var state:NPCState
 
 
-# =========================
-# 状态系统
-# =========================
-
-
-# 永久状态
-# 影响剧情、支线、结局
-
-var permanent_state:Dictionary = {}
-
-
-
-# 临时状态
-# 每日重置
-
-var temporary_state:Dictionary = {}
-
-
-
-
-# =========================
+# ==================================================
 # 初始化
-# =========================
-
+# ==================================================
 
 func initialize(data:Dictionary):
 
 	state = NPCState.new()
 
-	id = data.get(
-		"id",
-		""
-	)
+	id = data.get("id", "")
+	npc_name = data.get("name", "Unknown")
+
+	# JSON 只负责提供初始值，NPCState 负责运行时状态。
+	var permanent_data:Dictionary = data.get("permanent_state", {})
+	var temporary_data:Dictionary = data.get("temporary_state", {})
+
+	state.permanent.merge(permanent_data, true)
+	state.temporary.merge(temporary_data, true)
+
+	print("NPC Initialized:", npc_name)
 
 
-	npc_name = data.get(
-		"name",
-		"Unknown"
-	)
-
-
-	permanent_state = data.get(
-		"permanent_state",
-		{}
-	)
-
-
-	temporary_state = data.get(
-		"temporary_state",
-		{}
-	)
-
-
-	print(
-		"NPC Initialized:",
-		npc_name
-	)
-
-
-
-
-# =========================
+# ==================================================
 # 玩家行为
-# =========================
-
+# ==================================================
 
 func talk()->String:
 
-
-	if not state.temporary.has("talk_count"):
-
-		state.temporary["talk_count"]=0
-
-
-	state.temporary["talk_count"] += 1
-
+	state.temporary["talk_count"] = state.temporary.get("talk_count", 0) + 1
 
 	return "normal_talk"
 
 
-
 func drink(type:String)->String:
 
-
-	if not state.temporary.has("drink_count"):
-
-		state.temporary["drink_count"]=0
-
-
-	state.temporary["drink_count"] += 1
-
-
+	state.temporary["drink_count"] = state.temporary.get("drink_count", 0) + 1
 
 	if state.temporary["drink_count"] >= 3:
-
-
-		state.temporary["drunk"]=true
-
-
+		state.temporary["drunk"] = true
 
 	return "drink"
-
-	return "drink"
-
 
 
 func trade()->String:
@@ -124,24 +62,16 @@ func trade()->String:
 	return "trade"
 
 
-
-
-# =========================
-# 状态修改
-# =========================
-
+# ==================================================
+# 永久状态修改
+# ==================================================
 
 func add_permanent(
 	key:String,
 	value:int
 ):
 
-
-	if permanent_state.has(key):
-
-		permanent_state[key]+=value
-
-
+	state.permanent[key] = state.permanent.get(key, 0) + value
 
 
 func set_permanent(
@@ -149,24 +79,26 @@ func set_permanent(
 	value
 ):
 
-	permanent_state[key]=value
+	state.permanent[key] = value
 
 
+func get_permanent(
+	key:String
+):
+
+	return state.permanent.get(key, null)
 
 
+# ==================================================
+# 临时状态修改
+# ==================================================
 
 func add_temporary(
 	key:String,
 	value:int
 ):
 
-
-	if temporary_state.has(key):
-
-		temporary_state[key]+=value
-
-
-
+	state.temporary[key] = state.temporary.get(key, 0) + value
 
 
 func set_temporary(
@@ -174,104 +106,41 @@ func set_temporary(
 	value
 ):
 
-	temporary_state[key]=value
-
-
-
-
-
-func get_permanent(
-	key:String
-):
-
-	return permanent_state.get(
-		key,
-		null
-	)
-
-
+	state.temporary[key] = value
 
 
 func get_temporary(
 	key:String
 ):
 
-	return temporary_state.get(
-		key,
-		null
-	)
+	return state.temporary.get(key, null)
 
 
-
-
-# =========================
+# ==================================================
 # 每日结算
-# =========================
-
+# ==================================================
 
 func daily_resolve():
-
 
 	print(
 		npc_name,
 		" resolving..."
 	)
 
+	if state.temporary.get("talk_count", 0) >= 2:
+		add_permanent("trust", 1)
 
-	if state.temporary.get(
-		"talk_count",
-		0
-	) >= 2:
-
-
-		add_permanent(
-			"trust",
-			1
-		)
+	if state.temporary.get("drink_count", 0) >= 3:
+		add_permanent("fear", 1)
 
 
-	if state.temporary.get(
-		"drink_count",
-		0
-	) >= 3:
-
-
-		add_permanent(
-			"fear",
-			1
-		)
-
-	pass
-
-
-
+# ==================================================
+# 每日结束
+# ==================================================
 
 func reset_daily():
 
-
-	if temporary_state.has(
-		"talk_count"
-	):
-
-		temporary_state["talk_count"]=0
-
-
-
-	if temporary_state.has(
-		"drink_count"
-	):
-
-		temporary_state["drink_count"]=0
-
-
-
-	if temporary_state.has(
-		"drunk"
-	):
-
-		temporary_state["drunk"]=false
-
-
+	state.reset_daily()
 
 	print(
 		npc_name,

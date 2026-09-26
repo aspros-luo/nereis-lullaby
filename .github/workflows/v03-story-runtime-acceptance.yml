@@ -1,0 +1,28 @@
+name: v0.3 Story Runtime Acceptance
+
+on:
+  push:
+    branches:
+      - feature/v0.3-mainline-runtime-test
+  workflow_dispatch:
+
+jobs:
+  story-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Godot 4.6.1 headless acceptance test
+        uses: firebelley/godot-version-manager@v1
+        with:
+          version: 4.6.1
+          release-type: stable
+          cache: true
+          godot-bin: godot
+
+      - name: Verify project parses
+        run: godot --headless --path . --editor --quit --check-only
+
+      - name: Run v0.3 story runtime acceptance
+        run: godot --headless --path . --script res://tests/v03_story_runtime_acceptance.gd

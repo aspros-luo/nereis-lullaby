@@ -25,6 +25,8 @@ func start_day():
 
 	print("Day %s Start" % current_day)
 
+	StoryManager.evaluate_events()
+
 	start_morning()
 
 

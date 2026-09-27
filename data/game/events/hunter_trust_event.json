@@ -2,36 +2,90 @@
   "id": "hunter_trust_event",
   "priority": 10,
   "once": true,
+  "start_day": 2,
+  "end_day": 4,
   "conditions": [
     {
       "type": "npc_permanent",
       "npc_id": "hunter",
       "key": "trust",
       "operator": ">=",
-      "value": 21
+      "value": 20
     }
   ],
   "actions": [
     {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hunter",
+      "timeline": "hunter_trust_reveal"
+    }
+  ],
+  "expire_actions": [
+    {
       "type": "set_story_flag",
-      "key": "hunter_trusted_player",
+      "key": "hunter_secret_missed",
       "value": true
     },
     {
       "type": "set_npc_permanent",
       "npc_id": "hunter",
       "key": "knows_forest_secret",
-      "value": true
-    },
+      "value": false
+    }
+  ],
+  "choices": [
     {
-      "type": "queue_npc_dialogue",
+      "id": "listen_to_hunter",
       "npc_id": "hunter",
-      "timeline": "hunter_trust_reveal"
+      "label": "认真听猎人说下去",
+      "actions": [
+        {
+          "type": "add_npc_permanent",
+          "npc_id": "hunter",
+          "key": "trust",
+          "value": 2
+        },
+        {
+          "type": "set_story_flag",
+          "key": "hunter_secret_accepted",
+          "value": true
+        },
+        {
+          "type": "queue_phase_dialogue",
+          "phase": "MORNING",
+          "timeline": "hunter_forest_warning"
+        }
+      ]
     },
     {
-      "type": "queue_phase_dialogue",
-      "phase": "MORNING",
-      "timeline": "hunter_forest_warning"
+      "id": "question_hunter",
+      "npc_id": "hunter",
+      "label": "追问森林里究竟发生过什么",
+      "actions": [
+        {
+          "type": "add_npc_permanent",
+          "npc_id": "hunter",
+          "key": "trust",
+          "value": 1
+        },
+        {
+          "type": "set_story_flag",
+          "key": "hunter_secret_questioned",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "avoid_hunter_secret",
+      "npc_id": "hunter",
+      "label": "装作没有听懂",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "hunter_secret_avoided",
+          "value": true
+        }
+      ]
     }
   ]
 }

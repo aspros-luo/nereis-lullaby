@@ -7,6 +7,7 @@ signal choice_completed(event_id:String, choice_id:String)
 
 
 const EVENTS_DIRECTORY:String = "res://data/game/events"
+const MAINLINE_STAGE_KEY:String = "mainline_stage"
 
 
 var events:Dictionary = {}
@@ -91,6 +92,26 @@ func register_event(event:StoryEvent):
 func get_event(id:String)->StoryEvent:
 
 	return events.get(id)
+
+
+func get_mainline_stage()->int:
+
+	return int(StoryState.get_flag(MAINLINE_STAGE_KEY, 0))
+
+
+func set_mainline_stage(stage:int):
+
+	var current_stage:int = get_mainline_stage()
+
+	if stage <= current_stage:
+		return
+
+	StoryState.set_flag(
+		MAINLINE_STAGE_KEY,
+		stage
+	)
+
+	print("Mainline Stage:", current_stage, "->", stage)
 
 
 func get_event_status(event_id:String)->String:
@@ -466,6 +487,11 @@ func _execute_action(action:Dictionary):
 			StoryState.set_flag(
 				action.get("key", ""),
 				action.get("value", null)
+			)
+
+		"advance_mainline_stage":
+			set_mainline_stage(
+				int(action.get("value", 0))
 			)
 
 		"set_world_value":

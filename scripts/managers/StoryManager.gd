@@ -152,14 +152,12 @@ func _resolve_expired_events():
 		if current_day <= event.end_day:
 			continue
 
-		if not check_conditions(event.conditions):
-			continue
-
 		print("Story Event Expired:", event.id)
 
 		for action in event.expire_actions:
 			_execute_action(action)
 
+		_clear_pending_choices_for_event(event.id)
 		set_event_status(event.id, "EXPIRED")
 		event_expired.emit(event.id)
 
@@ -346,6 +344,16 @@ func _queue_event_choices(event:StoryEvent):
 	choice_available.emit(npc_id, event.id)
 
 
+func _clear_pending_choices_for_event(event_id:String):
+
+	for npc_id in pending_npc_choices.keys():
+
+		var data:Dictionary = pending_npc_choices.get(npc_id, {})
+
+		if str(data.get("event_id", "")) == event_id:
+			pending_npc_choices.erase(npc_id)
+
+
 func get_npc_choices(npc_id:String)->Array:
 
 	var data:Dictionary = pending_npc_choices.get(npc_id, {})
@@ -358,12 +366,7 @@ func get_npc_choices(npc_id:String)->Array:
 
 func consume_npc_choices(npc_id:String)->Array:
 
-	var choices:Array = get_npc_choices(npc_id)
-
-	if choices.is_empty():
-		return []
-
-	return choices
+	return get_npc_choices(npc_id)
 
 
 func choose_npc_choice(npc_id:String, choice_id:String)->bool:
@@ -416,6 +419,13 @@ func execute_event_by_id(id:String)->bool:
 		return false
 
 	return execute_event(event)
+
+
+func has_npc_dialogue(npc_id:String)->bool:
+
+	return not str(
+		pending_npc_dialogues.get(npc_id, "")
+	).is_empty()
 
 
 func consume_npc_dialogue(npc_id:String)->String:

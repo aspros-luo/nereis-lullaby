@@ -44,5 +44,49 @@
       "key": "mainline_forest_investigation_missed",
       "value": true
     }
+  ],
+  "choices": [
+    {
+      "id": "touch_strange_mark",
+      "phase": "MORNING",
+      "label": "触碰树上的奇怪刻痕",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_mark_touched",
+          "value": true
+        },
+        {
+          "type": "add_world_value",
+          "key": "outer_god_progress",
+          "value": 1
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "leave_mark_alone",
+      "phase": "MORNING",
+      "label": "记住位置，但不要碰它",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_mark_untouched",
+          "value": true
+        },
+        {
+          "type": "set_story_flag",
+          "key": "forest_mark_observed",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 5
+        }
+      ]
+    }
   ]
 }

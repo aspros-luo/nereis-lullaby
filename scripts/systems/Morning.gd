@@ -2,6 +2,7 @@ extends Node
 
 
 var story_dialogue_played:bool = false
+var forest_investigation_started:bool = false
 
 
 func _ready():
@@ -68,6 +69,10 @@ func _on_story_dialogue_started(_timeline:String):
 
 func _on_story_dialogue_finished(_timeline:String):
 	_update_action_buttons()
+
+	if forest_investigation_started:
+		forest_investigation_started = false
+		enter_tavern()
 
 
 func _update_action_buttons():
@@ -148,12 +153,8 @@ func _on_forest_investigation_pressed():
 		_update_action_buttons()
 		return
 
-	await get_tree().process_frame
-
-	if NarrativeManager.is_playing:
-		return
-
-	enter_tavern()
+	forest_investigation_started = true
+	_update_action_buttons()
 
 
 func enter_tavern():

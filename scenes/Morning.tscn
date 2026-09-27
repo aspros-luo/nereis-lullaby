@@ -9,7 +9,7 @@ script = ExtResource("1_1gwy7")
 layout_mode = 3
 anchors_preset = 0
 offset_right = 500.0
-offset_bottom = 200.0
+offset_bottom = 240.0
 
 [node name="Title" type="Label" parent="UI" unique_id=1718077244]
 layout_mode = 0
@@ -47,3 +47,12 @@ offset_top = 125.0
 offset_right = 150.0
 offset_bottom = 145.0
 text = "去酒馆"
+
+[node name="ForestInvestigationButton" type="Button" parent="UI" unique_id=903117524]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 150.0
+offset_right = 180.0
+offset_bottom = 170.0
+text = "深入森林"
+visible = false

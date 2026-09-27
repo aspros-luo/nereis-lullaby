@@ -289,12 +289,10 @@ func _compare(actual, operator:String, expected)->bool:
 
 func can_trigger(event:StoryEvent)->bool:
 
-	if event == null:
+	if event == null or event.manual:
 		return false
 
-	var status:String = get_event_status(event.id)
-
-	if status == "ACTIVE" or status == "COMPLETED" or status == "EXPIRED":
+	if get_event_status(event.id) in ["ACTIVE", "COMPLETED", "EXPIRED"]:
 		return false
 
 	if event.once and StoryState.has_flag(
@@ -317,6 +315,41 @@ func execute_event(event:StoryEvent)->bool:
 
 	if not can_trigger(event):
 		return false
+
+	return _execute_event(event)
+
+
+func execute_manual_event_by_id(id:String)->bool:
+
+	var event = get_event(id)
+
+	if event == null:
+		print("Manual Story Event Missing:", id)
+		return false
+
+	if not event.manual:
+		print("Story Event Is Not Manual:", id)
+		return false
+
+	if get_event_status(id) in ["COMPLETED", "EXPIRED"]:
+		return false
+
+	if event.start_day >= 0 and GameManager.current_day < event.start_day:
+		return false
+
+	if event.end_day >= 0 and GameManager.current_day > event.end_day:
+		return false
+
+	if event.once and StoryState.has_flag("event:" + id):
+		return false
+
+	if not check_conditions(event.conditions):
+		return false
+
+	return _execute_event(event)
+
+
+func _execute_event(event:StoryEvent)->bool:
 
 	print("Story Event Execute:", event.id)
 

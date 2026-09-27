@@ -13,13 +13,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Godot 4.6.1 headless acceptance test
-        uses: firebelley/godot-version-manager@v1
-        with:
-          version: 4.6.1
-          release-type: stable
-          cache: true
-          godot-bin: godot
+      - name: Install Godot 4.6.1
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/godot"
+          curl -L --fail --retry 3 \
+            -o "$HOME/godot/godot.zip" \
+            https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
+          unzip -q "$HOME/godot/godot.zip" -d "$HOME/godot"
+          mv "$HOME/godot/Godot_v4.6.1-stable_linux.x86_64" "$HOME/godot/godot"
+          chmod +x "$HOME/godot/godot"
+          echo "$HOME/godot" >> "$GITHUB_PATH"
+          godot --version
 
       - name: Verify project parses
         run: godot --headless --path . --editor --quit --check-only

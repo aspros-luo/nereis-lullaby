@@ -6,6 +6,12 @@
   "end_day": 4,
   "conditions": [
     {
+      "type": "story_flag",
+      "key": "mainline_facade_active",
+      "operator": "==",
+      "value": true
+    },
+    {
       "type": "npc_permanent",
       "npc_id": "hunter",
       "key": "trust",
@@ -31,6 +37,11 @@
       "npc_id": "hunter",
       "key": "knows_forest_secret",
       "value": false
+    },
+    {
+      "type": "set_story_flag",
+      "key": "mainline_hunter_route_missed",
+      "value": true
     }
   ],
   "choices": [
@@ -54,6 +65,10 @@
           "type": "set_story_flag",
           "key": "hunter_forest_route_unlocked",
           "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 2
         }
       ]
     },
@@ -77,6 +92,10 @@
           "type": "set_story_flag",
           "key": "hunter_forest_route_unlocked",
           "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 2
         }
       ]
     },

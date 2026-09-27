@@ -7,6 +7,8 @@ const EVENTS_DIRECTORY:String = "res://data/game/events"
 
 
 var events:Dictionary = {}
+var pending_npc_dialogues:Dictionary = {}
+var pending_phase_dialogues:Dictionary = {}
 
 
 func _ready():
@@ -260,6 +262,34 @@ func execute_event_by_id(id:String)->bool:
 	return execute_event(event)
 
 
+func consume_npc_dialogue(npc_id:String)->String:
+
+	var timeline:String = pending_npc_dialogues.get(npc_id, "")
+
+	if timeline.is_empty():
+		return ""
+
+	pending_npc_dialogues.erase(npc_id)
+
+	print("Story NPC Dialogue Consumed:", npc_id, "->", timeline)
+
+	return timeline
+
+
+func consume_phase_dialogue(phase:String)->String:
+
+	var timeline:String = pending_phase_dialogues.get(phase, "")
+
+	if timeline.is_empty():
+		return ""
+
+	pending_phase_dialogues.erase(phase)
+
+	print("Story Phase Dialogue Consumed:", phase, "->", timeline)
+
+	return timeline
+
+
 func _execute_action(action:Dictionary):
 
 	var type:String = action.get("type", "")
@@ -289,6 +319,28 @@ func _execute_action(action:Dictionary):
 				action.get("key", ""),
 				int(action.get("value", 0))
 			)
+
+		"queue_npc_dialogue":
+			var npc_id:String = action.get("npc_id", "")
+			var timeline:String = action.get("timeline", "")
+
+			if not npc_id.is_empty() and not timeline.is_empty():
+				pending_npc_dialogues[npc_id] = timeline
+				print("Story NPC Dialogue Queued:", npc_id, "->", timeline)
+
+		"queue_phase_dialogue":
+			var phase:String = action.get("phase", "")
+			var phase_timeline:String = action.get("timeline", "")
+
+			if not phase.is_empty() and not phase_timeline.is_empty():
+				pending_phase_dialogues[phase] = phase_timeline
+				print("Story Phase Dialogue Queued:", phase, "->", phase_timeline)
+
+		"play_timeline":
+			var direct_timeline:String = action.get("timeline", "")
+
+			if not direct_timeline.is_empty():
+				NarrativeManager.play_timeline(direct_timeline)
 
 		"set_npc_permanent":
 			_set_npc_state_value(action, true, false)

@@ -1,0 +1,60 @@
+{
+  "id": "hunter_forest_route_event",
+  "priority": 20,
+  "once": true,
+  "start_day": 3,
+  "end_day": 6,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "hunter_forest_route_unlocked",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hunter",
+      "timeline": "hunter_forest_route"
+    }
+  ],
+  "expire_actions": [
+    {
+      "type": "set_story_flag",
+      "key": "hunter_forest_route_missed",
+      "value": true
+    }
+  ],
+  "choices": [
+    {
+      "id": "go_to_forest",
+      "npc_id": "hunter",
+      "label": "明天去森林看看",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_investigation_committed",
+          "value": true
+        },
+        {
+          "type": "set_story_flag",
+          "key": "forest_investigation_result_pending",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "wait_and_watch",
+      "npc_id": "hunter",
+      "label": "先观察几天再说",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_investigation_delayed",
+          "value": true
+        }
+      ]
+    }
+  ]
+}

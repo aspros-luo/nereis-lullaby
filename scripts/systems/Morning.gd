@@ -26,6 +26,10 @@ func _ready():
 		_on_tavern_pressed
 	)
 
+	$UI/ForestInvestigationButton.pressed.connect(
+		_on_forest_investigation_pressed
+	)
+
 	NarrativeManager.dialogue_started.connect(
 		_on_story_dialogue_started
 	)
@@ -75,6 +79,18 @@ func _update_action_buttons():
 	$UI/LivestockButton.disabled = locked
 	$UI/TavernButton.disabled = locked
 
+	$UI/ForestInvestigationButton.visible = (
+		StoryState.get_flag(
+			"forest_investigation_result_pending",
+			false
+		)
+	)
+
+	$UI/ForestInvestigationButton.disabled = (
+		locked
+		or not $UI/ForestInvestigationButton.visible
+	)
+
 
 func _on_forest_pressed():
 
@@ -113,6 +129,26 @@ func _on_livestock_pressed():
 
 
 func _on_tavern_pressed():
+
+	if NarrativeManager.is_playing:
+		return
+
+	enter_tavern()
+
+
+func _on_forest_investigation_pressed():
+
+	if NarrativeManager.is_playing:
+		return
+
+	if not StoryManager.execute_manual_event_by_id(
+		"forest_investigation_event"
+	):
+		print("Forest Investigation unavailable")
+		_update_action_buttons()
+		return
+
+	await get_tree().process_frame
 
 	if NarrativeManager.is_playing:
 		return

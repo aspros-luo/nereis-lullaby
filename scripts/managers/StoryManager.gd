@@ -4,6 +4,8 @@ signal event_executed(event_id:String)
 signal event_expired(event_id:String)
 signal choice_available(npc_id:String, event_id:String)
 signal choice_completed(event_id:String, choice_id:String)
+signal phase_choice_available(phase:String, event_id:String)
+signal phase_choice_completed(phase:String, event_id:String, choice_id:String)
 
 
 const EVENTS_DIRECTORY:String = "res://data/game/events"
@@ -14,6 +16,7 @@ var events:Dictionary = {}
 var pending_npc_dialogues:Dictionary = {}
 var pending_phase_dialogues:Dictionary = {}
 var pending_npc_choices:Dictionary = {}
+var pending_phase_choices:Dictionary = {}
 
 
 func _ready():
@@ -106,10 +109,7 @@ func set_mainline_stage(stage:int):
 	if stage <= current_stage:
 		return
 
-	StoryState.set_flag(
-		MAINLINE_STAGE_KEY,
-		stage
-	)
+	StoryState.set_flag(MAINLINE_STAGE_KEY, stage)
 
 	print("Mainline Stage:", current_stage, "->", stage)
 
@@ -380,22 +380,38 @@ func _complete_event(event:StoryEvent):
 
 func _queue_event_choices(event:StoryEvent):
 
-	var npc_id:String = ""
-
-	if not event.choices.is_empty():
-		npc_id = str(event.choices[0].get("npc_id", ""))
-
-	if npc_id.is_empty():
-		print("Story Event Choice NPC Missing:", event.id)
+	if event.choices.is_empty():
 		return
 
-	pending_npc_choices[npc_id] = {
+	var npc_id:String = str(
+		event.choices[0].get("npc_id", "")
+	)
+
+	if not npc_id.is_empty():
+		pending_npc_choices[npc_id] = {
+			"event_id": event.id,
+			"choices": event.choices
+		}
+
+		print("Story Choices Available:", npc_id, "->", event.id)
+		choice_available.emit(npc_id, event.id)
+		return
+
+	var phase:String = str(
+		event.choices[0].get("phase", "")
+	)
+
+	if phase.is_empty():
+		print("Story Event Choice Target Missing:", event.id)
+		return
+
+	pending_phase_choices[phase] = {
 		"event_id": event.id,
 		"choices": event.choices
 	}
 
-	print("Story Choices Available:", npc_id, "->", event.id)
-	choice_available.emit(npc_id, event.id)
+	print("Story Phase Choices Available:", phase, "->", event.id)
+	phase_choice_available.emit(phase, event.id)
 
 
 func _clear_pending_choices_for_event(event_id:String):
@@ -406,6 +422,13 @@ func _clear_pending_choices_for_event(event_id:String):
 
 		if str(data.get("event_id", "")) == event_id:
 			pending_npc_choices.erase(npc_id)
+
+	for phase in pending_phase_choices.keys():
+
+		var phase_data:Dictionary = pending_phase_choices.get(phase, {})
+
+		if str(phase_data.get("event_id", "")) == event_id:
+			pending_phase_choices.erase(phase)
 
 
 func get_npc_choices(npc_id:String)->Array:
@@ -460,6 +483,57 @@ func choose_npc_choice(npc_id:String, choice_id:String)->bool:
 	pending_npc_choices.erase(npc_id)
 	_complete_event(event)
 	choice_completed.emit(event_id, choice_id)
+
+	return true
+
+
+func get_phase_choices(phase:String)->Array:
+
+	var data:Dictionary = pending_phase_choices.get(phase, {})
+
+	if data.is_empty():
+		return []
+
+	return data.get("choices", [])
+
+
+func choose_phase_choice(phase:String, choice_id:String)->bool:
+
+	var data:Dictionary = pending_phase_choices.get(phase, {})
+
+	if data.is_empty():
+		return false
+
+	var event_id:String = str(data.get("event_id", ""))
+	var event = get_event(event_id)
+
+	if event == null or get_event_status(event_id) != "ACTIVE":
+		pending_phase_choices.erase(phase)
+		return false
+
+	var selected:Dictionary = {}
+
+	for choice in data.get("choices", []):
+		if str(choice.get("id", "")) == choice_id:
+			selected = choice
+			break
+
+	if selected.is_empty():
+		return false
+
+	var conditions:Array = selected.get("conditions", [])
+
+	if not conditions.is_empty() and not check_conditions(conditions):
+		return false
+
+	print("Story Phase Choice Selected:", phase, "->", event_id, "->", choice_id)
+
+	for action in selected.get("actions", []):
+		_execute_action(action)
+
+	pending_phase_choices.erase(phase)
+	_complete_event(event)
+	phase_choice_completed.emit(phase, event_id, choice_id)
 
 	return true
 

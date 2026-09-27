@@ -24,6 +24,11 @@
       "type": "set_story_flag",
       "key": "hunter_forest_route_missed",
       "value": true
+    },
+    {
+      "type": "set_story_flag",
+      "key": "mainline_forest_route_missed",
+      "value": true
     }
   ],
   "choices": [
@@ -41,6 +46,10 @@
           "type": "set_story_flag",
           "key": "forest_investigation_result_pending",
           "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 3
         }
       ]
     },

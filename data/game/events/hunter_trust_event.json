@@ -1,0 +1,27 @@
+{
+  "id": "hunter_trust_event",
+  "priority": 10,
+  "once": true,
+  "conditions": [
+    {
+      "type": "npc_permanent",
+      "npc_id": "hunter",
+      "key": "trust",
+      "operator": ">=",
+      "value": 21
+    }
+  ],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "hunter_trusted_player",
+      "value": true
+    },
+    {
+      "type": "set_npc_permanent",
+      "npc_id": "hunter",
+      "key": "knows_forest_secret",
+      "value": true
+    }
+  ]
+}

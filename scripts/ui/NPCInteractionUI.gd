@@ -7,56 +7,39 @@ var current_npc_id:String = ""
 @onready var name_label=$Panel/VBoxContainer/NameLabel
 
 
-
 func _ready():
 
-
 	hide()
-
 
 	$Panel/VBoxContainer/TalkButton.pressed.connect(
 		_on_talk_pressed
 	)
 
-
 	$Panel/VBoxContainer/NormalDrinkButton.pressed.connect(
 		_on_normal_drink_pressed
 	)
-
 
 	$Panel/VBoxContainer/SpecialDrinkButton.pressed.connect(
 		_on_special_drink_pressed
 	)
 
-
 	$Panel/VBoxContainer/StatusButton.pressed.connect(
 		_on_status_pressed
 	)
-
 
 	$Panel/VBoxContainer/CloseButton.pressed.connect(
 		close
 	)
 
 
-
-
-
 func open(id:String):
-
 
 	current_npc_id=id
 
-
 	var npc = NPCManager.get_npc(id)
 
-
 	if npc:
-
-
 		name_label.text = npc.npc_name
-
-
 
 	show()
 
@@ -70,20 +53,28 @@ func open(id:String):
 	)
 
 
-
-
-
 func _on_talk_pressed():
-
 
 	print(
 		"Talk:",
 		current_npc_id
 	)
 
+	var story_timeline:String = StoryManager.consume_npc_dialogue(
+		current_npc_id
+	)
+
+	if not story_timeline.is_empty():
+		print(
+			"Story Dialogue:",
+			current_npc_id,
+			"->",
+			story_timeline
+		)
+		NarrativeManager.play_timeline(story_timeline)
+		return
 
 	var result = NPCInteractionSystem.talk()
-
 
 	print(
 		"Result:",
@@ -91,22 +82,16 @@ func _on_talk_pressed():
 	)
 
 
-
-
-
 func _on_normal_drink_pressed():
-
 
 	print(
 		"Serve normal drink:",
 		current_npc_id
 	)
 
-
 	var result = NPCInteractionSystem.drink(
 		"normal"
 	)
-
 
 	print(
 		"Result:",
@@ -114,22 +99,16 @@ func _on_normal_drink_pressed():
 	)
 
 
-
-
-
 func _on_special_drink_pressed():
-
 
 	print(
 		"Serve special drink:",
 		current_npc_id
 	)
 
-
 	var result = NPCInteractionSystem.drink(
 		"special"
 	)
-
 
 	print(
 		"Result:",
@@ -137,11 +116,7 @@ func _on_special_drink_pressed():
 	)
 
 
-
-
-
 func _on_status_pressed():
-
 
 	print(
 		"Check NPC:",
@@ -150,18 +125,9 @@ func _on_status_pressed():
 
 	NPCInteractionSystem.debug()
 
-	#NPCManager.debug_npc(
-		#current_npc_id
-	#)
-
-
-
-
 
 func close():
 
-
 	hide()
-
 
 	NPCInteractionSystem.end()

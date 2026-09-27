@@ -86,19 +86,8 @@ func _on_talk_pressed():
 	if NarrativeManager.is_playing:
 		return
 
-	var choices:Array = StoryManager.get_npc_choices(
-		current_npc_id
-	)
-
-	if not choices.is_empty():
-		_refresh_choice_ui()
-		return
-
-	print(
-		"Talk:",
-		current_npc_id
-	)
-
+	# 剧情事件可以先安排一段 NPC 对话，再把选择交给玩家。
+	# 因此必须优先消费剧情对话，而不是因为后面已有 choices 就提前锁死 Talk。
 	var story_timeline:String = StoryManager.consume_npc_dialogue(
 		current_npc_id
 	)
@@ -112,6 +101,19 @@ func _on_talk_pressed():
 		)
 		NarrativeManager.play_timeline(story_timeline)
 		return
+
+	var choices:Array = StoryManager.get_npc_choices(
+		current_npc_id
+	)
+
+	if not choices.is_empty():
+		_refresh_choice_ui()
+		return
+
+	print(
+		"Talk:",
+		current_npc_id
+	)
 
 	var result = NPCInteractionSystem.talk()
 
@@ -127,6 +129,9 @@ func _on_normal_drink_pressed():
 		return
 
 	if not StoryManager.get_npc_choices(current_npc_id).is_empty():
+		return
+
+	if StoryManager.has_npc_dialogue(current_npc_id):
 		return
 
 	print(
@@ -152,6 +157,9 @@ func _on_special_drink_pressed():
 	if not StoryManager.get_npc_choices(current_npc_id).is_empty():
 		return
 
+	if StoryManager.has_npc_dialogue(current_npc_id):
+		return
+
 	print(
 		"Serve special drink:",
 		current_npc_id
@@ -173,6 +181,9 @@ func _on_status_pressed():
 		return
 
 	if not StoryManager.get_npc_choices(current_npc_id).is_empty():
+		return
+
+	if StoryManager.has_npc_dialogue(current_npc_id):
 		return
 
 	print(
@@ -254,18 +265,23 @@ func _update_interaction_buttons():
 	var has_choices:bool = not StoryManager.get_npc_choices(
 		current_npc_id
 	).is_empty()
+	var has_story_dialogue:bool = StoryManager.has_npc_dialogue(
+		current_npc_id
+	)
 
-	talk_button.disabled = locked or has_choices
-	normal_drink_button.disabled = locked or has_choices
-	special_drink_button.disabled = locked or has_choices
-	status_button.disabled = locked or has_choices
+	# 剧情 NPC 对话必须允许玩家主动点 Talk 才能开始。
+	# 只有在没有剧情对话时，普通互动才会被 choices 锁住。
+	talk_button.disabled = locked
+	normal_drink_button.disabled = locked or has_choices or has_story_dialogue
+	special_drink_button.disabled = locked or has_choices or has_story_dialogue
+	status_button.disabled = locked or has_choices or has_story_dialogue
 
 	# 对话或剧情选择进行中不能关闭 NPC 交互窗口。
-	close_button.disabled = locked or has_choices
+	close_button.disabled = locked or has_choices or has_story_dialogue
 
 	for button in choice_buttons:
 		if is_instance_valid(button):
-			button.disabled = locked
+			button.disabled = locked or has_story_dialogue
 
 
 func close():
@@ -274,6 +290,9 @@ func close():
 		return
 
 	if not StoryManager.get_npc_choices(current_npc_id).is_empty():
+		return
+
+	if StoryManager.has_npc_dialogue(current_npc_id):
 		return
 
 	hide()

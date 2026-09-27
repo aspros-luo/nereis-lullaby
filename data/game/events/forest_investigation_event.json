@@ -1,0 +1,48 @@
+{
+  "id": "forest_investigation_event",
+  "priority": 50,
+  "once": true,
+  "manual": true,
+  "start_day": 3,
+  "end_day": 6,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "forest_investigation_committed",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "forest_investigation_started",
+      "value": true
+    },
+    {
+      "type": "set_story_flag",
+      "key": "forest_investigation_result_pending",
+      "value": false
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 4
+    },
+    {
+      "type": "play_timeline",
+      "timeline": "hunter_forest_route"
+    }
+  ],
+  "expire_actions": [
+    {
+      "type": "set_story_flag",
+      "key": "forest_investigation_expired",
+      "value": true
+    },
+    {
+      "type": "set_story_flag",
+      "key": "mainline_forest_investigation_missed",
+      "value": true
+    }
+  ]
+}

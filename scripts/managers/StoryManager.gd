@@ -3,6 +3,9 @@ extends Node
 signal event_executed(event_id:String)
 
 
+const EVENTS_DIRECTORY:String = "res://data/game/events"
+
+
 var events:Dictionary = {}
 
 
@@ -14,8 +17,40 @@ func _ready():
 
 func load_default_events():
 
-	load_event("res://data/game/events/test_event.json")
-	load_event("res://data/game/events/hunter_trust_event.json")
+	events.clear()
+	load_event_directory(EVENTS_DIRECTORY)
+
+
+func load_event_directory(path:String):
+
+	var directory = DirAccess.open(path)
+
+	if directory == null:
+		print("Story Event Directory Missing:", path)
+		return
+
+	var files:Array[String] = []
+
+	directory.list_dir_begin()
+
+	while true:
+
+		var entry:String = directory.get_next()
+
+		if entry.is_empty():
+			break
+
+		if directory.current_is_dir():
+			continue
+
+		if entry.ends_with(".json"):
+			files.append(entry)
+
+	directory.list_dir_end()
+	files.sort()
+
+	for file_name in files:
+		load_event(path.path_join(file_name))
 
 
 func load_event(path:String):

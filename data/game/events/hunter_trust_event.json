@@ -51,9 +51,9 @@
           "value": true
         },
         {
-          "type": "queue_phase_dialogue",
-          "phase": "MORNING",
-          "timeline": "hunter_forest_warning"
+          "type": "set_story_flag",
+          "key": "hunter_forest_route_unlocked",
+          "value": true
         }
       ]
     },
@@ -71,6 +71,11 @@
         {
           "type": "set_story_flag",
           "key": "hunter_secret_questioned",
+          "value": true
+        },
+        {
+          "type": "set_story_flag",
+          "key": "hunter_forest_route_unlocked",
           "value": true
         }
       ]

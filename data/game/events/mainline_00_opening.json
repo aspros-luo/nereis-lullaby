@@ -1,0 +1,19 @@
+{
+  "id": "mainline_00_opening",
+  "priority": 100,
+  "once": true,
+  "start_day": 1,
+  "end_day": 1,
+  "conditions": [],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 1
+    },
+    {
+      "type": "set_story_flag",
+      "key": "mainline_facade_active",
+      "value": true
+    }
+  ]
+}

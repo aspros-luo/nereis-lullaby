@@ -22,6 +22,16 @@
       "npc_id": "hunter",
       "key": "knows_forest_secret",
       "value": true
+    },
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hunter",
+      "timeline": "hunter_trust_reveal"
+    },
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "hunter_forest_warning"
     }
   ]
 }

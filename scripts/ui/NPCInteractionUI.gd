@@ -5,31 +5,46 @@ var current_npc_id:String = ""
 
 
 @onready var name_label=$Panel/VBoxContainer/NameLabel
+@onready var talk_button=$Panel/VBoxContainer/TalkButton
+@onready var normal_drink_button=$Panel/VBoxContainer/NormalDrinkButton
+@onready var special_drink_button=$Panel/VBoxContainer/SpecialDrinkButton
+@onready var status_button=$Panel/VBoxContainer/StatusButton
+@onready var close_button=$Panel/VBoxContainer/CloseButton
 
 
 func _ready():
 
 	hide()
 
-	$Panel/VBoxContainer/TalkButton.pressed.connect(
+	talk_button.pressed.connect(
 		_on_talk_pressed
 	)
 
-	$Panel/VBoxContainer/NormalDrinkButton.pressed.connect(
+	normal_drink_button.pressed.connect(
 		_on_normal_drink_pressed
 	)
 
-	$Panel/VBoxContainer/SpecialDrinkButton.pressed.connect(
+	special_drink_button.pressed.connect(
 		_on_special_drink_pressed
 	)
 
-	$Panel/VBoxContainer/StatusButton.pressed.connect(
+	status_button.pressed.connect(
 		_on_status_pressed
 	)
 
-	$Panel/VBoxContainer/CloseButton.pressed.connect(
+	close_button.pressed.connect(
 		close
 	)
+
+	NarrativeManager.dialogue_started.connect(
+		_on_story_dialogue_started
+	)
+
+	NarrativeManager.dialogue_finished.connect(
+		_on_story_dialogue_finished
+	)
+
+	_update_interaction_buttons()
 
 
 func open(id:String):
@@ -52,8 +67,13 @@ func open(id:String):
 		id
 	)
 
+	_update_interaction_buttons()
+
 
 func _on_talk_pressed():
+
+	if NarrativeManager.is_playing:
+		return
 
 	print(
 		"Talk:",
@@ -84,6 +104,9 @@ func _on_talk_pressed():
 
 func _on_normal_drink_pressed():
 
+	if NarrativeManager.is_playing:
+		return
+
 	print(
 		"Serve normal drink:",
 		current_npc_id
@@ -100,6 +123,9 @@ func _on_normal_drink_pressed():
 
 
 func _on_special_drink_pressed():
+
+	if NarrativeManager.is_playing:
+		return
 
 	print(
 		"Serve special drink:",
@@ -118,6 +144,9 @@ func _on_special_drink_pressed():
 
 func _on_status_pressed():
 
+	if NarrativeManager.is_playing:
+		return
+
 	print(
 		"Check NPC:",
 		current_npc_id
@@ -126,7 +155,31 @@ func _on_status_pressed():
 	NPCInteractionSystem.debug()
 
 
+func _on_story_dialogue_started(_timeline:String):
+	_update_interaction_buttons()
+
+
+func _on_story_dialogue_finished(_timeline:String):
+	_update_interaction_buttons()
+
+
+func _update_interaction_buttons():
+
+	var locked:bool = NarrativeManager.is_playing
+
+	talk_button.disabled = locked
+	normal_drink_button.disabled = locked
+	special_drink_button.disabled = locked
+	status_button.disabled = locked
+
+	# 对话进行中不能关闭 NPC 交互窗口，避免剧情状态被玩家打断。
+	close_button.disabled = locked
+
+
 func close():
+
+	if NarrativeManager.is_playing:
+		return
 
 	hide()
 

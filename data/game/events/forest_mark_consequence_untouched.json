@@ -1,0 +1,38 @@
+{
+  "id": "forest_mark_consequence_untouched",
+  "priority": 70,
+  "once": true,
+  "manual": false,
+  "start_day": 4,
+  "end_day": 4,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "forest_mark_untouched",
+      "operator": "==",
+      "value": true
+    },
+    {
+      "type": "story_flag",
+      "key": "forest_investigation_started",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 6
+    },
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "forest_mark_untouched_consequence"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "forest_mark_consequence_seen",
+      "value": true
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "forest_mark_hero_anomaly",
+  "priority": 80,
+  "once": true,
+  "manual": false,
+  "start_day": 4,
+  "end_day": 7,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "forest_investigation_started",
+      "operator": "==",
+      "value": true
+    },
+    {
+      "type": "story_flag",
+      "key": "forest_mark_touched",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "hero_mark_anomaly_seen",
+      "value": true
+    },
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "hero_mark_anomaly"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 6
+    }
+  ]
+}

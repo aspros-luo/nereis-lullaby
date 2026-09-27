@@ -26,6 +26,15 @@ func _ready():
 		_on_tavern_pressed
 	)
 
+	NarrativeManager.dialogue_started.connect(
+		_on_story_dialogue_started
+	)
+
+	NarrativeManager.dialogue_finished.connect(
+		_on_story_dialogue_finished
+	)
+
+	_update_action_buttons()
 	_play_pending_story_dialogue()
 
 
@@ -49,7 +58,28 @@ func _play_pending_story_dialogue():
 	NarrativeManager.play_timeline(timeline)
 
 
+func _on_story_dialogue_started(_timeline:String):
+	_update_action_buttons()
+
+
+func _on_story_dialogue_finished(_timeline:String):
+	_update_action_buttons()
+
+
+func _update_action_buttons():
+
+	var locked:bool = NarrativeManager.is_playing
+
+	$UI/ForestButton.disabled = locked
+	$UI/FarmButton.disabled = locked
+	$UI/LivestockButton.disabled = locked
+	$UI/TavernButton.disabled = locked
+
+
 func _on_forest_pressed():
+
+	if NarrativeManager.is_playing:
+		return
 
 	ActionManager.execute_action(
 		ActionManager.Action.FOREST
@@ -60,6 +90,9 @@ func _on_forest_pressed():
 
 func _on_farm_pressed():
 
+	if NarrativeManager.is_playing:
+		return
+
 	ActionManager.execute_action(
 		ActionManager.Action.FARM
 	)
@@ -69,6 +102,9 @@ func _on_farm_pressed():
 
 func _on_livestock_pressed():
 
+	if NarrativeManager.is_playing:
+		return
+
 	ActionManager.execute_action(
 		ActionManager.Action.LIVESTOCK
 	)
@@ -77,6 +113,9 @@ func _on_livestock_pressed():
 
 
 func _on_tavern_pressed():
+
+	if NarrativeManager.is_playing:
+		return
 
 	enter_tavern()
 

@@ -3,216 +3,72 @@ extends Node
 
 var current_npc:NPCBase = null
 
-
-
 signal interaction_result(result)
 
-
-
-# =========================
-# 开始交互
-# =========================
-
-func start_interaction(
-	id:String
-):
-
-
+func start_interaction(id:String):
 	current_npc = NPCManager.get_npc(id)
 
-
-
 	if current_npc == null:
-
-
-		print(
-			"NPC Missing:",
-			id
-		)
-
+		print("NPC Missing:", id)
 		return
 
-
-
-	print(
-		"Start Interaction:",
-		current_npc.npc_name
-	)
-
-
+	print("Start Interaction:", current_npc.npc_name)
 	show_options()
 
-
-
-
-
-# =========================
-# 显示选项
-# =========================
-
 func show_options():
-
-
 	if current_npc == null:
-
 		return
 
-
-	print(
-		"Interaction Options:"
-	)
-
-	print(
-		"1. Talk"
-	)
-
-	print(
-		"2. Drink"
-	)
-
-	print(
-		"3. Special"
-	)
-
-
-
-
-
-# =========================
-# 对话
-# =========================
+	print("Interaction Options:")
+	print("1. Talk")
+	print("2. Drink")
+	print("3. Special")
 
 func talk():
-
-
 	if current_npc == null:
-
 		return
 
+	var npc_id:String = current_npc.id
 
+	if StoryManager.has_npc_dialogue(npc_id):
+		var timeline:String = StoryManager.consume_npc_dialogue(npc_id)
+		print("Story NPC Dialogue:", npc_id, "->", timeline)
+		NarrativeManager.play_timeline(timeline)
+		interaction_result.emit("story:" + timeline)
+		return timeline
 
 	var result = current_npc.talk()
-
-
-
-	print(
-		"Talk Result:",
-		result
-	)
-
-
-	interaction_result.emit(
-		result
-	)
-
-
-
+	print("Talk Result:", result)
+	interaction_result.emit(result)
 	return result
 
-
-
-
-
-# =========================
-# 喝酒
-# =========================
-
-func drink(
-	type:String="normal"
-):
-
-
+func drink(type:String="normal"):
 	if current_npc == null:
-
 		return
 
-
-
-	var result = current_npc.drink(
-		type
-	)
-
-
-
-	print(
-		"Drink Result:",
-		result
-	)
-
-
-	interaction_result.emit(
-		result
-	)
-
-
-
+	var result = current_npc.drink(type)
+	print("Drink Result:", result)
+	interaction_result.emit(result)
 	return result
-
-
-
-
-
-# =========================
-# 特殊行为
-# =========================
 
 func special():
-
-
 	if current_npc == null:
-
 		return
-
-
 
 	var result = current_npc.trade()
-
-
-
-	print(
-		"Special Result:",
-		result
-	)
-
-
-	interaction_result.emit(
-		result
-	)
-
-
-
+	print("Special Result:", result)
+	interaction_result.emit(result)
 	return result
 
-
 func debug():
-
 	if current_npc == null:
-
 		return
-
 
 	print("================")
 	print(current_npc.npc_name)
-
-	print(
-		"Permanent:",
-		current_npc.state.permanent
-	)
-
-
-	print(
-		"Temporary:",
-		current_npc.state.temporary
-	)
-
+	print("Permanent:", current_npc.state.permanent)
+	print("Temporary:", current_npc.state.temporary)
 	print("================")
 
-
-# =========================
-# 结束
-# =========================
-
 func end():
-
-
-	current_npc=null
+	current_npc = null

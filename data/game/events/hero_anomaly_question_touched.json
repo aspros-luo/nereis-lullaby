@@ -1,0 +1,42 @@
+{
+  "id": "hero_anomaly_question_touched",
+  "priority": 100,
+  "once": true,
+  "manual": false,
+  "start_day": 5,
+  "end_day": 6,
+  "conditions": [
+    {"type":"story_flag","key":"hero_anomaly_followup_queued","operator":"==","value":true},
+    {"type":"story_flag","key":"forest_mark_touched","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"queue_npc_dialogue","npc_id":"hero","timeline":"hero_anomaly_question_touched"},
+    {"type":"advance_mainline_stage","value":7}
+  ],
+  "expire_actions": [
+    {"type":"set_story_flag","key":"hero_anomaly_question_missed","value":true}
+  ],
+  "choices": [
+    {
+      "id":"tell_hero_about_mark",
+      "npc_id":"hero",
+      "label":"告诉他森林里的刻痕",
+      "actions":[
+        {"type":"set_story_flag","key":"hero_truth_shared","value":true},
+        {"type":"add_npc_permanent","npc_id":"hero","key":"memory","value":1},
+        {"type":"add_world_value","key":"hero_humanity","value":-1},
+        {"type":"advance_mainline_stage","value":8}
+      ]
+    },
+    {
+      "id":"deny_everything",
+      "npc_id":"hero",
+      "label":"什么都不说",
+      "actions":[
+        {"type":"set_story_flag","key":"hero_truth_hidden","value":true},
+        {"type":"add_npc_permanent","npc_id":"hero","key":"trust","value":1},
+        {"type":"advance_mainline_stage","value":8}
+      ]
+    }
+  ]
+}

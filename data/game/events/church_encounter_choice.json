@@ -1,0 +1,40 @@
+{
+  "id": "church_encounter_choice",
+  "priority": 110,
+  "once": true,
+  "manual": false,
+  "start_day": 9,
+  "end_day": 10,
+  "conditions": [
+    {"type":"story_flag","key":"church_shadow_started","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"set_story_flag","key":"church_encounter_available","value":true}
+  ],
+  "expire_actions": [
+    {"type":"set_story_flag","key":"church_encounter_missed","value":true}
+  ],
+  "choices": [
+    {
+      "id":"follow_church_patrol",
+      "phase":"MORNING",
+      "label":"跟随教会巡逻队",
+      "actions":[
+        {"type":"set_story_flag","key":"followed_church_patrol","value":true},
+        {"type":"set_world_value","key":"church_truth","value":1},
+        {"type":"advance_mainline_stage","value":10},
+        {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"church_patrol_follow"}
+      ]
+    },
+    {
+      "id":"avoid_church_patrol",
+      "phase":"MORNING",
+      "label":"避开教会巡逻队",
+      "actions":[
+        {"type":"set_story_flag","key":"avoided_church_patrol","value":true},
+        {"type":"advance_mainline_stage","value":10},
+        {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"church_patrol_avoid"}
+      ]
+    }
+  ]
+}

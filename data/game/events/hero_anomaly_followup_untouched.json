@@ -1,0 +1,16 @@
+{
+  "id": "hero_anomaly_followup_untouched",
+  "priority": 90,
+  "once": true,
+  "manual": false,
+  "start_day": 5,
+  "end_day": 8,
+  "conditions": [
+    {"type":"story_flag","key":"hero_mark_anomaly_seen","operator":"==","value":true},
+    {"type":"story_flag","key":"forest_mark_untouched","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"queue_npc_dialogue","npc_id":"hero","timeline":"hero_notices_mark_untouched"},
+    {"type":"set_story_flag","key":"hero_anomaly_followup_queued","value":true}
+  ]
+}

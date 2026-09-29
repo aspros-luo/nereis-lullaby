@@ -1,0 +1,19 @@
+{
+  "id": "church_shadow_hidden",
+  "priority": 100,
+  "once": true,
+  "manual": false,
+  "start_day": 7,
+  "end_day": 9,
+  "conditions": [
+    {"type":"story_flag","key":"hero_truth_hidden","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"church_shadow_hidden"},
+    {"type":"set_story_flag","key":"church_shadow_started","value":true},
+    {"type":"advance_mainline_stage","value":9}
+  ],
+  "expire_actions": [
+    {"type":"set_story_flag","key":"church_shadow_missed","value":true}
+  ]
+}

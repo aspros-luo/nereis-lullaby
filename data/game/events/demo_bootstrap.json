@@ -1,0 +1,20 @@
+{
+  "id": "demo_bootstrap",
+  "priority": 1000,
+  "once": true,
+  "manual": false,
+  "start_day": 1,
+  "end_day": 1,
+  "conditions": [],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "mainline_facade_active",
+      "value": true
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 1
+    }
+  ]
+}

@@ -7,69 +7,37 @@ var phase_choice_buttons:Array[Button] = []
 
 
 func _ready():
+	print("Morning Scene Loaded")
 
-	print(
-		"Morning Scene Loaded"
-	)
+	$UI/ForestButton.pressed.connect(_on_forest_pressed)
+	$UI/FarmButton.pressed.connect(_on_farm_pressed)
+	$UI/LivestockButton.pressed.connect(_on_livestock_pressed)
+	$UI/TavernButton.pressed.connect(_on_tavern_pressed)
+	$UI/ForestInvestigationButton.pressed.connect(_on_forest_investigation_pressed)
 
-	$UI/ForestButton.pressed.connect(
-		_on_forest_pressed
-	)
+	NarrativeManager.dialogue_started.connect(_on_story_dialogue_started)
+	NarrativeManager.dialogue_finished.connect(_on_story_dialogue_finished)
 
-	$UI/FarmButton.pressed.connect(
-		_on_farm_pressed
-	)
+	StoryManager.phase_choice_available.connect(_on_phase_choice_available)
+	StoryManager.phase_choice_completed.connect(_on_phase_choice_completed)
 
-	$UI/LivestockButton.pressed.connect(
-		_on_livestock_pressed
-	)
-
-	$UI/TavernButton.pressed.connect(
-		_on_tavern_pressed
-	)
-
-	$UI/ForestInvestigationButton.pressed.connect(
-		_on_forest_investigation_pressed
-	)
-
-	NarrativeManager.dialogue_started.connect(
-		_on_story_dialogue_started
-	)
-
-	NarrativeManager.dialogue_finished.connect(
-		_on_story_dialogue_finished
-	)
-
-	StoryManager.phase_choice_available.connect(
-		_on_phase_choice_available
-	)
-
-	StoryManager.phase_choice_completed.connect(
-		_on_phase_choice_completed
-	)
-
+	_apply_action_feedback()
 	_update_action_buttons()
 	_refresh_phase_choice_ui()
 	_play_pending_story_dialogue()
 
 
 func _play_pending_story_dialogue():
-
 	if story_dialogue_played:
 		return
 
 	story_dialogue_played = true
-
 	var timeline:String = StoryManager.consume_phase_dialogue("MORNING")
 
 	if timeline.is_empty():
 		return
 
-	print(
-		"Story Morning Dialogue:",
-		timeline
-	)
-
+	print("Story Morning Dialogue:", timeline)
 	NarrativeManager.play_timeline(timeline)
 
 
@@ -84,7 +52,6 @@ func _on_story_dialogue_finished(_timeline:String):
 
 
 func _on_phase_choice_available(phase:String, _event_id:String):
-
 	if phase != "MORNING":
 		return
 
@@ -92,22 +59,11 @@ func _on_phase_choice_available(phase:String, _event_id:String):
 	_update_action_buttons()
 
 
-func _on_phase_choice_completed(
-	phase:String,
-	event_id:String,
-	choice_id:String
-):
-
+func _on_phase_choice_completed(phase:String, event_id:String, choice_id:String):
 	if phase != "MORNING":
 		return
 
-	print(
-		"Morning Story Choice Completed:",
-		event_id,
-		"->",
-		choice_id
-	)
-
+	print("Morning Story Choice Completed:", event_id, "->", choice_id)
 	_refresh_phase_choice_ui()
 	_update_action_buttons()
 
@@ -117,7 +73,6 @@ func _on_phase_choice_completed(
 
 
 func _refresh_phase_choice_ui():
-
 	for button in phase_choice_buttons:
 		if is_instance_valid(button):
 			button.queue_free()
@@ -127,33 +82,46 @@ func _refresh_phase_choice_ui():
 	var choices:Array = StoryManager.get_phase_choices("MORNING")
 
 	for choice in choices:
-
 		var button := Button.new()
-		button.text = str(
-			choice.get("label", choice.get("id", "选择"))
-		)
-		button.custom_minimum_size = Vector2(220.0, 28.0)
+		button.text = str(choice.get("label", choice.get("id", "选择")))
+		button.custom_minimum_size = Vector2(220.0, 32.0)
+		button.focus_mode = Control.FOCUS_NONE
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.add_theme_color_override("font_color", Color("eadfc8"))
+		button.add_theme_color_override("font_hover_color", Color("fff1c8"))
 
-		button.pressed.connect(
-			_on_phase_choice_pressed.bind(
-				str(choice.get("id", ""))
-			)
-		)
+		button.pressed.connect(_on_phase_choice_pressed.bind(str(choice.get("id", ""))))
+		button.mouse_entered.connect(_on_choice_hover.bind(button))
+		button.mouse_exited.connect(_on_choice_exit.bind(button))
 
 		$UI.add_child(button)
 		phase_choice_buttons.append(button)
 
 		var index:int = phase_choice_buttons.size() - 1
-		button.position = Vector2(
-			100.0,
-			180.0 + index * 32.0
-		)
+		button.position = Vector2(100.0, 180.0 + index * 38.0)
 
 	_update_phase_choice_buttons()
 
 
-func _update_phase_choice_buttons():
+func _on_choice_hover(button:Button):
+	if button.disabled:
+		return
 
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "scale", Vector2(1.025, 1.025), 0.1)
+
+
+func _on_choice_exit(button:Button):
+	if not is_instance_valid(button):
+		return
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "scale", Vector2.ONE, 0.1)
+
+
+func _update_phase_choice_buttons():
 	var locked:bool = NarrativeManager.is_playing
 
 	for button in phase_choice_buttons:
@@ -162,110 +130,100 @@ func _update_phase_choice_buttons():
 
 
 func _on_phase_choice_pressed(choice_id:String):
-
 	if NarrativeManager.is_playing:
 		return
 
-	if StoryManager.choose_phase_choice(
-		"MORNING",
-		choice_id
-	):
+	if StoryManager.choose_phase_choice("MORNING", choice_id):
 		_refresh_phase_choice_ui()
 		_update_action_buttons()
 
 
 func _update_action_buttons():
-
 	var locked:bool = NarrativeManager.is_playing
-	var has_phase_choices:bool = not StoryManager.get_phase_choices(
-		"MORNING"
-	).is_empty()
+	var has_phase_choices:bool = not StoryManager.get_phase_choices("MORNING").is_empty()
 
 	$UI/ForestButton.disabled = locked or has_phase_choices
 	$UI/FarmButton.disabled = locked or has_phase_choices
 	$UI/LivestockButton.disabled = locked or has_phase_choices
 	$UI/TavernButton.disabled = locked or has_phase_choices
 
-	$UI/ForestInvestigationButton.visible = (
-		StoryState.get_flag(
-			"forest_investigation_result_pending",
-			false
-		)
-	)
-
-	$UI/ForestInvestigationButton.disabled = (
-		locked
-		or has_phase_choices
-		or not $UI/ForestInvestigationButton.visible
-	)
+	$UI/ForestInvestigationButton.visible = StoryState.get_flag("forest_investigation_result_pending", false)
+	$UI/ForestInvestigationButton.disabled = locked or has_phase_choices or not $UI/ForestInvestigationButton.visible
 
 	_update_phase_choice_buttons()
 
 
+func _apply_action_feedback():
+	var buttons:Array[Button] = [
+		$UI/ForestButton,
+		$UI/FarmButton,
+		$UI/LivestockButton,
+		$UI/TavernButton,
+		$UI/ForestInvestigationButton
+	]
+
+	for button in buttons:
+		button.focus_mode = Control.FOCUS_NONE
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.mouse_entered.connect(_on_action_hover.bind(button))
+		button.mouse_exited.connect(_on_action_exit.bind(button))
+
+
+func _on_action_hover(button:Button):
+	if button.disabled or not button.visible:
+		return
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "position:x", 108.0, 0.1)
+
+
+func _on_action_exit(button:Button):
+	if not is_instance_valid(button):
+		return
+
+	var target_x := 104.0
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "position:x", target_x, 0.1)
+
+
 func _on_forest_pressed():
-
-	if NarrativeManager.is_playing:
+	if NarrativeManager.is_playing or not StoryManager.get_phase_choices("MORNING").is_empty():
 		return
 
-	if not StoryManager.get_phase_choices("MORNING").is_empty():
-		return
-
-	ActionManager.execute_action(
-		ActionManager.Action.FOREST
-	)
-
+	ActionManager.execute_action(ActionManager.Action.FOREST)
 	enter_tavern()
 
 
 func _on_farm_pressed():
-
-	if NarrativeManager.is_playing:
+	if NarrativeManager.is_playing or not StoryManager.get_phase_choices("MORNING").is_empty():
 		return
 
-	if not StoryManager.get_phase_choices("MORNING").is_empty():
-		return
-
-	ActionManager.execute_action(
-		ActionManager.Action.FARM
-	)
-
+	ActionManager.execute_action(ActionManager.Action.FARM)
 	enter_tavern()
 
 
 func _on_livestock_pressed():
-
-	if NarrativeManager.is_playing:
+	if NarrativeManager.is_playing or not StoryManager.get_phase_choices("MORNING").is_empty():
 		return
 
-	if not StoryManager.get_phase_choices("MORNING").is_empty():
-		return
-
-	ActionManager.execute_action(
-		ActionManager.Action.LIVESTOCK
-	)
-
+	ActionManager.execute_action(ActionManager.Action.LIVESTOCK)
 	enter_tavern()
 
 
 func _on_tavern_pressed():
-
-	if NarrativeManager.is_playing:
-		return
-
-	if not StoryManager.get_phase_choices("MORNING").is_empty():
+	if NarrativeManager.is_playing or not StoryManager.get_phase_choices("MORNING").is_empty():
 		return
 
 	enter_tavern()
 
 
 func _on_forest_investigation_pressed():
-
 	if NarrativeManager.is_playing:
 		return
 
-	if not StoryManager.execute_manual_event_by_id(
-		"forest_investigation_event"
-	):
+	if not StoryManager.execute_manual_event_by_id("forest_investigation_event"):
 		print("Forest Investigation unavailable")
 		_update_action_buttons()
 		return
@@ -276,7 +234,5 @@ func _on_forest_investigation_pressed():
 
 
 func enter_tavern():
-
 	ResourceManager.print_resources()
-
 	DayManager.start_tavern()

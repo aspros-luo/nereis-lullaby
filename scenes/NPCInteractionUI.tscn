@@ -2,6 +2,34 @@
 
 [ext_resource type="Script" uid="uid://bdyh0gm1yt8vl" path="res://scripts/ui/NPCInteractionUI.gd" id="1_5q43m"]
 
+[sub_resource type="StyleBoxFlat" id="InteractionPanel"]
+bg_color = Color(0.035, 0.031, 0.034, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.53, 0.4, 0.3, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxFlat" id="InteractionButton"]
+bg_color = Color(0.11, 0.09, 0.09, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.29, 0.25, 0.9)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [node name="NPCInteractionUI" type="Control" unique_id=2068901334]
 layout_mode = 3
 anchors_preset = 15
@@ -12,34 +40,53 @@ grow_vertical = 2
 script = ExtResource("1_5q43m")
 
 [node name="Panel" type="Panel" parent="." unique_id=1436574629]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 870.0
+offset_top = 390.0
+offset_right = 1200.0
+offset_bottom = 665.0
+theme_override_styles/panel = SubResource("InteractionPanel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=926816487]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 2
+theme_override_constants/separation = 7
 
 [node name="NameLabel" type="Label" parent="Panel/VBoxContainer" unique_id=934572885]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.76, 0.57, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
 
 [node name="TalkButton" type="Button" parent="Panel/VBoxContainer" unique_id=571880184]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.8, 0.74, 1)
+theme_override_styles/normal = SubResource("InteractionButton")
 text = "交谈"
 
 [node name="NormalDrinkButton" type="Button" parent="Panel/VBoxContainer" unique_id=1738156300]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.8, 0.74, 1)
+theme_override_styles/normal = SubResource("InteractionButton")
 text = "端上麦酒"
 
 [node name="SpecialDrinkButton" type="Button" parent="Panel/VBoxContainer" unique_id=293538416]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.8, 0.74, 1)
+theme_override_styles/normal = SubResource("InteractionButton")
 text = "端上月影"
 
 [node name="StatusButton" type="Button" parent="Panel/VBoxContainer" unique_id=559189689]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.52, 0.49, 1)
+theme_override_styles/normal = SubResource("InteractionButton")
 text = "状态"
 
 [node name="CloseButton" type="Button" parent="Panel/VBoxContainer" unique_id=586422084]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.56, 0.48, 1)
+theme_override_styles/normal = SubResource("InteractionButton")
 text = "结束对话"

@@ -37,12 +37,16 @@ func _apply_visual_identity():
 
 	if texture:
 		$Sprite2D.texture = texture
-		$Sprite2D.scale = Vector2(0.72, 0.72)
+		$Sprite2D.scale = Vector2(0.34, 0.34)
+		$Sprite2D.position = Vector2(0, -48)
 
 func _apply_label_style():
+	$Label.position = Vector2(-48, 20)
+	$Label.size = Vector2(96, 28)
 	$Label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	$Label.add_theme_font_size_override("font_size", 14)
 	$Label.add_theme_color_override("font_color", Color("e2d4b5"))
-	$Label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+	$Label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	$Label.add_theme_constant_override("shadow_offset_x", 2)
 	$Label.add_theme_constant_override("shadow_offset_y", 2)
 

@@ -3,20 +3,20 @@
 [ext_resource type="Script" uid="uid://bdyh0gm1yt8vl" path="res://scripts/ui/NPCInteractionUI.gd" id="1_5q43m"]
 
 [sub_resource type="StyleBoxFlat" id="InteractionPanel"]
-bg_color = Color(0.035, 0.031, 0.034, 0.96)
+bg_color = Color(0.035, 0.031, 0.034, 0.97)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.53, 0.4, 0.3, 0.9)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+border_color = Color(0.62, 0.47, 0.31, 0.92)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 content_margin_left = 18.0
-content_margin_top = 16.0
+content_margin_top = 14.0
 content_margin_right = 18.0
-content_margin_bottom = 16.0
+content_margin_bottom = 14.0
 
 [sub_resource type="StyleBoxFlat" id="InteractionButton"]
 bg_color = Color(0.11, 0.09, 0.09, 0.98)
@@ -24,7 +24,7 @@ border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.35, 0.29, 0.25, 0.9)
+border_color = Color(0.39, 0.31, 0.25, 0.9)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -40,15 +40,15 @@ grow_vertical = 2
 script = ExtResource("1_5q43m")
 
 [node name="Panel" type="Panel" parent="." unique_id=1436574629]
-offset_left = 870.0
-offset_top = 390.0
-offset_right = 1200.0
-offset_bottom = 665.0
+offset_left = 850.0
+offset_top = 300.0
+offset_right = 1235.0
+offset_bottom = 710.0
 theme_override_styles/panel = SubResource("InteractionPanel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=926816487]
 layout_mode = 2
-theme_override_constants/separation = 7
+theme_override_constants/separation = 6
 
 [node name="NameLabel" type="Label" parent="Panel/VBoxContainer" unique_id=934572885]
 layout_mode = 2

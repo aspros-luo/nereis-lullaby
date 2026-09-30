@@ -14,12 +14,10 @@ var flow:DayFlow = DayFlow.IDLE
 
 
 func _ready():
-
 	print("DayManager Ready")
 
 
 func start_day():
-
 	current_day = GameManager.current_day
 	flow = DayFlow.MORNING
 
@@ -31,7 +29,6 @@ func start_day():
 
 
 func start_morning():
-
 	if flow == DayFlow.ENDING:
 		return
 
@@ -43,15 +40,23 @@ func start_morning():
 
 	print("Morning Start")
 
-	get_tree().change_scene_to_file(
+	var result := get_tree().change_scene_to_file(
 		"res://scenes/Morning.tscn"
 	)
 
+	if result != OK:
+		push_error("Failed to load Morning scene. Error code: %s" % result)
+	else:
+		print("Morning Scene Change Requested")
+
 
 func start_tavern():
-
 	if flow == DayFlow.ENDING:
 		print("Tavern start blocked: day is ending")
+		return
+
+	if flow == DayFlow.TAVERN:
+		print("Tavern start ignored: already entering or inside tavern")
 		return
 
 	flow = DayFlow.TAVERN
@@ -62,13 +67,21 @@ func start_tavern():
 
 	print("Tavern Start")
 
-	get_tree().change_scene_to_file(
+	var result := get_tree().change_scene_to_file(
 		"res://scenes/Tavern.tscn"
 	)
 
+	if result != OK:
+		flow = DayFlow.MORNING
+		PhaseManager.change_phase(
+			PhaseManager.Phase.MORNING
+		)
+		push_error("Failed to load Tavern scene. Error code: %s" % result)
+	else:
+		print("Tavern Scene Change Requested")
+
 
 func start_night():
-
 	if flow == DayFlow.ENDING:
 		return
 
@@ -82,7 +95,6 @@ func start_night():
 
 
 func end_day():
-
 	if flow == DayFlow.ENDING:
 		print("Day ending blocked")
 		return

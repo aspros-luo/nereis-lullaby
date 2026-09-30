@@ -3,15 +3,16 @@
 [ext_resource type="Script" uid="uid://ch3l3igoix1eq" path="res://scripts/systems/TavernNPC.gd" id="1_hfs58"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrof2"]
-size = Vector2(42, 21)
+size = Vector2(170, 210)
 
 [node name="TavernNpc" type="Area2D" unique_id=806688711]
 script = ExtResource("1_hfs58")
+input_pickable = true
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1596779856]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1172157331]
-position = Vector2(21, 10.5)
+position = Vector2(0, -43)
 shape = SubResource("RectangleShape2D_lrof2")
 
 [node name="Label" type="Label" parent="." unique_id=738455248]

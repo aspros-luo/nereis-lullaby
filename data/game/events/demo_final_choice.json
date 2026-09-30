@@ -1,0 +1,97 @@
+{
+  "id": "demo_final_choice",
+  "priority": 200,
+  "once": true,
+  "manual": false,
+  "start_day": 11,
+  "end_day": 12,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "mainline_stage",
+      "operator": ">=",
+      "value": 10
+    }
+  ],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "demo_final_choice_available",
+      "value": true
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 11
+    }
+  ],
+  "expire_actions": [
+    {
+      "type": "set_story_flag",
+      "key": "demo_final_choice_missed",
+      "value": true
+    },
+    {
+      "type": "set_story_flag",
+      "key": "demo_ending_request",
+      "value": "human"
+    }
+  ],
+  "choices": [
+    {
+      "id": "answer_forest_voice",
+      "phase": "MORNING",
+      "label": "回应森林里的声音",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "final_choice_forest",
+          "value": true
+        },
+        {
+          "type": "set_story_flag",
+          "key": "demo_ending_request",
+          "value": "outer_god"
+        }
+      ]
+    },
+    {
+      "id": "trust_church",
+      "phase": "MORNING",
+      "label": "相信教会，交出你知道的一切",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "final_choice_church",
+          "value": true
+        },
+        {
+          "type": "set_world_value",
+          "key": "church_truth",
+          "value": 2
+        },
+        {
+          "type": "set_story_flag",
+          "key": "demo_ending_request",
+          "value": "church"
+        }
+      ]
+    },
+    {
+      "id": "stay_with_village",
+      "phase": "MORNING",
+      "label": "什么都不说，回到酒馆",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "final_choice_human",
+          "value": true
+        },
+        {
+          "type": "set_story_flag",
+          "key": "demo_ending_request",
+          "value": "human"
+        }
+      ]
+    }
+  ]
+}

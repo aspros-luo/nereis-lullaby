@@ -1,0 +1,39 @@
+{
+  "id": "demo_church_shadow",
+  "priority": 90,
+  "once": true,
+  "manual": false,
+  "start_day": 7,
+  "end_day": 8,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "mainline_stage",
+      "operator": ">=",
+      "value": 6
+    }
+  ],
+  "actions": [
+    {
+      "type": "set_story_flag",
+      "key": "church_shadow_started",
+      "value": true
+    },
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "church_shadow_shared"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 8
+    }
+  ],
+  "expire_actions": [
+    {
+      "type": "set_story_flag",
+      "key": "church_shadow_missed",
+      "value": true
+    }
+  ]
+}

@@ -1,58 +1,151 @@
 [gd_scene format=3 uid="uid://f58m6osg5bi0"]
 
 [ext_resource type="Script" uid="uid://bfjyg1bd261rf" path="res://scripts/systems/Morning.gd" id="1_1gwy7"]
+[ext_resource type="Texture2D" path="res://assets/ui/demo_morning_bg.svg" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.055, 0.067, 0.075, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.42, 0.31, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="ButtonStyle"]
+bg_color = Color(0.12, 0.14, 0.16, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.42, 0.31, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 18.0
+content_margin_right = 18.0
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.24, 0.2, 0.16, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.65, 0.38, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 18.0
+content_margin_right = 18.0
 
 [node name="Morning" type="Node" unique_id=581528714]
 script = ExtResource("1_1gwy7")
 
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
+
 [node name="UI" type="Control" parent="." unique_id=1970252265]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 500.0
-offset_bottom = 240.0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="Panel" type="Panel" parent="UI"]
+offset_left = 72.0
+offset_top = 64.0
+offset_right = 430.0
+offset_bottom = 610.0
+theme_override_styles/panel = SubResource("PanelStyle")
 
 [node name="Title" type="Label" parent="UI" unique_id=1718077244]
-layout_mode = 0
+offset_left = 104.0
+offset_top = 92.0
 offset_right = 400.0
-offset_bottom = 100.0
+offset_bottom = 132.0
+theme_override_colors/font_color = Color(0.86, 0.79, 0.63, 1)
+theme_override_font_sizes/font_size = 28
+text = "清晨 · 村庄边缘"
+
+[node name="Hint" type="Label" parent="UI"]
+offset_left = 104.0
+offset_top = 137.0
+offset_right = 390.0
+offset_bottom = 185.0
+theme_override_colors/font_color = Color(0.65, 0.64, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "今天的选择，会在夜里留下痕迹。"
 
 [node name="ForestButton" type="Button" parent="UI" unique_id=1391054295]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 50.0
-offset_right = 150.0
-offset_bottom = 70.0
-text = "森林"
+offset_left = 104.0
+offset_top = 205.0
+offset_right = 360.0
+offset_bottom = 248.0
+theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("ButtonStyle")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "前往森林"
 
 [node name="FarmButton" type="Button" parent="UI" unique_id=1815742930]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 75.0
-offset_right = 150.0
-offset_bottom = 95.0
-text = "农场"
+offset_left = 104.0
+offset_top = 258.0
+offset_right = 360.0
+offset_bottom = 301.0
+theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("ButtonStyle")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "前往农场"
 
 [node name="LivestockButton" type="Button" parent="UI" unique_id=818717613]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 100.0
-offset_right = 150.0
-offset_bottom = 120.0
-text = "live stock"
+offset_left = 104.0
+offset_top = 311.0
+offset_right = 360.0
+offset_bottom = 354.0
+theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("ButtonStyle")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "照料牲畜"
 
 [node name="TavernButton" type="Button" parent="UI" unique_id=742154397]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 125.0
-offset_right = 150.0
-offset_bottom = 145.0
-text = "去酒馆"
+offset_left = 104.0
+offset_top = 364.0
+offset_right = 360.0
+offset_bottom = 407.0
+theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("ButtonStyle")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "直接去酒馆"
 
 [node name="ForestInvestigationButton" type="Button" parent="UI" unique_id=903117524]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 150.0
-offset_right = 180.0
-offset_bottom = 170.0
-text = "深入森林"
+offset_left = 104.0
+offset_top = 432.0
+offset_right = 360.0
+offset_bottom = 480.0
+theme_override_colors/font_color = Color(0.85, 0.57, 0.45, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("ButtonStyle")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "深入森林 · 调查异常"
 visible = false
+
+[node name="Footer" type="Label" parent="UI"]
+offset_left = 104.0
+offset_top = 548.0
+offset_right = 380.0
+offset_bottom = 580.0
+theme_override_colors/font_color = Color(0.45, 0.44, 0.42, 1)
+theme_override_font_sizes/font_size = 12
+text = "酒馆开业日 · 行动结束后进入夜晚"

@@ -1,10 +1,26 @@
 extends Control
 
 
+# ==================================================
+# Nereis Lullaby - NPC Interaction Presentation
+#
+# Visual direction:
+# - dark fantasy portrait-card feeling
+# - restrained warm gold accents
+# - deep burgundy / charcoal surfaces
+# - interaction feedback should feel tactile, not flashy
+# ==================================================
+
+const TEXT_PRIMARY := Color("e8dcc7")
+const TEXT_MUTED := Color("a99b86")
+const TEXT_ACCENT := Color("d9b56d")
+const TEXT_ACCENT_HOVER := Color("fff0c8")
+const PANEL_TINT := Color("2a2020")
+const HOVER_SCALE := Vector2(1.015, 1.015)
+
 var current_npc_id:String = ""
 var choice_buttons:Array[Button] = []
 var panel_base_position := Vector2.ZERO
-
 
 @onready var panel:Panel = $Panel
 @onready var name_label:Label = $Panel/VBoxContainer/NameLabel
@@ -14,7 +30,6 @@ var panel_base_position := Vector2.ZERO
 @onready var status_button:Button = $Panel/VBoxContainer/StatusButton
 @onready var close_button:Button = $Panel/VBoxContainer/CloseButton
 @onready var vbox:VBoxContainer = $Panel/VBoxContainer
-
 
 func _ready():
 	panel_base_position = panel.position
@@ -31,9 +46,16 @@ func _ready():
 	StoryManager.choice_available.connect(_on_story_choice_available)
 	StoryManager.choice_completed.connect(_on_story_choice_completed)
 
+	_apply_visual_language()
 	_apply_button_feedback()
 	_update_interaction_buttons()
 
+func _apply_visual_language():
+	name_label.add_theme_color_override("font_color", TEXT_ACCENT)
+	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7))
+	name_label.add_theme_constant_override("shadow_offset_x", 1)
+	name_label.add_theme_constant_override("shadow_offset_y", 1)
+	panel.modulate = PANEL_TINT
 
 func open(id:String):
 	current_npc_id = id
@@ -57,7 +79,6 @@ func open(id:String):
 	_refresh_choice_ui()
 	_update_interaction_buttons()
 
-
 func _on_talk_pressed():
 	if NarrativeManager.is_playing:
 		return
@@ -77,7 +98,6 @@ func _on_talk_pressed():
 	var result = NPCInteractionSystem.talk()
 	print("Result:", result)
 
-
 func _on_normal_drink_pressed():
 	if NarrativeManager.is_playing:
 		return
@@ -89,7 +109,6 @@ func _on_normal_drink_pressed():
 	print("Serve normal drink:", current_npc_id)
 	var result = NPCInteractionSystem.drink("normal")
 	print("Result:", result)
-
 
 func _on_special_drink_pressed():
 	if NarrativeManager.is_playing:
@@ -103,7 +122,6 @@ func _on_special_drink_pressed():
 	var result = NPCInteractionSystem.drink("special")
 	print("Result:", result)
 
-
 func _on_status_pressed():
 	if NarrativeManager.is_playing:
 		return
@@ -115,15 +133,12 @@ func _on_status_pressed():
 	print("Check NPC:", current_npc_id)
 	NPCInteractionSystem.debug()
 
-
 func _on_story_dialogue_started(_timeline:String):
 	_update_interaction_buttons()
-
 
 func _on_story_dialogue_finished(_timeline:String):
 	_refresh_choice_ui()
 	_update_interaction_buttons()
-
 
 func _on_story_choice_available(npc_id:String, _event_id:String):
 	if npc_id != current_npc_id:
@@ -132,11 +147,9 @@ func _on_story_choice_available(npc_id:String, _event_id:String):
 	_refresh_choice_ui()
 	_update_interaction_buttons()
 
-
 func _on_story_choice_completed(_event_id:String, _choice_id:String):
 	_refresh_choice_ui()
 	_update_interaction_buttons()
-
 
 func _refresh_choice_ui():
 	for button in choice_buttons:
@@ -150,11 +163,13 @@ func _refresh_choice_ui():
 	for choice in choices:
 		var button := Button.new()
 		button.text = str(choice.get("label", choice.get("id", "选择")))
-		button.custom_minimum_size = Vector2(0, 34)
+		button.custom_minimum_size = Vector2(0, 38)
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		button.add_theme_color_override("font_color", Color("e4d8c1"))
-		button.add_theme_color_override("font_hover_color", Color("fff0c8"))
+		button.add_theme_color_override("font_color", TEXT_PRIMARY)
+		button.add_theme_color_override("font_hover_color", TEXT_ACCENT_HOVER)
+		button.add_theme_color_override("font_pressed_color", TEXT_ACCENT)
+		button.add_theme_color_override("font_disabled_color", TEXT_MUTED)
 
 		button.pressed.connect(_on_choice_pressed.bind(str(choice.get("id", ""))))
 		button.mouse_entered.connect(_on_choice_hover.bind(button))
@@ -163,7 +178,6 @@ func _refresh_choice_ui():
 		vbox.add_child(button)
 		choice_buttons.append(button)
 
-
 func _on_choice_pressed(choice_id:String):
 	if NarrativeManager.is_playing:
 		return
@@ -171,7 +185,6 @@ func _on_choice_pressed(choice_id:String):
 	if StoryManager.choose_npc_choice(current_npc_id, choice_id):
 		_refresh_choice_ui()
 		_update_interaction_buttons()
-
 
 func _update_interaction_buttons():
 	var locked:bool = NarrativeManager.is_playing
@@ -188,7 +201,6 @@ func _update_interaction_buttons():
 		if is_instance_valid(button):
 			button.disabled = locked or has_story_dialogue
 
-
 func _apply_button_feedback():
 	var buttons:Array[Button] = [
 		talk_button,
@@ -201,9 +213,9 @@ func _apply_button_feedback():
 	for button in buttons:
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.pivot_offset = button.size / 2.0
 		button.mouse_entered.connect(_on_button_hover.bind(button))
 		button.mouse_exited.connect(_on_button_exit.bind(button))
-
 
 func _on_button_hover(button:Button):
 	if button.disabled:
@@ -211,8 +223,9 @@ func _on_button_hover(button:Button):
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
 	tween.tween_property(button, "position:x", 4.0, 0.08)
-
+	tween.tween_property(button, "scale", HOVER_SCALE, 0.08)
 
 func _on_button_exit(button:Button):
 	if not is_instance_valid(button):
@@ -220,8 +233,9 @@ func _on_button_exit(button:Button):
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
 	tween.tween_property(button, "position:x", 0.0, 0.08)
-
+	tween.tween_property(button, "scale", Vector2.ONE, 0.08)
 
 func _on_choice_hover(button:Button):
 	if button.disabled:
@@ -229,8 +243,9 @@ func _on_choice_hover(button:Button):
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
 	tween.tween_property(button, "position:x", 4.0, 0.08)
-
+	tween.tween_property(button, "scale", HOVER_SCALE, 0.08)
 
 func _on_choice_exit(button:Button):
 	if not is_instance_valid(button):
@@ -238,8 +253,9 @@ func _on_choice_exit(button:Button):
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
 	tween.tween_property(button, "position:x", 0.0, 0.08)
-
+	tween.tween_property(button, "scale", Vector2.ONE, 0.08)
 
 func close():
 	if NarrativeManager.is_playing:

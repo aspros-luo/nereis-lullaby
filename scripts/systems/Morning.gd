@@ -4,6 +4,7 @@ extends Node
 var story_dialogue_played:bool = false
 var forest_investigation_started:bool = false
 var phase_choice_buttons:Array[Button] = []
+var tavern_transition_started:bool = false
 
 
 func _ready():
@@ -70,6 +71,10 @@ func _on_phase_choice_completed(phase:String, event_id:String, choice_id:String)
 	if event_id == "forest_investigation_event":
 		forest_investigation_started = false
 		enter_tavern()
+
+
+func _refresh_choice_buttons_placeholder():
+	pass
 
 
 func _refresh_phase_choice_ui():
@@ -142,13 +147,13 @@ func _update_action_buttons():
 	var locked:bool = NarrativeManager.is_playing
 	var has_phase_choices:bool = not StoryManager.get_phase_choices("MORNING").is_empty()
 
-	$UI/ForestButton.disabled = locked or has_phase_choices
-	$UI/FarmButton.disabled = locked or has_phase_choices
-	$UI/LivestockButton.disabled = locked or has_phase_choices
-	$UI/TavernButton.disabled = locked or has_phase_choices
+	$UI/ForestButton.disabled = locked or has_phase_choices or tavern_transition_started
+	$UI/FarmButton.disabled = locked or has_phase_choices or tavern_transition_started
+	$UI/LivestockButton.disabled = locked or has_phase_choices or tavern_transition_started
+	$UI/TavernButton.disabled = locked or has_phase_choices or tavern_transition_started
 
 	$UI/ForestInvestigationButton.visible = StoryState.get_flag("forest_investigation_result_pending", false)
-	$UI/ForestInvestigationButton.disabled = locked or has_phase_choices or not $UI/ForestInvestigationButton.visible
+	$UI/ForestInvestigationButton.disabled = locked or has_phase_choices or not $UI/ForestInvestigationButton.visible or tavern_transition_started
 
 	_update_phase_choice_buttons()
 
@@ -234,5 +239,15 @@ func _on_forest_investigation_pressed():
 
 
 func enter_tavern():
+	if tavern_transition_started:
+		print("Tavern transition already started")
+		return
+
+	tavern_transition_started = true
+	_update_action_buttons()
 	ResourceManager.print_resources()
+	call_deferred("_start_tavern_transition")
+
+
+func _start_tavern_transition():
 	DayManager.start_tavern()

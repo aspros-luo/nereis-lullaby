@@ -11,14 +11,17 @@ const NPC_POSITIONS := {
 func _ready():
 	print("Tavern Scene Loaded")
 	TavernManager.open_tavern()
+	TavernSession.start_session()
 	_spawn_tonight_guests()
 
 	if DayManager.has_method("finish_scene_transition"):
 		DayManager.finish_scene_transition()
 
+
 func _spawn_tonight_guests():
-	for npc_id in ["hunter", "merchant", "hero"]:
+	for npc_id in TavernSession.guests:
 		_spawn_npc(npc_id)
+
 
 func _spawn_npc(npc_id:String):
 	var npc = NPC_SCENE.instantiate()

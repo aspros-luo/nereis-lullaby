@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://scripts/systems/Tavern.gd" id="1_f7s0u"]
 [ext_resource type="Script" path="res://scripts/ui/TavernUI.gd" id="2_vjnjn"]
-[ext_resource type="PackedScene" path="res://scenes/TavernNPC.tscn" id="4_grwn0"]
 [ext_resource type="PackedScene" path="res://scenes/NPCInteractionUI.tscn" id="5_grwn0"]
 [ext_resource type="Texture2D" path="res://assets/ui/demo_tavern_bg.svg" id="6_bg"]
 

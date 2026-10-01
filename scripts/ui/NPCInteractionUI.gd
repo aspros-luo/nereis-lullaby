@@ -184,7 +184,11 @@ func _update_interaction_buttons():
 	normal_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
 	special_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
 	status_button.disabled = locked or has_choices or has_story_dialogue
-	close_button.disabled = locked or has_choices or has_story_dialogue
+
+	# 剧情选择属于“待处理状态”，但允许玩家暂时关闭 NPC 面板。
+	# 重新打开后选择仍保留，不会丢失事件。
+	close_button.disabled = locked
+
 	for button in choice_buttons:
 		if is_instance_valid(button):
 			button.disabled = locked or has_story_dialogue
@@ -223,8 +227,9 @@ func _on_choice_exit(button:Button):
 	_on_button_exit(button)
 
 func close():
-	if NarrativeManager.is_playing or not StoryManager.get_npc_choices(current_npc_id).is_empty() or StoryManager.has_npc_dialogue(current_npc_id):
+	if NarrativeManager.is_playing:
 		return
+
 	NPCInteractionSystem.end()
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

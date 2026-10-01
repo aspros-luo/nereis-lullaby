@@ -1,6 +1,5 @@
 extends Control
 
-
 var day_end_clicked := false
 
 @onready var end_day_button:Button = $Panel/VBox/EndDayButton
@@ -14,6 +13,8 @@ func _ready():
 
 	NarrativeManager.dialogue_started.connect(_on_story_dialogue_started)
 	NarrativeManager.dialogue_finished.connect(_on_story_dialogue_finished)
+	TavernSession.session_started.connect(_on_tavern_session_changed)
+	TavernSession.guest_served.connect(_on_guest_served)
 
 	_apply_button_feedback()
 	_update_status()
@@ -49,6 +50,14 @@ func _on_story_dialogue_finished(_timeline:String):
 	_update_status()
 
 
+func _on_tavern_session_changed():
+	_update_status()
+
+
+func _on_guest_served(_npc_id:String):
+	_update_status()
+
+
 func _update_status():
 	if not is_instance_valid(status_label):
 		return
@@ -59,7 +68,12 @@ func _update_status():
 	elif day_end_clicked:
 		phase_text = "正在打烊……"
 
-	status_label.text = "营业第 %d 天  ·  %s" % [DayManager.current_day, phase_text]
+	status_label.text = "营业第 %d 天  ·  已接待 %d/%d  ·  %s" % [
+		DayManager.current_day,
+		TavernSession.get_served_count(),
+		TavernSession.get_guest_count(),
+		phase_text
+	]
 
 
 func _update_day_end_button():

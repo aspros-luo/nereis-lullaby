@@ -173,9 +173,10 @@ func _update_interaction_buttons():
 	var locked:bool = NarrativeManager.is_playing
 	var has_choices:bool = not StoryManager.get_npc_choices(current_npc_id).is_empty()
 	var has_story_dialogue:bool = StoryManager.has_npc_dialogue(current_npc_id)
+	var has_been_served:bool = TavernSession.has_served(current_npc_id)
 	talk_button.disabled = locked
-	normal_drink_button.disabled = locked or has_choices or has_story_dialogue
-	special_drink_button.disabled = locked or has_choices or has_story_dialogue
+	normal_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
+	special_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
 	status_button.disabled = locked or has_choices or has_story_dialogue
 	close_button.disabled = locked or has_choices or has_story_dialogue
 	for button in choice_buttons:

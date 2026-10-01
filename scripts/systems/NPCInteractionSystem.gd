@@ -5,6 +5,7 @@ var current_npc:NPCBase = null
 
 signal interaction_result(result)
 
+
 func start_interaction(id:String):
 	current_npc = NPCManager.get_npc(id)
 
@@ -15,6 +16,7 @@ func start_interaction(id:String):
 	print("Start Interaction:", current_npc.npc_name)
 	show_options()
 
+
 func show_options():
 	if current_npc == null:
 		return
@@ -23,6 +25,7 @@ func show_options():
 	print("1. Talk")
 	print("2. Drink")
 	print("3. Special")
+
 
 func talk():
 	if current_npc == null:
@@ -42,14 +45,30 @@ func talk():
 	interaction_result.emit(result)
 	return result
 
+
 func drink(type:String="normal"):
 	if current_npc == null:
 		return
 
+	var npc_id:String = current_npc.id
+
+	if TavernSession.has_served(npc_id):
+		print("Guest already served tonight:", npc_id)
+		return "already_served"
+
 	var result = current_npc.drink(type)
+
+	if type == "special":
+		WorldState.add_value("village_corruption", 1)
+		WorldState.add_value("outer_god_progress", 1)
+		print("Special drink influence applied:", npc_id)
+
+	TavernSession.mark_served(npc_id)
+
 	print("Drink Result:", result)
 	interaction_result.emit(result)
 	return result
+
 
 func special():
 	if current_npc == null:
@@ -60,6 +79,7 @@ func special():
 	interaction_result.emit(result)
 	return result
 
+
 func debug():
 	if current_npc == null:
 		return
@@ -69,6 +89,7 @@ func debug():
 	print("Permanent:", current_npc.state.permanent)
 	print("Temporary:", current_npc.state.temporary)
 	print("================")
+
 
 func end():
 	current_npc = null

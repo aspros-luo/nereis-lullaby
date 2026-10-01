@@ -5,6 +5,7 @@ var story_dialogue_played:bool = false
 var forest_investigation_started:bool = false
 var phase_choice_buttons:Array[Button] = []
 var tavern_transition_started:bool = false
+var tavern_after_story_pending:bool = false
 
 
 func _ready():
@@ -51,6 +52,10 @@ func _on_story_dialogue_finished(_timeline:String):
 	_update_action_buttons()
 	_refresh_phase_choice_ui()
 
+	if tavern_after_story_pending:
+		tavern_after_story_pending = false
+		call_deferred("enter_tavern")
+
 
 func _on_phase_choice_available(phase:String, _event_id:String):
 	if phase != "MORNING":
@@ -70,11 +75,21 @@ func _on_phase_choice_completed(phase:String, event_id:String, choice_id:String)
 
 	if event_id == "forest_investigation_event":
 		forest_investigation_started = false
-		enter_tavern()
+		tavern_after_story_pending = true
+
+	call_deferred("_play_queued_phase_dialogue_after_choice")
 
 
-func _refresh_choice_buttons_placeholder():
-	pass
+func _play_queued_phase_dialogue_after_choice():
+	var timeline:String = StoryManager.consume_phase_dialogue("MORNING")
+	if timeline.is_empty():
+		if tavern_after_story_pending:
+			tavern_after_story_pending = false
+			enter_tavern()
+		return
+
+	print("Story Morning Dialogue After Choice:", timeline)
+	NarrativeManager.play_timeline(timeline)
 
 
 func _refresh_phase_choice_ui():

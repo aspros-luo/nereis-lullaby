@@ -20,6 +20,11 @@
       "value": true
     },
     {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "demo_final_choice_intro"
+    },
+    {
       "type": "advance_mainline_stage",
       "value": 11
     }

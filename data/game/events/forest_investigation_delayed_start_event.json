@@ -1,0 +1,17 @@
+{
+  "id": "forest_investigation_delayed_start_event",
+  "priority": 45,
+  "once": true,
+  "manual": false,
+  "start_day": 4,
+  "end_day": 5,
+  "conditions": [
+    {"type":"story_flag","key":"forest_investigation_delayed_followup_seen","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"set_story_flag","key":"forest_investigation_committed","value":true},
+    {"type":"set_story_flag","key":"forest_investigation_result_pending","value":true},
+    {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"forest_delayed_entry"},
+    {"type":"advance_mainline_stage","value":3}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "hunter_forest_route_delayed_event",
+  "priority": 35,
+  "once": true,
+  "manual": false,
+  "start_day": 3,
+  "end_day": 4,
+  "conditions": [
+    {"type":"story_flag","key":"forest_investigation_delayed","operator":"==","value":true}
+  ],
+  "actions": [
+    {"type":"queue_npc_dialogue","npc_id":"hunter","timeline":"hunter_forest_wait"},
+    {"type":"set_story_flag","key":"forest_investigation_delayed_followup_seen","value":true}
+  ]
+}

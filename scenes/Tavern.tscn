@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scripts/ui/TavernUI.gd" id="2_vjnjn"]
 [ext_resource type="Script" path="res://scripts/systems/TavernSpawner.gd" id="3_dg26j"]
 [ext_resource type="PackedScene" path="res://scenes/TavernNPC.tscn" id="4_grwn0"]
-[ext_resource type="PackedScene" path="res://scenes/NPCInteractionUI.tscn" id="5_grwn0"]
+[ext_resource type="PackedScene" path="res://scenes/NPCInteractionUI.tscn" id="5_npcui"]
 [ext_resource type="Texture2D" path="res://assets/ui/demo_tavern_bg.svg" id="6_bg"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
@@ -71,11 +71,7 @@ theme_override_colors/font_color = Color(0.78, 0.72, 0.65, 1)
 text = "结束营业 · 进入夜晚"
 
 [node name="TavernSpawner" type="Node2D" parent="."]
-script = ExtResource("3_dg26")
+script = ExtResource("3_dg26j")
 npc_scene = ExtResource("4_grwn0")
 
-[node name="NPCInteractionUI" parent="." instance=ExtResource("5_grwn0")]
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+[node name="NPCInteractionUI" parent="." instance=ExtResource("5_npcui")]

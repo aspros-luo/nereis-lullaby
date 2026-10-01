@@ -1,4 +1,4 @@
-# Nereis Lullaby — v0.3 Mainline Skeleton
+# Nereis Lullaby — v0.3 Mainline Runtime
 
 ## Design rule
 
@@ -16,7 +16,7 @@ Hidden runtime examples:
 
 Visible information is limited to natural world information such as the current tavern day and available actions.
 
-## Mainline stages
+## Mainline flow
 
 | Stage | Meaning | Player-facing behavior |
 | --- | --- | --- |
@@ -28,46 +28,52 @@ Visible information is limited to natural world information such as the current 
 
 The stage is stored in `StoryState` as `mainline_stage` and is never displayed directly.
 
-## Current flow
+## Mainline flow
 
-```text
 Day 1
-  normal village facade
-        |
-        v
+  village facade
+
 Day 2-4
-  hunter trust threshold
-        |
-        v
-  hunter reveal
-        |
-        +-------------------+
-        |                   |
-     accept              avoid
-        |                   |
-        v                   v
-  stage 2              hidden missed route
-        |
-        v
+  hunter trust threshold -> forest anomaly revealed
+
 Day 3-6
-  forest route available
-        |
-        v
-  player chooses
-        |
-        v
-  commit investigation
-        |
-        v
-next morning
-  "深入森林" becomes available
-        |
-        v
-  player actively enters
-        |
-        v
-  stage 4
-```
+  forest route window -> commit investigation or silently miss it
+
+Next morning
+  forest investigation -> touch or leave the strange mark
+
+Day 5-6
+  hero notices the anomaly -> player tells or hides the truth
+
+Day 7-9
+  church shadow appears
+
+Day 9-10
+  church patrol encounter -> follow or avoid
+
+Day 11-12
+  final three-way choice -> demo ending
+
+## Runtime rules
+
+- Story events are loaded automatically from data/game/events/*.json.
+- Event windows use hidden day limits; missing a window can permanently expire that route.
+- Story choices are exposed only when their current scene/phase makes them relevant.
+- Phase dialogue queued by a choice is now played immediately after the choice.
+- The final choice is introduced by a short morning dialogue before the options appear.
+- EndingManager consumes the hidden demo_ending_request flag and opens the ending scene.
+
+## Current implementation boundary
+
+The v0.3 playable demo now has the full narrative skeleton from the hunter reveal through the three demo endings.
+
+Next work:
+- tavern interaction polish
+- story-dialogue close/back UX
+- stronger branch-specific consequences
+- visual and audio feedback
+- additional art assets
+- expanding ending content
 
 ## Important constraint
 

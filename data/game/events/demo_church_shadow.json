@@ -1,6 +1,6 @@
 {
   "id": "demo_church_shadow",
-  "priority": 90,
+  "priority": 40,
   "once": true,
   "manual": false,
   "start_day": 7,
@@ -11,6 +11,18 @@
       "key": "mainline_stage",
       "operator": ">=",
       "value": 6
+    },
+    {
+      "type": "story_flag",
+      "key": "hero_truth_shared",
+      "operator": "==",
+      "value": false
+    },
+    {
+      "type": "story_flag",
+      "key": "hero_truth_hidden",
+      "operator": "==",
+      "value": false
     }
   ],
   "actions": [

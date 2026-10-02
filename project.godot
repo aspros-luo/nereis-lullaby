@@ -54,7 +54,8 @@ directories/dtl_directory={
 "church_shadow_shared": "res://data/dialogic/timelines/church_shadow_shared.dtl",
 "church_shadow_hidden": "res://data/dialogic/timelines/church_shadow_hidden.dtl",
 "church_patrol_follow": "res://data/dialogic/timelines/church_patrol_follow.dtl",
-"church_patrol_avoid": "res://data/dialogic/timelines/church_patrol_avoid.dtl"
+"church_patrol_avoid": "res://data/dialogic/timelines/church_patrol_avoid.dtl",
+"demo_final_choice_intro": "res://data/dialogic/timelines/demo_final_choice_intro.dtl"
 }
 layout/style_directory={}
 

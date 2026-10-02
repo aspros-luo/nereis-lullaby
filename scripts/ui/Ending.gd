@@ -1,10 +1,10 @@
 extends Control
 
 
-@onready var title_label:Label = $Center/VBox/Title
-@onready var body_label:Label = $Center/VBox/Body
-@onready var hint_label:Label = $Center/VBox/Hint
-@onready var restart_button:Button = $Center/VBox/Restart
+@onready var title_label:Label = $Center/Panel/VBox/Title
+@onready var body_label:Label = $Center/Panel/VBox/Body
+@onready var hint_label:Label = $Center/Panel/VBox/Hint
+@onready var restart_button:Button = $Center/Panel/VBox/Restart
 
 
 func _ready():
@@ -39,5 +39,9 @@ func _apply_ending():
 
 func _restart():
 	StoryState.reset()
+	WorldState.reset()
 	GameManager.current_day = 1
+	DayManager.current_day = 1
+	EndingManager.current_ending = ""
+	EndingManager._ending_started = false
 	get_tree().change_scene_to_file("res://scenes/Morning.tscn")

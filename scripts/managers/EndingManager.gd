@@ -6,22 +6,23 @@ var current_ending:String = ""
 var _ending_started:bool = false
 
 
-func _process(_delta):
-	if _ending_started:
+func _ready():
+	print("EndingManager Ready")
+
+
+func request_ending(ending_id:String):
+	if ending_id.is_empty() or _ending_started:
 		return
 
-	var requested:String = str(StoryState.get_flag("demo_ending_request", ""))
-	if requested.is_empty():
-		return
-
-	_ending_started = true
-	start_ending(requested)
+	print("Ending Requested:", ending_id)
+	start_ending(ending_id)
 
 
 func start_ending(ending_id:String):
-	if ending_id.is_empty():
+	if ending_id.is_empty() or _ending_started:
 		return
 
+	_ending_started = true
 	current_ending = ending_id
 	StoryState.set_flag("demo_ending", ending_id)
 	StoryState.remove_flag("demo_ending_request")
@@ -29,4 +30,11 @@ func start_ending(ending_id:String):
 
 	print("Demo Ending:", ending_id)
 
-	get_tree().change_scene_to_file("res://scenes/Ending.tscn")
+	call_deferred("_change_to_ending")
+
+
+func _change_to_ending():
+	var result := get_tree().change_scene_to_file("res://scenes/Ending.tscn")
+	if result != OK:
+		_ending_started = false
+		push_error("Failed to load Ending scene. Error code: %s" % result)

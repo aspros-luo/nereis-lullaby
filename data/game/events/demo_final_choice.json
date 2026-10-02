@@ -31,14 +31,8 @@
   ],
   "expire_actions": [
     {
-      "type": "set_story_flag",
-      "key": "demo_final_choice_missed",
-      "value": true
-    },
-    {
-      "type": "set_story_flag",
-      "key": "demo_ending_request",
-      "value": "human"
+      "type": "request_ending",
+      "ending_id": "human"
     }
   ],
   "choices": [
@@ -53,9 +47,8 @@
           "value": true
         },
         {
-          "type": "set_story_flag",
-          "key": "demo_ending_request",
-          "value": "outer_god"
+          "type": "request_ending",
+          "ending_id": "outer_god"
         }
       ]
     },
@@ -75,9 +68,8 @@
           "value": 2
         },
         {
-          "type": "set_story_flag",
-          "key": "demo_ending_request",
-          "value": "church"
+          "type": "request_ending",
+          "ending_id": "church"
         }
       ]
     },
@@ -92,9 +84,8 @@
           "value": true
         },
         {
-          "type": "set_story_flag",
-          "key": "demo_ending_request",
-          "value": "human"
+          "type": "request_ending",
+          "ending_id": "human"
         }
       ]
     }

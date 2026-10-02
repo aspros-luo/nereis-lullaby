@@ -5,111 +5,17 @@
   "start_day": 2,
   "end_day": 4,
   "conditions": [
-    {
-      "type": "story_flag",
-      "key": "mainline_facade_active",
-      "operator": "==",
-      "value": true
-    },
-    {
-      "type": "npc_permanent",
-      "npc_id": "hunter",
-      "key": "trust",
-      "operator": ">=",
-      "value": 20
-    }
+    {"type":"story_flag","key":"mainline_facade_active","operator":"==","value":true},
+    {"type":"npc_permanent","npc_id":"hunter","key":"trust","operator":">=","value":20}
   ],
   "actions": [
-    {
-      "type": "queue_npc_dialogue",
-      "npc_id": "hunter",
-      "timeline": "hunter_trust_reveal"
-    }
+    {"type":"queue_npc_dialogue","npc_id":"hunter","timeline":"hunter_trust_reveal"},
+    {"type":"set_story_flag","key":"hunter_secret_accepted","value":true},
+    {"type":"set_story_flag","key":"hunter_forest_route_unlocked","value":true}
   ],
   "expire_actions": [
-    {
-      "type": "set_story_flag",
-      "key": "hunter_secret_missed",
-      "value": true
-    },
-    {
-      "type": "set_npc_permanent",
-      "npc_id": "hunter",
-      "key": "knows_forest_secret",
-      "value": false
-    },
-    {
-      "type": "set_story_flag",
-      "key": "mainline_hunter_route_missed",
-      "value": true
-    }
-  ],
-  "choices": [
-    {
-      "id": "listen_to_hunter",
-      "npc_id": "hunter",
-      "label": "认真听猎人说下去",
-      "actions": [
-        {
-          "type": "add_npc_permanent",
-          "npc_id": "hunter",
-          "key": "trust",
-          "value": 2
-        },
-        {
-          "type": "set_story_flag",
-          "key": "hunter_secret_accepted",
-          "value": true
-        },
-        {
-          "type": "set_story_flag",
-          "key": "hunter_forest_route_unlocked",
-          "value": true
-        },
-        {
-          "type": "advance_mainline_stage",
-          "value": 2
-        }
-      ]
-    },
-    {
-      "id": "question_hunter",
-      "npc_id": "hunter",
-      "label": "追问森林里究竟发生过什么",
-      "actions": [
-        {
-          "type": "add_npc_permanent",
-          "npc_id": "hunter",
-          "key": "trust",
-          "value": 1
-        },
-        {
-          "type": "set_story_flag",
-          "key": "hunter_secret_questioned",
-          "value": true
-        },
-        {
-          "type": "set_story_flag",
-          "key": "hunter_forest_route_unlocked",
-          "value": true
-        },
-        {
-          "type": "advance_mainline_stage",
-          "value": 2
-        }
-      ]
-    },
-    {
-      "id": "avoid_hunter_secret",
-      "npc_id": "hunter",
-      "label": "装作没有听懂",
-      "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "hunter_secret_avoided",
-          "value": true
-        }
-      ]
-    }
+    {"type":"set_story_flag","key":"hunter_secret_missed","value":true},
+    {"type":"set_npc_permanent","npc_id":"hunter","key":"knows_forest_secret","value":false},
+    {"type":"set_story_flag","key":"mainline_hunter_route_missed","value":true}
   ]
 }

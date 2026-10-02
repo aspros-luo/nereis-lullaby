@@ -641,6 +641,11 @@ func _execute_action(action:Dictionary):
 			if not direct_timeline.is_empty():
 				NarrativeManager.play_timeline(direct_timeline)
 
+		"request_ending":
+			var ending_id:String = str(action.get("ending_id", ""))
+			if not ending_id.is_empty():
+				EndingManager.request_ending(ending_id)
+
 		"set_npc_permanent":
 			_set_npc_state_value(action, true, false)
 

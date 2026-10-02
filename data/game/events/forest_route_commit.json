@@ -3,32 +3,17 @@
   "priority": 60,
   "once": true,
   "manual": false,
-  "start_day": 2,
+  "start_day": 3,
   "end_day": 5,
   "conditions": [
-    {
-      "type": "story_flag",
-      "key": "hunter_forest_route_unlocked",
-      "operator": "==",
-      "value": true
-    }
+    {"type":"story_flag","key":"hunter_forest_route_unlocked","operator":"==","value":true}
   ],
   "actions": [
-    {
-      "type": "set_story_flag",
-      "key": "forest_investigation_committed",
-      "value": true
-    },
-    {
-      "type": "advance_mainline_stage",
-      "value": 3
-    }
+    {"type":"set_story_flag","key":"forest_investigation_committed","value":true},
+    {"type":"set_story_flag","key":"forest_investigation_result_pending","value":true},
+    {"type":"advance_mainline_stage","value":3}
   ],
   "expire_actions": [
-    {
-      "type": "set_story_flag",
-      "key": "mainline_forest_route_missed",
-      "value": true
-    }
+    {"type":"set_story_flag","key":"mainline_forest_route_missed","value":true}
   ]
 }

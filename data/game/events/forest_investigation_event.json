@@ -2,91 +2,41 @@
   "id": "forest_investigation_event",
   "priority": 50,
   "once": true,
-  "manual": false,
+  "manual": true,
   "start_day": 3,
   "end_day": 6,
   "conditions": [
-    {
-      "type": "story_flag",
-      "key": "forest_investigation_committed",
-      "operator": "==",
-      "value": true
-    }
+    {"type":"story_flag","key":"forest_investigation_committed","operator":"==","value":true}
   ],
   "actions": [
-    {
-      "type": "set_story_flag",
-      "key": "forest_investigation_started",
-      "value": true
-    },
-    {
-      "type": "set_story_flag",
-      "key": "forest_investigation_result_pending",
-      "value": false
-    },
-    {
-      "type": "advance_mainline_stage",
-      "value": 4
-    },
-    {
-      "type": "queue_phase_dialogue",
-      "phase": "MORNING",
-      "timeline": "forest_entry"
-    }
+    {"type":"set_story_flag","key":"forest_investigation_started","value":true},
+    {"type":"set_story_flag","key":"forest_investigation_result_pending","value":false},
+    {"type":"advance_mainline_stage","value":4},
+    {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"forest_entry"}
   ],
   "expire_actions": [
-    {
-      "type": "set_story_flag",
-      "key": "forest_investigation_expired",
-      "value": true
-    },
-    {
-      "type": "set_story_flag",
-      "key": "mainline_forest_investigation_missed",
-      "value": true
-    }
+    {"type":"set_story_flag","key":"forest_investigation_expired","value":true},
+    {"type":"set_story_flag","key":"mainline_forest_investigation_missed","value":true}
   ],
   "choices": [
     {
-      "id": "touch_strange_mark",
-      "phase": "MORNING",
-      "label": "触碰树上的奇怪刻痕",
-      "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "forest_mark_touched",
-          "value": true
-        },
-        {
-          "type": "add_world_value",
-          "key": "outer_god_progress",
-          "value": 1
-        },
-        {
-          "type": "advance_mainline_stage",
-          "value": 5
-        }
+      "id":"touch_strange_mark",
+      "phase":"MORNING",
+      "label":"触碰树上的奇怪刻痕",
+      "actions":[
+        {"type":"set_story_flag","key":"forest_mark_touched","value":true},
+        {"type":"add_world_value","key":"outer_god_progress","value":1},
+        {"type":"advance_mainline_stage","value":5}
       ]
     },
     {
-      "id": "leave_mark_alone",
-      "phase": "MORNING",
-      "label": "记住位置，但不要碰它",
-      "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "forest_mark_untouched",
-          "value": true
-        },
-        {
-          "type": "set_story_flag",
-          "key": "forest_mark_observed",
-          "value": true
-        },
-        {
-          "type": "advance_mainline_stage",
-          "value": 5
-        }
+      "id":"leave_mark_alone",
+      "phase":"MORNING",
+      "label":"记住位置，但不要碰它",
+      "actions":[
+        {"type":"set_story_flag","key":"forest_mark_untouched","value":true},
+        {"type":"set_story_flag","key":"forest_mark_observed","value":true},
+        {"type":"advance_mainline_stage","value":5}
       ]
     }
   ]

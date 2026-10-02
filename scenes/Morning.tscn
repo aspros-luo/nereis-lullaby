@@ -8,7 +8,7 @@ bg_color = Color(0.055, 0.067, 0.075, 0.92)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
-border_width_bottom = 2
+border_bottom_width = 2
 border_color = Color(0.48, 0.42, 0.31, 0.8)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
@@ -90,10 +90,7 @@ offset_left = 104.0
 offset_top = 205.0
 offset_right = 360.0
 offset_bottom = 248.0
-theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("ButtonStyle")
-theme_override_styles/hover = SubResource("ButtonHover")
+visible = false
 text = "前往森林"
 
 [node name="FarmButton" type="Button" parent="UI" unique_id=1815742930]
@@ -101,10 +98,7 @@ offset_left = 104.0
 offset_top = 258.0
 offset_right = 360.0
 offset_bottom = 301.0
-theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("ButtonStyle")
-theme_override_styles/hover = SubResource("ButtonHover")
+visible = false
 text = "前往农场"
 
 [node name="LivestockButton" type="Button" parent="UI" unique_id=818717613]
@@ -112,33 +106,26 @@ offset_left = 104.0
 offset_top = 311.0
 offset_right = 360.0
 offset_bottom = 354.0
-theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("ButtonStyle")
-theme_override_styles/hover = SubResource("ButtonHover")
+visible = false
 text = "照料牲畜"
 
 [node name="TavernButton" type="Button" parent="UI" unique_id=742154397]
 offset_left = 104.0
-offset_top = 364.0
+offset_top = 205.0
 offset_right = 360.0
-offset_bottom = 407.0
-theme_override_colors/font_color = Color(0.84, 0.82, 0.76, 1)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("ButtonStyle")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "直接去酒馆"
+offset_bottom = 248.0
+text = "去酒馆"
 
 [node name="ForestInvestigationButton" type="Button" parent="UI" unique_id=903117524]
 offset_left = 104.0
-offset_top = 432.0
+offset_top = 258.0
 offset_right = 360.0
-offset_bottom = 480.0
+offset_bottom = 301.0
 theme_override_colors/font_color = Color(0.85, 0.57, 0.45, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("ButtonStyle")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "深入森林 · 调查异常"
+text = "进入森林 · 调查异常"
 visible = false
 
 [node name="Footer" type="Label" parent="UI"]

@@ -68,7 +68,11 @@ func _on_input_event(_viewport, event, _shape_idx):
 
 func interact():
 	print("Interact NPC:", npc_id)
-	var ui = get_tree().current_scene.get_node("NPCInteractionUI")
+
+	var ui = get_parent().get_node_or_null("NPCInteractionUI")
+	if ui == null:
+		ui = get_tree().current_scene.get_node_or_null("NPCInteractionUI")
+
 	if ui:
 		ui.open(npc_id)
 	else:

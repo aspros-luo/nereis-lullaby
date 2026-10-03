@@ -1,0 +1,28 @@
+{
+  "id": "longform_d90_forest_hunter",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 90,
+  "end_day": 90,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hunter",
+      "timeline": "longform_d90_forest_hunter"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 90
+    }
+  ],
+  "choices": []
+}

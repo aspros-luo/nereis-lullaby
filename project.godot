@@ -110,6 +110,7 @@ directories/dtl_directory={
 "longform_d110_village_hero": "res://data/dialogic/timelines/longform_d110_village_hero.dtl",
 "longform_d119_final_prep": "res://data/dialogic/timelines/longform_d119_final_prep.dtl",
 "longform_d120_finale": "res://data/dialogic/timelines/longform_d120_finale.dtl",
+"ng_plus_d12_whisper": "res://data/dialogic/timelines/ng_plus_d12_whisper.dtl",
 }
 layout/style_directory={}
 

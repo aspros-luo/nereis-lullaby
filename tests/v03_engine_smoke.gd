@@ -107,7 +107,6 @@ func _run():
 	expect(ui != null, "NPCInteractionUI exists in Tavern")
 	expect(tavern_ui != null, "TavernUI exists in Tavern")
 	if ui == null or tavern_ui == null:
-		tavern.queue_free()
 		get_tree().quit(1)
 		return
 
@@ -162,11 +161,11 @@ func _run():
 		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice applies hero_truth_shared")
 		expect(not bool(node("StoryManager").call("has_pending_npc_choices")), "Selecting D6 choice clears pending NPC choices")
 
-	if is_instance_valid(tavern):
-		tavern.process_mode = Node.PROCESS_MODE_DISABLED
-		tavern.get_parent().remove_child(tavern)
-		tavern.queue_free()
-	await get_tree().process_frame
-	await get_tree().process_frame
+	# Do not free the temporary Tavern tree here. Godot's UI layout/tween queue can
+	# still be processing dynamically-created choice buttons on headless shutdown.
+	# The process exits immediately after disabling this test scene, avoiding a
+	# native-engine shutdown crash that is unrelated to gameplay behavior.
+	tavern.process_mode = Node.PROCESS_MODE_DISABLED if is_instance_valid(tavern) else Node.PROCESS_MODE_INHERIT
 
+	await get_tree().process_frame
 	get_tree().quit(0 if failures == 0 else 1)

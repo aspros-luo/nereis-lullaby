@@ -431,6 +431,11 @@ func _clear_pending_choices_for_event(event_id:String):
 			pending_phase_choices.erase(phase)
 
 
+func has_pending_npc_choices()->bool:
+
+	return not pending_npc_choices.is_empty()
+
+
 func get_npc_choices(npc_id:String)->Array:
 
 	var data:Dictionary = pending_npc_choices.get(npc_id, {})

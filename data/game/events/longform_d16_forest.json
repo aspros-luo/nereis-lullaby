@@ -1,0 +1,66 @@
+{
+  "id": "longform_d16_forest",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 16,
+  "end_day": 16,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d16_forest_decision"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "forest_chapter_started",
+      "value": true
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 16
+    }
+  ],
+  "choices": [
+    {
+      "id": "follow_tide",
+      "phase": "MORNING",
+      "label": "沿着潮声继续深入",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_deep_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "guard_village",
+      "phase": "MORNING",
+      "label": "先守住村庄这盏灯",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_guard_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    }
+  ]
+}

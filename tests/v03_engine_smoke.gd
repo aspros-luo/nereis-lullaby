@@ -161,8 +161,8 @@ func _run():
 		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice applies hero_truth_shared")
 		expect(not bool(node("StoryManager").call("has_pending_npc_choices")), "Selecting D6 choice clears pending NPC choices")
 
-	ui.call("close")
-	tavern.queue_free()
+	if is_instance_valid(tavern):
+		tavern.process_mode = Node.PROCESS_MODE_DISABLED
 	await get_tree().process_frame
 
 	get_tree().quit(0 if failures == 0 else 1)

@@ -1,0 +1,28 @@
+{
+  "id": "ng_plus_d12_whisper",
+  "priority": 180,
+  "once": true,
+  "manual": false,
+  "start_day": 12,
+  "end_day": 12,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "ng_plus",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "ng_plus_d12_whisper"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "ng_plus_memory_awakened",
+      "value": true
+    }
+  ]
+}

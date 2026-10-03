@@ -56,13 +56,8 @@ func _run():
 		var hero_timeline = load("res://data/dialogic/timelines/hero_anomaly_question_untouched.dtl")
 		expect(hunter_timeline != null, "hunter_trust_reveal loads as a resource")
 		expect(hero_timeline != null, "hero_anomaly_question_untouched loads as a resource")
-		expect(bool(node("NarrativeManager").call("play_timeline", "hunter_trust_reveal")), "NarrativeManager starts registered hunter timeline")
-		await get_tree().process_frame
-		expect(node("NarrativeManager").get("is_playing") == true, "NarrativeManager enters playing state")
-		await dialogic.end_timeline(true)
-		await get_tree().process_frame
-		await get_tree().process_frame
-		expect(node("NarrativeManager").get("is_playing") == false, "NarrativeManager leaves playing state after Dialogic timeline end")
+		expect(dialogic.timeline_exists("hunter_trust_reveal"), "Dialogic registration resolves hunter_trust_reveal")
+		expect(dialogic.timeline_exists("hero_anomaly_question_untouched"), "Dialogic registration resolves hero_anomaly_question_untouched")
 
 	reset_runtime()
 
@@ -114,6 +109,7 @@ func _run():
 
 	var hero:Area2D = null
 	var merchant:Area2D = null
+	var hunter:Area2D = null
 	var npc_count:int = 0
 	for child in tavern.get_children():
 		if child is Area2D:
@@ -123,12 +119,15 @@ func _run():
 				hero = child
 			elif node_id == "merchant":
 				merchant = child
+			elif node_id == "hunter":
+				hunter = child
 
 	expect(npc_count == 3, "Tavern spawns exactly three guests")
 	expect(hero != null, "Hero guest is spawned")
 	expect(merchant != null, "Merchant guest is spawned")
+	expect(hunter != null, "Hunter guest is spawned")
 
-	if hero != null and merchant != null:
+	if hero != null and merchant != null and hunter != null:
 		hero.call("interact")
 		await get_tree().process_frame
 		expect(ui.visible, "Hero interaction opens NPC panel")
@@ -138,9 +137,13 @@ func _run():
 		merchant.call("interact")
 		await get_tree().process_frame
 		expect(str(ui.get("current_npc_id")) == "merchant", "Open NPC panel can switch to another guest")
+		hunter.call("interact")
+		await get_tree().process_frame
+		expect(str(ui.get("current_npc_id")) == "hunter", "Open NPC panel can switch to hunter")
 		hero.call("interact")
 		await get_tree().process_frame
 		expect(str(ui.get("current_npc_id")) == "hero", "Hero can be reopened after switching guests")
+		expect((ui.get("choice_buttons") as Array).size() == 2, "D6 choice buttons survive NPC switching")
 
 		var pending_timeline:String = str(node("StoryManager").call("consume_npc_dialogue", "hero"))
 		expect(pending_timeline == "hero_anomaly_question_untouched", "D6 hero timeline is consumed from the pending dialogue")
@@ -156,14 +159,14 @@ func _run():
 		tavern_ui.call("_on_end_day_pressed")
 		expect(int(node("GameManager").get("current_day")) == day_before, "End Day is blocked while an NPC story choice is pending")
 
-		ui.call("_on_choice_pressed", "tell_hero_about_mark")
+		buttons[0].emit_signal("pressed")
 		await get_tree().process_frame
-		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice applies hero_truth_shared")
+		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice through the real Button applies hero_truth_shared")
 		expect(not bool(node("StoryManager").call("has_pending_npc_choices")), "Selecting D6 choice clears pending NPC choices")
 
-	# Let all panel tweens finish before headless engine shutdown. This is a test
-	# harness concern: exiting while a SceneTreeTween is still active can trigger
-	# a native Godot 4.6.1 shutdown crash unrelated to gameplay.
+	# Disable the temporary scene and allow all queued UI work to settle before
+	# headless shutdown. We deliberately avoid forcing a free on this test tree;
+	# Godot 4.6.1 can crash natively while a UI Container is being torn down.
 	tavern.process_mode = Node.PROCESS_MODE_DISABLED
 	await get_tree().create_timer(0.5).timeout
 

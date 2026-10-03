@@ -1,0 +1,27 @@
+{
+  "id": "longform_d32_village_merchant",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 32,
+  "end_day": 32,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "merchant",
+      "timeline": "longform_d32_village_merchant"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 32
+    }
+  ]
+}

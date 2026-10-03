@@ -1,0 +1,26 @@
+{
+  "id": "longform_d12_forest",
+  "priority": 140,
+  "once": true,
+  "start_day": 12,
+  "end_day": 12,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hero",
+      "timeline": "longform_d12_forest_hero"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 13
+    }
+  ]
+}

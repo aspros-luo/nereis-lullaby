@@ -1,0 +1,56 @@
+{
+  "id": "longform_d58_village_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 58,
+  "end_day": 58,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 58
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "打开那间空屋",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_house_opened",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "继续封存它",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_house_sealed",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    }
+  ]
+}

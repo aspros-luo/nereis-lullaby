@@ -47,7 +47,7 @@ func _run():
 	expect(node("NPCManager") != null, "NPCManager autoload is available")
 	expect(node("EndingManager") != null, "EndingManager autoload is available")
 
-	var dialogic:Node = node("Dialogic")
+	var dialogic:DialogicGameHandler = node("Dialogic") as DialogicGameHandler
 	expect(dialogic != null, "Dialogic autoload is available")
 	if dialogic != null:
 		expect(bool(ResourceLoader.exists("res://data/dialogic/timelines/hunter_trust_reveal.dtl")), "hunter_trust_reveal resource is loadable")
@@ -59,7 +59,8 @@ func _run():
 		expect(bool(node("NarrativeManager").call("play_timeline", "hunter_trust_reveal")), "NarrativeManager starts registered hunter timeline")
 		await get_tree().process_frame
 		expect(node("NarrativeManager").get("is_playing") == true, "NarrativeManager enters playing state")
-		dialogic.call("end_timeline", true)
+		await dialogic.end_timeline(true)
+		await get_tree().process_frame
 		await get_tree().process_frame
 		expect(node("NarrativeManager").get("is_playing") == false, "NarrativeManager leaves playing state after Dialogic timeline end")
 
@@ -163,6 +164,9 @@ func _run():
 
 	if is_instance_valid(tavern):
 		tavern.process_mode = Node.PROCESS_MODE_DISABLED
+		tavern.get_parent().remove_child(tavern)
+		tavern.queue_free()
+	await get_tree().process_frame
 	await get_tree().process_frame
 
 	get_tree().quit(0 if failures == 0 else 1)

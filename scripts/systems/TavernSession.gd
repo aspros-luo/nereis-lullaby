@@ -116,3 +116,10 @@ func end_session():
 	print("Tavern Closed")
 	session_finished.emit()
 	DayManager.start_night()
+
+func reset_session():
+	guests.clear()
+	current_guest_index = 0
+	served_guests.clear()
+
+

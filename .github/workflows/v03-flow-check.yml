@@ -1,0 +1,35 @@
+name: v0.3 Flow Check
+
+on:
+  push:
+    branches:
+      - feature/v0.3-playable-demo
+  pull_request:
+    branches:
+      - feature/v0.3-playable-demo
+
+jobs:
+  python-audit:
+    name: Exhaustive story branch audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run exhaustive Python audit
+        run: python3 tests/v03_flow_audit.py
+
+  godot-check:
+    name: Godot 4.6.1 engine smoke test
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.6.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import and parse project
+        run: godot --headless --editor --quit --path .
+
+      - name: Run engine smoke test
+        run: godot --headless --path . -s res://tests/v03_engine_smoke.gd

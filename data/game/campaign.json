@@ -1,0 +1,21 @@
+{
+  "title": "Nereis' Lullaby — Longform Campaign",
+  "target_hours": 40,
+  "target_days": 120,
+  "new_game_plus": {
+    "reserved": true,
+    "cycle": 2,
+    "carry_over": ["hero_memory", "ng_plus"],
+    "future_hooks": ["hidden_dialogue", "true_route", "alternate_finale"]
+  },
+  "chapters": [
+    {"id":"I","title":"酒馆的灯","start_day":1,"end_day":11,"target_hours":4},
+    {"id":"II","title":"潮痕","start_day":12,"end_day":24,"target_hours":4},
+    {"id":"III","title":"深井之下","start_day":25,"end_day":40,"target_hours":6},
+    {"id":"IV","title":"无月森林","start_day":41,"end_day":58,"target_hours":6},
+    {"id":"V","title":"盐海圣堂","start_day":59,"end_day":78,"target_hours":7},
+    {"id":"VI","title":"梦境王座","start_day":79,"end_day":98,"target_hours":6},
+    {"id":"VII","title":"蜜忒之歌","start_day":99,"end_day":120,"target_hours":7}
+  ],
+  "pacing_note": "40小时为内容与流程目标，不以空转等待强行拉长；最终时长需通过实际试玩校准。"
+}

@@ -178,4 +178,4 @@ func _run():
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	get_tree().quit(0 if failures == 0 else 1)
+	OS.exit(0 if failures == 0 else 1)

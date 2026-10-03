@@ -1,6 +1,10 @@
 extends Node
 
 
+var _dialogic_timeline_loader:ResourceFormatLoader
+var _dialogic_character_loader:ResourceFormatLoader
+
+
 signal dialogue_started(timeline:String)
 signal dialogue_finished(timeline:String)
 
@@ -11,10 +15,31 @@ var current_timeline:String = ""
 
 func _ready():
 
+	_register_dialogic_resource_loaders()
+
 	print("NarrativeManager Ready")
 
 	if not Dialogic.timeline_ended.is_connected(_on_dialogic_timeline_ended):
 		Dialogic.timeline_ended.connect(_on_dialogic_timeline_ended)
+
+
+func _register_dialogic_resource_loaders():
+
+	var timeline_loader_script = preload("res://addons/dialogic/Resources/TimelineResourceLoader.gd")
+	var character_loader_script = preload("res://addons/dialogic/Resources/CharacterResourceLoader.gd")
+
+	_dialogic_timeline_loader = timeline_loader_script.new()
+	_dialogic_character_loader = character_loader_script.new()
+
+	ResourceLoader.add_resource_format_loader(
+		_dialogic_timeline_loader,
+		true
+	)
+
+	ResourceLoader.add_resource_format_loader(
+		_dialogic_character_loader,
+		true
+	)
 
 
 func play_timeline(

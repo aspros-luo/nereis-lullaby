@@ -1,0 +1,27 @@
+{
+  "id": "longform_d90_church_hero",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 90,
+  "end_day": 90,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hero",
+      "timeline": "longform_d90_church_hero"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 90
+    }
+  ]
+}

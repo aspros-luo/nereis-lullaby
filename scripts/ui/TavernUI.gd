@@ -30,6 +30,10 @@ func _on_end_day_pressed():
 		print("End Day blocked: story dialogue is playing")
 		return
 
+	if StoryManager.has_pending_npc_choices():
+		print("End Day blocked: pending story choice")
+		return
+
 	if day_end_clicked:
 		print("End Day already clicked")
 		return
@@ -80,6 +84,7 @@ func _update_day_end_button():
 	end_day_button.disabled = (
 		day_end_clicked
 		or NarrativeManager.is_playing
+		or StoryManager.has_pending_npc_choices()
 	)
 
 

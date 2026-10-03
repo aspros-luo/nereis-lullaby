@@ -1,0 +1,56 @@
+{
+  "id": "longform_d98_forest_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 98,
+  "end_day": 98,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 98
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "穿过梦里的森林",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_dream_crossed",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 99
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "留在梦外",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_dream_refused",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 99
+        }
+      ]
+    }
+  ]
+}

@@ -56,7 +56,8 @@ func play_timeline(
 		)
 		return false
 
-	if not Dialogic.timeline_exists(timeline_name):
+	var timeline_resource = _resolve_timeline(timeline_name)
+	if timeline_resource == null:
 		print(
 			"Narrative timeline missing:",
 			timeline_name
@@ -74,10 +75,32 @@ func play_timeline(
 	dialogue_started.emit(timeline_name)
 
 	Dialogic.start(
-		timeline_name
+		timeline_resource
 	)
 
 	return true
+
+
+func _resolve_timeline(timeline_name:String)->DialogicTimeline:
+
+	if Dialogic.timeline_exists(timeline_name):
+		var registered_timeline = DialogicResourceUtil.get_timeline_resource(timeline_name)
+		if registered_timeline != null:
+			return registered_timeline
+
+	var directory:Dictionary = ProjectSettings.get_setting(
+		"dialogic/directories/dtl_directory",
+		{}
+	)
+	var path:String = str(directory.get(timeline_name, ""))
+	if path.is_empty():
+		return null
+
+	var timeline_resource = load(path)
+	if timeline_resource is DialogicTimeline:
+		return timeline_resource
+
+	return null
 
 
 func _on_dialogic_timeline_ended():

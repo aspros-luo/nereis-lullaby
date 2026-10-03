@@ -1,0 +1,27 @@
+{
+  "id": "longform_d119_final_prep",
+  "priority": 160,
+  "once": true,
+  "manual": false,
+  "start_day": 119,
+  "end_day": 119,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "act2_started",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d119_final_prep"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 119
+    }
+  ]
+}

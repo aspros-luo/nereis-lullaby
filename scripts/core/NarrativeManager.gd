@@ -93,6 +93,16 @@ func _resolve_timeline(timeline_name:String)->DialogicTimeline:
 		{}
 	)
 	var path:String = str(directory.get(timeline_name, ""))
+
+	if path.is_empty():
+		var files:PackedStringArray = DirAccess.get_files_at(
+			"res://data/dialogic/timelines"
+		)
+		for file_name in files:
+			if file_name.get_basename() == timeline_name and file_name.ends_with(".dtl"):
+				path = "res://data/dialogic/timelines/" + file_name
+				break
+
 	if path.is_empty():
 		return null
 

@@ -1,0 +1,66 @@
+{
+  "id": "longform_d16_church",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 16,
+  "end_day": 16,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d16_church_decision"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "church_chapter_started",
+      "value": true
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 16
+    }
+  ],
+  "choices": [
+    {
+      "id": "open_archive",
+      "phase": "MORNING",
+      "label": "打开教会的旧档案",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_archive_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "follow_watcher",
+      "phase": "MORNING",
+      "label": "跟踪昨夜的观察者",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_watcher_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    }
+  ]
+}

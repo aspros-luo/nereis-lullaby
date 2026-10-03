@@ -1,6 +1,6 @@
 {
   "id": "forest_mark_consequence_touched",
-  "priority": 80,
+  "priority": 90,
   "once": true,
   "manual": false,
   "start_day": 4,

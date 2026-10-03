@@ -10,7 +10,7 @@ signal save_failed(message:String)
 signal load_failed(message:String)
 
 func _ready():
-	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	DirAccess.make_dir_recursive(SAVE_DIR)
 	print("SaveManager Ready")
 
 func has_save(slot:int = 0)->bool:

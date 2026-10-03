@@ -1,0 +1,26 @@
+{
+  "id": "longform_d14_church",
+  "priority": 140,
+  "once": true,
+  "start_day": 14,
+  "end_day": 14,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "merchant",
+      "timeline": "longform_d14_church_merchant"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 15
+    }
+  ]
+}

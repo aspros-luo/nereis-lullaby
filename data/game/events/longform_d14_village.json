@@ -1,0 +1,26 @@
+{
+  "id": "longform_d14_village",
+  "priority": 140,
+  "once": true,
+  "start_day": 14,
+  "end_day": 14,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "merchant",
+      "timeline": "longform_d14_village_merchant"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 15
+    }
+  ]
+}

@@ -15,6 +15,11 @@
   ],
   "actions": [
     {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d40_village_choice"
+    },
+    {
       "type": "advance_mainline_stage",
       "value": 40
     }

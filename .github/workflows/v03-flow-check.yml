@@ -52,3 +52,14 @@ jobs:
             exit 0
           fi
           exit $code
+
+      - name: Run full v0.4 D1-D120 longform flow test
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v04_longform_flow.tscn > /tmp/v04_longform_flow.log 2>&1
+          code=$?
+          cat /tmp/v04_longform_flow.log
+          if grep -q "PASS: v0.4 full longform route D1-D120 complete" /tmp/v04_longform_flow.log; then
+            exit 0
+          fi
+          exit $code

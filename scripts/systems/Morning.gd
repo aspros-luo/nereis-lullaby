@@ -39,9 +39,7 @@ func _on_story_dialogue_started(_timeline:String):
 func _on_story_dialogue_finished(_timeline:String):
 	_update_action_buttons()
 	_refresh_phase_choice_ui()
-	if tavern_after_story_pending:
-		tavern_after_story_pending = false
-		call_deferred("enter_tavern")
+	call_deferred("_advance_pending_morning_story")
 
 func _on_phase_choice_available(phase:String, _event_id:String):
 	if phase != "MORNING":
@@ -58,17 +56,21 @@ func _on_phase_choice_completed(phase:String, event_id:String, choice_id:String)
 	if event_id == "forest_investigation_event":
 		forest_investigation_started = false
 		tavern_after_story_pending = true
-	call_deferred("_play_queued_phase_dialogue_after_choice")
+	call_deferred("_advance_pending_morning_story")
 
-func _play_queued_phase_dialogue_after_choice():
-	var timeline:String = StoryManager.consume_phase_dialogue("MORNING")
-	if timeline.is_empty():
-		if tavern_after_story_pending:
-			tavern_after_story_pending = false
-			enter_tavern()
+func _advance_pending_morning_story():
+	if NarrativeManager.is_playing:
 		return
-	print("Story Morning Dialogue After Choice:", timeline)
-	NarrativeManager.play_timeline(timeline)
+
+	var timeline:String = StoryManager.consume_phase_dialogue("MORNING")
+	if not timeline.is_empty():
+		print("Story Morning Dialogue:", timeline)
+		NarrativeManager.play_timeline(timeline)
+		return
+
+	if tavern_after_story_pending:
+		tavern_after_story_pending = false
+		enter_tavern()
 
 func _refresh_phase_choice_ui():
 	for button in phase_choice_buttons:
@@ -124,6 +126,7 @@ func _update_action_buttons():
 	var locked:bool = NarrativeManager.is_playing
 	var has_phase_choices:bool = not StoryManager.get_phase_choices("MORNING").is_empty()
 	var forest_story_available:bool = StoryState.get_flag("forest_investigation_result_pending", false)
+	var has_phase_dialogue:bool = StoryManager.has_pending_phase_dialogue("MORNING")
 
 	# 当前版本暂时隐藏星露谷式的日常采集入口。
 	# 核心主线需要主动触发时，再由剧情解锁对应行动。
@@ -136,10 +139,10 @@ func _update_action_buttons():
 	$UI/LivestockButton.disabled = true
 
 	$UI/TavernButton.visible = true
-	$UI/TavernButton.disabled = locked or has_phase_choices or tavern_transition_started
+	$UI/TavernButton.disabled = locked or has_phase_choices or has_phase_dialogue or tavern_transition_started
 
 	$UI/ForestInvestigationButton.visible = forest_story_available
-	$UI/ForestInvestigationButton.disabled = locked or has_phase_choices or not forest_story_available or tavern_transition_started
+	$UI/ForestInvestigationButton.disabled = locked or has_phase_choices or has_phase_dialogue or not forest_story_available or tavern_transition_started
 
 	_update_phase_choice_buttons()
 

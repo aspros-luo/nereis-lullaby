@@ -48,3 +48,14 @@ jobs:
             exit 0
           fi
           exit $code
+
+      - name: Validate all three D1-D120 routes and NG+
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v04_all_routes_engine.tscn > /tmp/v04_routes.log 2>&1
+          code=$?
+          cat /tmp/v04_routes.log
+          if grep -q "PASS: v0.4 all three routes D1-D120 complete" /tmp/v04_routes.log; then
+            exit 0
+          fi
+          exit $code

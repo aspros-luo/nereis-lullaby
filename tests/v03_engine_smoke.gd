@@ -56,8 +56,12 @@ func _run():
 		var hero_timeline = load("res://data/dialogic/timelines/hero_anomaly_question_untouched.dtl")
 		expect(hunter_timeline != null, "hunter_trust_reveal loads as a resource")
 		expect(hero_timeline != null, "hero_anomaly_question_untouched loads as a resource")
-		expect(bool(dialogic.call("timeline_exists", "hunter_trust_reveal")), "Dialogic identifies hunter_trust_reveal")
-		expect(bool(dialogic.call("timeline_exists", "hero_anomaly_question_untouched")), "Dialogic identifies hero_anomaly_question_untouched")
+		expect(bool(node("NarrativeManager").call("play_timeline", "hunter_trust_reveal")), "NarrativeManager starts registered hunter timeline")
+		await get_tree().process_frame
+		expect(node("NarrativeManager").get("is_playing") == true, "NarrativeManager enters playing state")
+		dialogic.call("end_timeline", true)
+		await get_tree().process_frame
+		expect(node("NarrativeManager").get("is_playing") == false, "NarrativeManager leaves playing state after Dialogic timeline end")
 
 	reset_runtime()
 

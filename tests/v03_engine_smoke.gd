@@ -168,4 +168,4 @@ func _run():
 	# dedicated smoke-test process directly so Godot's global resource-leak detector
 	# cannot turn valid gameplay assertions into a false-negative CI result.
 	print("PASS: v0.3 engine smoke assertions complete")
-	OS.exit(0 if failures == 0 else 1)
+	get_tree().quit(0 if failures == 0 else 1)

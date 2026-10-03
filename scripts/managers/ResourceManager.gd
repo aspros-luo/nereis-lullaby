@@ -56,3 +56,8 @@ func print_resources():
 	print(resources)
 
 	print("================")
+
+func reset():
+	resources.clear()
+
+

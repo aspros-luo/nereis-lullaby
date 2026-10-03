@@ -87,6 +87,15 @@ func open(id:String):
 	_refresh_choice_ui()
 	_update_interaction_buttons()
 
+func _process(_delta):
+	if not visible or current_npc_id.is_empty() or NarrativeManager.is_playing:
+		return
+	var pending_choices:Array = StoryManager.get_npc_choices(current_npc_id)
+	if not pending_choices.is_empty() and choice_buttons.is_empty():
+		_refresh_choice_ui()
+		_update_interaction_buttons()
+
+
 func _on_talk_pressed():
 	if NarrativeManager.is_playing:
 		return
@@ -181,14 +190,13 @@ func _update_interaction_buttons():
 	else:
 		normal_drink_button.text = "端上麦酒"
 		special_drink_button.text = "端上月影"
-	talk_button.disabled = locked or has_choices
+	talk_button.disabled = locked
 	normal_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
 	special_drink_button.disabled = locked or has_choices or has_story_dialogue or has_been_served
 	status_button.disabled = locked or has_choices or has_story_dialogue
 
-	# 剧情选择属于“待处理状态”。必须先完成选择，才能继续营业或结束当天。
-	# 不允许关闭面板，避免玩家看不到待处理选择而误以为剧情卡死。
-	close_button.disabled = locked or has_choices
+	# 剧情选择属于待处理状态；玩家可以关闭并重新打开 NPC 面板，选择本身不会丢失。
+	close_button.disabled = locked
 
 	for button in choice_buttons:
 		if is_instance_valid(button):

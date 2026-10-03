@@ -1,0 +1,26 @@
+{
+  "id": "longform_d13_village",
+  "priority": 140,
+  "once": true,
+  "start_day": 13,
+  "end_day": 13,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hunter",
+      "timeline": "longform_d13_village_hunter"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 14
+    }
+  ]
+}

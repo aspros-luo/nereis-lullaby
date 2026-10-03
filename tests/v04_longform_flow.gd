@@ -104,7 +104,7 @@ func _run():
 	phase_dialogue("demo_final_choice_intro", "D11 final-intro dialogue")
 	expect((node("StoryManager").call("get_phase_choices","MORNING") as Array).size() == 3, "D11 exposes three route choices")
 	choose_phase("answer_forest_voice", "D11 forest route selection")
-	expect(not bool(node("EndingManager").get("current_ending")), "D11 does not end the full campaign")
+	expect(str(node("EndingManager").get("current_ending")).is_empty(), "D11 does not end the full campaign")
 	phase_dialogue("act2_forest_call", "D11 forest route call")
 
 	# Act II+ longform route: key days through Day 120.

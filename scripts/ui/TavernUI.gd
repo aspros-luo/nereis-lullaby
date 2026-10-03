@@ -13,6 +13,8 @@ func _ready():
 
 	NarrativeManager.dialogue_started.connect(_on_story_dialogue_started)
 	NarrativeManager.dialogue_finished.connect(_on_story_dialogue_finished)
+	StoryManager.choice_available.connect(_on_story_choice_available)
+	StoryManager.choice_completed.connect(_on_story_choice_completed)
 	TavernSession.session_started.connect(_on_tavern_session_changed)
 	TavernSession.guest_served.connect(_on_guest_served)
 
@@ -62,6 +64,16 @@ func _on_guest_served(_npc_id:String):
 	_update_status()
 
 
+func _on_story_choice_available(_npc_id:String, _event_id:String):
+	_update_status()
+	_update_day_end_button()
+
+
+func _on_story_choice_completed(_event_id:String, _choice_id:String):
+	_update_status()
+	_update_day_end_button()
+
+
 func _update_status():
 	if not is_instance_valid(status_label):
 		return
@@ -69,6 +81,8 @@ func _update_status():
 	var phase_text := "营业中"
 	if NarrativeManager.is_playing:
 		phase_text = "剧情进行中 · 请稍候"
+	elif StoryManager.has_pending_npc_choices():
+		phase_text = "请先完成剧情选择"
 	elif day_end_clicked:
 		phase_text = "正在打烊……"
 

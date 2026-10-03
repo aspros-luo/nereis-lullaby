@@ -1,0 +1,56 @@
+{
+  "id": "longform_d58_church_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 58,
+  "end_day": 58,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 58
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "交出一段记忆",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_memory_given",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "保留最后一段记忆",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_memory_hidden",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    }
+  ]
+}

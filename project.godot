@@ -1,9 +1,87 @@
+; Engine configuration file.
+; It's best edited using the Editor UI and not directly,
+; since the parameters that go here are not all obvious.
+
+config_version=5
+
 [application]
 
-run/main_scene="uid://djob7pcs8by1r"
+config/name="nereis-lullaby"
+run/main_scene="uid://djob7pcs8by1"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/icon="res://icon.svg"
 
 [autoload]
 
+GameManager="*uid://vpbs3ji2jgo"
+DayManager="*uid://dfy2sf7mk5hnr"
+PhaseManager="*uid://b0qmyw5dqdv8r"
+ActionManager="*uid://cnkfh7byxxbtb"
+ResourceManager="*uid://bo4wuvorl5wls"
+TavernManager="*uid://bbbm77rti1jkg"
+TavernSession="*uid://o1ahwymetwyo"
+NPCManager="*uid://ciolf55ig4pu4"
+WorldState="*uid://wu370goe7fld"
+StoryState="*res://scripts/core/StoryState.gd"
+StoryManager="*res://scripts/managers/StoryManager.gd"
+EndingManager="*res://scripts/managers/EndingManager.gd"
+NarrativeManager="*uid://8cmusxtdapti"
+DrinkManager="*uid://cl1f744ro4id6"
+Dialogic="*uid://ds2q0uclmolvu"
+NPCInteractionSystem="*uid://crj84xc0t3grr"
 SaveManager="*res://scripts/managers/SaveManager.gd"
 GameMenu="*res://scripts/ui/GameMenu.gd"
 ChapterBanner="*res://scripts/ui/ChapterBanner.gd"
+
+[dialogic]
+
+directories/dch_directory={
+"hunter": "res://data/dialogic/character/hunter.dch",
+"mite": "res://data/dialogic/character/mite.dch",
+"hero": "res://data/dialogic/character/hero.dch",
+"merchant": "res://data/dialogic/character/merchant.dch"
+}
+directories/dtl_directory={
+"day01_tavern_start": "res://data/dialogic/timelines/day01_tavern_start.dtl",
+"hunter_trust_reveal": "res://data/dialogic/timelines/hunter_trust_reveal.dtl",
+"forest_entry": "res://data/dialogic/timelines/forest_entry.dtl",
+"forest_mark_touched_consequence": "res://data/dialogic/timelines/forest_mark_touched_consequence.dtl",
+"forest_mark_untouched_consequence": "res://data/dialogic/timelines/forest_mark_untouched_consequence.dtl",
+"hero_mark_anomaly": "res://data/dialogic/timelines/hero_mark_anomaly.dtl",
+"hero_mark_anomaly_untouched": "res://data/dialogic/timelines/hero_mark_anomaly_untouched.dtl",
+"hero_notices_mark_touched": "res://data/dialogic/timelines/hero_notices_mark_touched.dtl",
+"hero_notices_mark_untouched": "res://data/dialogic/timelines/hero_notices_mark_untouched.dtl",
+"hero_anomaly_question_touched": "res://data/dialogic/timelines/hero_anomaly_question_touched.dtl",
+"hero_anomaly_question_untouched": "res://data/dialogic/timelines/hero_anomaly_question_untouched.dtl",
+"church_shadow_shared": "res://data/dialogic/timelines/church_shadow_shared.dtl",
+"church_shadow_hidden": "res://data/dialogic/timelines/church_shadow_hidden.dtl",
+"church_patrol_follow": "res://data/dialogic/timelines/church_patrol_follow.dtl",
+"church_patrol_avoid": "res://data/dialogic/timelines/church_patrol_avoid.dtl",
+"demo_final_choice_intro": "res://data/dialogic/timelines/demo_final_choice_intro.dtl"
+}
+layout/style_directory={}
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg")
+
+[input]
+
+dialogic_default_action={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194309,"physical_keycode":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":true,"double_click":false,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"window_id":0,"keycode":32,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"window_id":0,"keycode":88,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false)
+]
+}
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

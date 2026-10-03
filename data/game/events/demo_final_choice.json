@@ -6,34 +6,18 @@
   "start_day": 11,
   "end_day": 12,
   "conditions": [
-    {
-      "type": "story_flag",
-      "key": "mainline_stage",
-      "operator": ">=",
-      "value": 10
-    }
+    {"type":"story_flag","key":"mainline_stage","operator":">=","value":10}
   ],
   "actions": [
-    {
-      "type": "set_story_flag",
-      "key": "demo_final_choice_available",
-      "value": true
-    },
-    {
-      "type": "queue_phase_dialogue",
-      "phase": "MORNING",
-      "timeline": "demo_final_choice_intro"
-    },
-    {
-      "type": "advance_mainline_stage",
-      "value": 11
-    }
+    {"type":"set_story_flag","key":"demo_final_choice_available","value":true},
+    {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"demo_final_choice_intro"},
+    {"type":"advance_mainline_stage","value":11}
   ],
   "expire_actions": [
-    {
-      "type": "request_ending",
-      "ending_id": "human"
-    }
+    {"type":"set_story_flag","key":"act1_choice_missed","value":true},
+    {"type":"set_story_flag","key":"final_choice_human","value":true},
+    {"type":"set_story_flag","key":"route_human","value":true},
+    {"type":"advance_mainline_stage","value":12}
   ],
   "choices": [
     {
@@ -41,15 +25,11 @@
       "phase": "MORNING",
       "label": "回应森林里的声音",
       "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "final_choice_forest",
-          "value": true
-        },
-        {
-          "type": "request_ending",
-          "ending_id": "outer_god"
-        }
+        {"type":"set_story_flag","key":"final_choice_forest","value":true},
+        {"type":"set_story_flag","key":"route_forest","value":true},
+        {"type":"set_story_flag","key":"act2_started","value":true},
+        {"type":"advance_mainline_stage","value":12},
+        {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"act2_forest_call"}
       ]
     },
     {
@@ -57,20 +37,12 @@
       "phase": "MORNING",
       "label": "相信教会，交出你知道的一切",
       "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "final_choice_church",
-          "value": true
-        },
-        {
-          "type": "set_world_value",
-          "key": "church_truth",
-          "value": 2
-        },
-        {
-          "type": "request_ending",
-          "ending_id": "church"
-        }
+        {"type":"set_story_flag","key":"final_choice_church","value":true},
+        {"type":"set_story_flag","key":"route_church","value":true},
+        {"type":"set_story_flag","key":"act2_started","value":true},
+        {"type":"set_world_value","key":"church_truth","value":2},
+        {"type":"advance_mainline_stage","value":12},
+        {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"act2_church_call"}
       ]
     },
     {
@@ -78,15 +50,11 @@
       "phase": "MORNING",
       "label": "什么都不说，回到酒馆",
       "actions": [
-        {
-          "type": "set_story_flag",
-          "key": "final_choice_human",
-          "value": true
-        },
-        {
-          "type": "request_ending",
-          "ending_id": "human"
-        }
+        {"type":"set_story_flag","key":"final_choice_human","value":true},
+        {"type":"set_story_flag","key":"route_human","value":true},
+        {"type":"set_story_flag","key":"act2_started","value":true},
+        {"type":"advance_mainline_stage","value":12},
+        {"type":"queue_phase_dialogue","phase":"MORNING","timeline":"act2_village_call"}
       ]
     }
   ]

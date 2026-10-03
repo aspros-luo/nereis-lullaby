@@ -50,8 +50,14 @@ func _run():
 	var dialogic:Node = node("Dialogic")
 	expect(dialogic != null, "Dialogic autoload is available")
 	if dialogic != null:
-		expect(bool(dialogic.call("timeline_exists", "hunter_trust_reveal")), "hunter_trust_reveal is registered with Dialogic")
-		expect(bool(dialogic.call("timeline_exists", "hero_anomaly_question_untouched")), "hero_anomaly_question_untouched is registered with Dialogic")
+		expect(bool(ResourceLoader.exists("res://data/dialogic/timelines/hunter_trust_reveal.dtl")), "hunter_trust_reveal resource is loadable")
+		expect(bool(ResourceLoader.exists("res://data/dialogic/timelines/hero_anomaly_question_untouched.dtl")), "hero_anomaly_question_untouched resource is loadable")
+		var hunter_timeline = load("res://data/dialogic/timelines/hunter_trust_reveal.dtl")
+		var hero_timeline = load("res://data/dialogic/timelines/hero_anomaly_question_untouched.dtl")
+		expect(hunter_timeline != null, "hunter_trust_reveal loads as a resource")
+		expect(hero_timeline != null, "hero_anomaly_question_untouched loads as a resource")
+		expect(bool(dialogic.call("timeline_exists", "hunter_trust_reveal")), "Dialogic identifies hunter_trust_reveal")
+		expect(bool(dialogic.call("timeline_exists", "hero_anomaly_question_untouched")), "Dialogic identifies hero_anomaly_question_untouched")
 
 	reset_runtime()
 

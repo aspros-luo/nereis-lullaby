@@ -41,3 +41,14 @@ jobs:
             exit 0
           fi
           exit $code
+
+      - name: Run full D1-D11 engine flow test
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v03_full_flow_engine.tscn > /tmp/v03_full_flow_engine.log 2>&1
+          code=$?
+          cat /tmp/v03_full_flow_engine.log
+          if grep -q "PASS: v0.3 full story engine flow D1-D11 complete" /tmp/v03_full_flow_engine.log; then
+            exit 0
+          fi
+          exit $code

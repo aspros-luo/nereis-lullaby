@@ -1,0 +1,56 @@
+{
+  "id": "longform_d40_village_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 40,
+  "end_day": 40,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 40
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "接受眼前的代价",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_hard_choice",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 41
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "保留最后的退路",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_soft_choice",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 41
+        }
+      ]
+    }
+  ]
+}

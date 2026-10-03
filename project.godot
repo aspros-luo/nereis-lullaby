@@ -77,6 +77,7 @@ directories/dtl_directory={
 "longform_d18_church_merchant": "res://data/dialogic/timelines/longform_d18_church_merchant.dtl",
 "longform_d18_village_hunter": "res://data/dialogic/timelines/longform_d18_village_hunter.dtl",
 "longform_d25_chapter3": "res://data/dialogic/timelines/longform_d25_chapter3.dtl",
+"longform_d41_chapter4": "res://data/dialogic/timelines/longform_d41_chapter4.dtl",
 "longform_d32_forest_hunter": "res://data/dialogic/timelines/longform_d32_forest_hunter.dtl",
 "longform_d32_church_hero": "res://data/dialogic/timelines/longform_d32_church_hero.dtl",
 "longform_d32_village_merchant": "res://data/dialogic/timelines/longform_d32_village_merchant.dtl",

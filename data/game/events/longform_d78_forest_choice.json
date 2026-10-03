@@ -1,0 +1,56 @@
+{
+  "id": "longform_d78_forest_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 78,
+  "end_day": 78,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 78
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "接受森林的名字",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_true_name",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "坚持自己的名字",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_true_name_refused",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+name: v0.4 Longform Validation
+
+on:
+  push:
+    branches:
+      - feature/v0.4-longform
+  pull_request:
+    branches:
+      - feature/v0.4-longform
+
+jobs:
+  content-audit:
+    name: Longform content and dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run content audit
+        run: python3 tests/v04_content_audit.py
+
+  godot-flow:
+    name: Godot 4.6.1 longform engine validation
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.6.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Import and parse project
+        run: godot --headless --editor --quit --path .
+      - name: Validate original v0.3 interaction flow
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v03_engine_smoke.tscn > /tmp/v03.log 2>&1
+          code=$?
+          cat /tmp/v03.log
+          if grep -q "PASS: v0.3 engine smoke assertions complete" /tmp/v03.log; then
+            exit 0
+          fi
+          exit $code
+      - name: Validate D1-D120 longform flow
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v04_longform_flow.tscn > /tmp/v04.log 2>&1
+          code=$?
+          cat /tmp/v04.log
+          if grep -q "PASS: v0.4 full longform route D1-D120 complete" /tmp/v04.log; then
+            exit 0
+          fi
+          exit $code

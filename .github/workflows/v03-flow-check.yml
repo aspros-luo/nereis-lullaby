@@ -32,4 +32,4 @@ jobs:
         run: godot --headless --editor --quit --path .
 
       - name: Run engine smoke test
-        run: godot --headless --path . -s res://tests/v03_engine_smoke.gd
+        run: godot --headless --path . res://tests/v03_engine_smoke.tscn

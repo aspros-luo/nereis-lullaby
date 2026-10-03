@@ -1,0 +1,56 @@
+{
+  "id": "longform_d78_church_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 78,
+  "end_day": 78,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 78
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "接受教会的审问",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_trial_accepted",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "拒绝交出自己",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "church_trial_refused",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    }
+  ]
+}

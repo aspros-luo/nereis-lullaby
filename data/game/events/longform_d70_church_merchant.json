@@ -1,0 +1,27 @@
+{
+  "id": "longform_d70_church_merchant",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 70,
+  "end_day": 70,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_church",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "merchant",
+      "timeline": "longform_d70_church_merchant"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 70
+    }
+  ]
+}

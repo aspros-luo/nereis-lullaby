@@ -38,10 +38,13 @@ NPCInteractionSystem="*uid://crj84xc0t3grr"
 
 directories/dch_directory={
 "hunter": "res://data/dialogic/character/hunter.dch",
-"mite": "res://data/dialogic/character/mite.dch"
+"mite": "res://data/dialogic/character/mite.dch",
+"hero": "res://data/dialogic/character/hero.dch",
+"merchant": "res://data/dialogic/character/merchant.dch"
 }
 directories/dtl_directory={
 "day01_tavern_start": "res://data/dialogic/timelines/day01_tavern_start.dtl",
+"hunter_trust_reveal": "res://data/dialogic/timelines/hunter_trust_reveal.dtl",
 "forest_entry": "res://data/dialogic/timelines/forest_entry.dtl",
 "forest_mark_touched_consequence": "res://data/dialogic/timelines/forest_mark_touched_consequence.dtl",
 "forest_mark_untouched_consequence": "res://data/dialogic/timelines/forest_mark_untouched_consequence.dtl",

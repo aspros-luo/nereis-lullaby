@@ -1,0 +1,66 @@
+{
+  "id": "longform_d16_village",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 16,
+  "end_day": 16,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d16_village_decision"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "village_chapter_started",
+      "value": true
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 16
+    }
+  ],
+  "choices": [
+    {
+      "id": "repair_tavern",
+      "phase": "MORNING",
+      "label": "修好酒馆，把灯留到最后",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_rebuild_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "protect_children",
+      "phase": "MORNING",
+      "label": "先照看村里的孩子",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_guard_path",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 18
+        }
+      ]
+    }
+  ]
+}

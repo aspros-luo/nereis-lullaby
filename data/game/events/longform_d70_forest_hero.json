@@ -1,0 +1,28 @@
+{
+  "id": "longform_d70_forest_hero",
+  "priority": 130,
+  "once": true,
+  "manual": false,
+  "start_day": 70,
+  "end_day": 70,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hero",
+      "timeline": "longform_d70_forest_hero"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 70
+    }
+  ],
+  "choices": []
+}

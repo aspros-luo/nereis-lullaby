@@ -8,6 +8,8 @@ var day_end_clicked := false
 
 func _ready():
 	print("TavernUI Ready")
+	if ChapterBanner:
+		ChapterBanner.show_chapter(_chapter_title(), "第 %d 天 · 夜色正在变深" % DayManager.current_day)
 
 	end_day_button.pressed.connect(_on_end_day_pressed)
 
@@ -122,3 +124,19 @@ func _on_end_day_exit():
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(end_day_button, "scale", Vector2.ONE, 0.1)
+
+func _chapter_title()->String:
+	var day := DayManager.current_day
+	if day <= 11:
+		return "第一章 · 酒馆的灯"
+	if day <= 24:
+		return "第二章 · 潮痕"
+	if day <= 40:
+		return "第三章 · 深井之下"
+	if day <= 58:
+		return "第四章 · 无月森林"
+	if day <= 78:
+		return "第五章 · 盐海圣堂"
+	if day <= 98:
+		return "第六章 · 梦境王座"
+	return "第七章 · 蜜忒之歌"

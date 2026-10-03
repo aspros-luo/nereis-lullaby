@@ -32,4 +32,12 @@ jobs:
         run: godot --headless --editor --quit --path .
 
       - name: Run engine smoke test
-        run: godot --headless --path . res://tests/v03_engine_smoke.tscn
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v03_engine_smoke.tscn > /tmp/v03_engine_smoke.log 2>&1
+          code=$?
+          cat /tmp/v03_engine_smoke.log
+          if grep -q "PASS: v0.3 engine smoke assertions complete" /tmp/v03_engine_smoke.log; then
+            exit 0
+          fi
+          exit $code

@@ -224,19 +224,21 @@ func _journal_text()->String:
 	if stage >= 9:
 		lines.append("IV 教会阴影")
 	if stage >= 11:
-		lines.append("V 终曲")
+		lines.append("V  第一幕终曲")
 	if stage >= 12:
-		lines.append("VI 潮汐之后")
+		lines.append("VI 潮痕")
 	if stage >= 20:
 		lines.append("VII 深井之下")
-	if stage >= 30:
-		lines.append("VIII 无月森林")
 	if stage >= 40:
+		lines.append("VIII 无月森林")
+	if stage >= 59:
 		lines.append("IX 盐海圣堂")
-	if stage >= 50:
-		lines.append("X 梦境王座")
-	if stage >= 60:
+	if stage >= 79:
+		lines.append("X  梦境王座")
+	if stage >= 99:
 		lines.append("XI 蜜忒之歌")
+	if stage >= 120:
+		lines.append("最终章 · 灯下终曲")
 	return "\n".join(lines)
 
 func _start_ng_plus():

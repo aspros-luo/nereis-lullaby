@@ -1,0 +1,83 @@
+{
+  "id": "longform_d120_finale",
+  "priority": 220,
+  "once": true,
+  "manual": false,
+  "start_day": 120,
+  "end_day": 121,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "mainline_stage",
+      "operator": ">=",
+      "value": 119
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d120_finale"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 120
+    }
+  ],
+  "expire_actions": [
+    {
+      "type": "request_ending",
+      "ending_id": "human"
+    }
+  ],
+  "choices": [
+    {
+      "id": "answer_forest_voice",
+      "phase": "MORNING",
+      "label": "回应森林的声音",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "ending_route_forest",
+          "value": true
+        },
+        {
+          "type": "request_ending",
+          "ending_id": "outer_god"
+        }
+      ]
+    },
+    {
+      "id": "trust_church",
+      "phase": "MORNING",
+      "label": "将一切交给教会",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "ending_route_church",
+          "value": true
+        },
+        {
+          "type": "request_ending",
+          "ending_id": "church"
+        }
+      ]
+    },
+    {
+      "id": "stay_with_village",
+      "phase": "MORNING",
+      "label": "留下来点亮酒馆",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "ending_route_human",
+          "value": true
+        },
+        {
+          "type": "request_ending",
+          "ending_id": "human"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "longform_d98_village_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 98,
+  "end_day": 98,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 98
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "点燃最后三盏灯",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_three_lights",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 99
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "只留一盏灯",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_one_light",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 99
+        }
+      ]
+    }
+  ]
+}

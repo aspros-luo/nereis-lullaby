@@ -123,3 +123,9 @@ func debug_npc(
 	print("Permanent:", npc.state.permanent)
 	print("Temporary:", npc.state.temporary)
 	print("================")
+
+func reset_runtime_state():
+	npcs.clear()
+	load_default_npcs()
+
+

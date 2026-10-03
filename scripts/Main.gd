@@ -1,16 +1,8 @@
 extends Node
 
+@onready var main_menu:Control = $MainMenu
 
 func _ready():
-
 	print("Nereis Lullaby Start")
-
-	call_deferred(
-		"start_game"
-	)
-
-
-
-func start_game():
-
-	GameManager.start_game()
+	if main_menu:
+		main_menu.show()

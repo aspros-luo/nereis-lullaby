@@ -161,11 +161,10 @@ func _run():
 		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice applies hero_truth_shared")
 		expect(not bool(node("StoryManager").call("has_pending_npc_choices")), "Selecting D6 choice clears pending NPC choices")
 
-	# Do not free the temporary Tavern tree here. Godot's UI layout/tween queue can
-	# still be processing dynamically-created choice buttons on headless shutdown.
-	# The process exits immediately after disabling this test scene, avoiding a
-	# native-engine shutdown crash that is unrelated to gameplay behavior.
-	tavern.process_mode = Node.PROCESS_MODE_DISABLED if is_instance_valid(tavern) else Node.PROCESS_MODE_INHERIT
+	# Let all panel tweens finish before headless engine shutdown. This is a test
+	# harness concern: exiting while a SceneTreeTween is still active can trigger
+	# a native Godot 4.6.1 shutdown crash unrelated to gameplay.
+	tavern.process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(0.5).timeout
 
-	await get_tree().process_frame
 	get_tree().quit(0 if failures == 0 else 1)

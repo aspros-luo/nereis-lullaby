@@ -8,6 +8,8 @@ var tavern_after_story_pending:bool = false
 
 func _ready():
 	print("Morning Scene Loaded")
+	if ChapterBanner:
+		ChapterBanner.show_chapter(_chapter_title(), "第 %d 天 · 清晨" % DayManager.current_day)
 	$UI/ForestButton.pressed.connect(_on_forest_pressed)
 	$UI/FarmButton.pressed.connect(_on_farm_pressed)
 	$UI/LivestockButton.pressed.connect(_on_livestock_pressed)
@@ -220,3 +222,19 @@ func enter_tavern():
 
 func _start_tavern_transition():
 	DayManager.start_tavern()
+
+func _chapter_title()->String:
+	var day := DayManager.current_day
+	if day <= 11:
+		return "第一章 · 酒馆的灯"
+	if day <= 24:
+		return "第二章 · 潮痕"
+	if day <= 40:
+		return "第三章 · 深井之下"
+	if day <= 58:
+		return "第四章 · 无月森林"
+	if day <= 78:
+		return "第五章 · 盐海圣堂"
+	if day <= 98:
+		return "第六章 · 梦境王座"
+	return "第七章 · 蜜忒之歌"

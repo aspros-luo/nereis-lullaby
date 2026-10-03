@@ -1,0 +1,27 @@
+{
+  "id": "longform_d41_chapter4",
+  "priority": 160,
+  "once": true,
+  "manual": false,
+  "start_day": 41,
+  "end_day": 41,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "act2_started",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d41_chapter4"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 41
+    }
+  ]
+}

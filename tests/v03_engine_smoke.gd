@@ -164,10 +164,18 @@ func _run():
 		expect(bool(node("StoryState").call("get_flag", "hero_truth_shared", false)), "Selecting D6 choice through the real Button applies hero_truth_shared")
 		expect(not bool(node("StoryManager").call("has_pending_npc_choices")), "Selecting D6 choice clears pending NPC choices")
 
-	# Disable the temporary scene and allow all queued UI work to settle before
-	# headless shutdown. We deliberately avoid forcing a free on this test tree;
-	# Godot 4.6.1 can crash natively while a UI Container is being torn down.
+	# Cleanly remove the temporary Tavern scene before shutdown. The current NPC
+	# panel uses fixed choice controls, so there is no dynamic Container churn to
+	# tear down here.
 	tavern.process_mode = Node.PROCESS_MODE_DISABLED
-	await get_tree().create_timer(0.5).timeout
+	if ui != null:
+		ui.hide()
+	NPCInteractionSystem.end()
+	await get_tree().create_timer(0.25).timeout
+	if is_instance_valid(tavern):
+		tavern.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 	get_tree().quit(0 if failures == 0 else 1)

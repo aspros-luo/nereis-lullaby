@@ -19,17 +19,17 @@ func _apply_ending():
 		"outer_god":
 			title_label.text = "潮声"
 			body_label.text = "你终于听见了那道声音。\n森林没有回答你。\n它只是记住了你的名字。"
-			hint_label.text = "Demo Ending A — 你选择了回应未知。"
+			hint_label.text = "结局 A · 潮声 · 第 %d 周目" % GameManager.run_cycle
 
 		"church":
 			title_label.text = "圣火之下"
 			body_label.text = "你把看到的一切交给了教会。\n村庄暂时恢复了平静。\n但你开始怀疑，他们究竟在守护什么。"
-			hint_label.text = "Demo Ending B — 你选择了相信秩序。"
+			hint_label.text = "结局 B · 圣火之下 · 第 %d 周目" % GameManager.run_cycle
 
 		"human":
 			title_label.text = "留下来"
 			body_label.text = "你没有回应森林，也没有把一切交给教会。\n你选择留下来。\n至少今晚，酒馆的灯还亮着。"
-			hint_label.text = "Demo Ending C — 你选择了留下。"
+			hint_label.text = "结局 C · 留下 · 第 %d 周目" % GameManager.run_cycle
 
 		_:
 			title_label.text = "未完"

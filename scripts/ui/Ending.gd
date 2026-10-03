@@ -39,9 +39,14 @@ func _apply_ending():
 
 func _restart():
 	StoryState.reset()
+	StoryManager.reset_runtime_state()
 	WorldState.reset()
+	ResourceManager.reset()
+	ActionManager.reset()
+	TavernSession.reset_session()
+	NPCManager.reset_runtime_state()
 	GameManager.current_day = 1
 	DayManager.current_day = 1
 	EndingManager.current_ending = ""
 	EndingManager._ending_started = false
-	get_tree().change_scene_to_file("res://scenes/Morning.tscn")
+	GameManager.start_game()

@@ -436,6 +436,14 @@ func has_pending_npc_choices()->bool:
 	return not pending_npc_choices.is_empty()
 
 
+func reset_runtime_state():
+
+	pending_npc_dialogues.clear()
+	pending_phase_dialogues.clear()
+	pending_npc_choices.clear()
+	pending_phase_choices.clear()
+
+
 func get_npc_choices(npc_id:String)->Array:
 
 	var data:Dictionary = pending_npc_choices.get(npc_id, {})
@@ -575,14 +583,25 @@ func consume_npc_dialogue(npc_id:String)->String:
 	return timeline
 
 
+func has_pending_phase_dialogue(phase:String)->bool:
+
+	var dialogue_queue:Array = pending_phase_dialogues.get(phase, [])
+	return not dialogue_queue.is_empty()
+
+
 func consume_phase_dialogue(phase:String)->String:
 
-	var timeline:String = pending_phase_dialogues.get(phase, "")
+	var dialogue_queue:Array = pending_phase_dialogues.get(phase, [])
 
-	if timeline.is_empty():
+	if dialogue_queue.is_empty():
 		return ""
 
-	pending_phase_dialogues.erase(phase)
+	var timeline:String = str(dialogue_queue.pop_front())
+
+	if dialogue_queue.is_empty():
+		pending_phase_dialogues.erase(phase)
+	else:
+		pending_phase_dialogues[phase] = dialogue_queue
 
 	print("Story Phase Dialogue Consumed:", phase, "->", timeline)
 

@@ -1,0 +1,56 @@
+{
+  "id": "longform_d58_forest_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 58,
+  "end_day": 58,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 58
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "让森林记住你的名字",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_name_given",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "保留名字",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "forest_name_hidden",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 59
+        }
+      ]
+    }
+  ]
+}

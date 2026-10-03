@@ -1,0 +1,27 @@
+{
+  "id": "longform_d25_chapter3",
+  "priority": 160,
+  "once": true,
+  "manual": false,
+  "start_day": 25,
+  "end_day": 25,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "act2_started",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_phase_dialogue",
+      "phase": "MORNING",
+      "timeline": "longform_d25_chapter3"
+    },
+    {
+      "type": "advance_mainline_stage",
+      "value": 25
+    }
+  ]
+}

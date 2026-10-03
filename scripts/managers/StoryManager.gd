@@ -656,7 +656,12 @@ func _execute_action(action:Dictionary):
 			var phase_timeline:String = action.get("timeline", "")
 
 			if not phase.is_empty() and not phase_timeline.is_empty():
-				pending_phase_dialogues[phase] = phase_timeline
+				var dialogue_queue:Array = pending_phase_dialogues.get(phase, [])
+				if not dialogue_queue is Array:
+					dialogue_queue = []
+				if not dialogue_queue.has(phase_timeline):
+					dialogue_queue.append(phase_timeline)
+				pending_phase_dialogues[phase] = dialogue_queue
 				print("Story Phase Dialogue Queued:", phase, "->", phase_timeline)
 
 		"play_timeline":

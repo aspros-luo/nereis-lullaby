@@ -1,0 +1,56 @@
+{
+  "id": "longform_d78_village_choice",
+  "priority": 140,
+  "once": true,
+  "manual": false,
+  "start_day": 78,
+  "end_day": 78,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "route_human",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "advance_mainline_stage",
+      "value": 78
+    }
+  ],
+  "choices": [
+    {
+      "id": "accept",
+      "phase": "MORNING",
+      "label": "向村民承诺留下",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_promise",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "phase": "MORNING",
+      "label": "只承诺今晚",
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "village_night_promise",
+          "value": true
+        },
+        {
+          "type": "advance_mainline_stage",
+          "value": 79
+        }
+      ]
+    }
+  ]
+}

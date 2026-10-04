@@ -21,6 +21,21 @@ func has_save(slot:int = 0)->bool:
 func has_completed_run()->bool:
 	return bool(load_meta().get("completed_run", false))
 
+func get_discovered_endings()->Array[String]:
+	var raw:Array = load_meta().get("discovered_endings", [])
+	var result:Array[String] = []
+	for ending_id in raw:
+		var value := str(ending_id)
+		if not value.is_empty() and not result.has(value):
+			result.append(value)
+	return result
+
+func has_discovered_ending(ending_id:String)->bool:
+	return get_discovered_endings().has(ending_id)
+
+func has_true_ending_unlocked()->bool:
+	return get_discovered_endings().size() >= 3
+
 func get_meta_value(key:String, default_value = null):
 	return load_meta().get(key, default_value)
 
@@ -29,6 +44,16 @@ func mark_run_completed(ending_id:String):
 	meta["completed_run"] = true
 	meta["last_ending"] = ending_id
 	meta["unlocked_new_game_plus"] = true
+	var endings:Array = []
+	var existing:Array = meta.get("discovered_endings", [])
+	for value in existing:
+		var id := str(value)
+		if not id.is_empty() and not endings.has(id):
+			endings.append(id)
+	if not ending_id.is_empty() and not endings.has(ending_id):
+		endings.append(ending_id)
+	meta["discovered_endings"] = endings
+	meta["run_count"] = int(meta.get("run_count", 0)) + 1
 	meta["timestamp"] = Time.get_datetime_string_from_system(true)
 	_write_json(META_PATH, meta)
 

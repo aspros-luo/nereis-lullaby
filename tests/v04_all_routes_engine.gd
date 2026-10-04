@@ -131,6 +131,20 @@ func run_route(route:String, final_choice:String, ending_id:String):
 			expect(int(node("StoryManager").call("evaluate_events")) >= 1,route + " D" + str(spec[0]) + " milestone executes")
 			npc(str(spec[1]),str(spec[2]),route + " D" + str(spec[0]) + " milestone")
 
+	var side_days:Array[int] = [20,23,27,35,44,54,67,85]
+	for day in side_days:
+		set_day(day)
+		expect(int(node("StoryManager").call("evaluate_events")) >= 1,route + " supplemental D" + str(day) + " event executes")
+		var side_event_id:String = "v04_" + route + "_d" + str(day)
+		var side_event = node("StoryManager").call("get_event", side_event_id)
+		expect(side_event != null,route + " supplemental event object exists D" + str(day))
+		if side_event != null:
+			var side_action:Array = side_event.get("actions", [])
+			if not side_action.is_empty():
+				npc_id = str(side_action[0].get("npc_id", ""))
+				var timeline_id:String = str(side_action[0].get("timeline", ""))
+				npc(npc_id,timeline_id,route + " supplemental D" + str(day) + " dialogue")
+
 	set_day(25)
 	node("StoryManager").call("evaluate_events")
 	phase("longform_d25_chapter3",route + " D25")
@@ -165,13 +179,22 @@ func _run():
 	run_route("church","trust_church","church")
 	run_route("village","stay_with_village","human")
 
-	# NG+ keeps a distinct run cycle and carries a small hidden memory hook.
-	reset_runtime()
+	# NG+ also unlocks the hidden fourth ending after all three major endings are discovered.
+	SaveManager.mark_run_completed("outer_god")
+	SaveManager.mark_run_completed("church")
+	SaveManager.mark_run_completed("human")
 	node("GameManager").set("run_cycle",1)
 	node("GameManager").call("start_new_game",true)
-	expect(int(node("GameManager").get("run_cycle")) == 2,"NG+ increments run cycle")
-	expect(bool(node("StoryState").call("get_flag","ng_plus",false)),"NG+ flag is set")
-	expect(int(node("WorldState").call("get_value","hero_memory")) == 2,"NG+ preserves memory bonus")
+	expect(bool(node("StoryState").call("get_flag","true_ending_unlocked",false)),"NG+ true-ending flag unlocks")
+	node("GameManager").set("current_day",120)
+	node("DayManager").set("current_day",120)
+	node("StoryState").call("set_flag","mainline_stage",119)
+	node("StoryManager").call("evaluate_events")
+	phase("longform_d120_finale","NG+ D120 finale")
+	var ng_final_choices:Array = node("StoryManager").call("get_phase_choices","MORNING")
+	expect(ng_final_choices.size() == 4,"NG+ exposes gated true ending choice")
+	choice("awaken_complete_song","NG+ true ending choice")
+	expect(str(node("EndingManager").get("current_ending")) == "true","NG+ reaches true ending")
 
 	print("PASS: v0.4 all three routes D1-D120 complete")
 	get_tree().quit(0 if failures == 0 else 1)

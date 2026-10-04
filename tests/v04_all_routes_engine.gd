@@ -141,9 +141,9 @@ func run_route(route:String, final_choice:String, ending_id:String):
 		if side_event != null:
 			var side_action:Array = side_event.get("actions", [])
 			if not side_action.is_empty():
-				npc_id = str(side_action[0].get("npc_id", ""))
+				var side_npc_id:String = str(side_action[0].get("npc_id", ""))
 				var timeline_id:String = str(side_action[0].get("timeline", ""))
-				npc(npc_id,timeline_id,route + " supplemental D" + str(day) + " dialogue")
+				npc(side_npc_id,timeline_id,route + " supplemental D" + str(day) + " dialogue")
 
 	set_day(25)
 	node("StoryManager").call("evaluate_events")

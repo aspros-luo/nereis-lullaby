@@ -78,6 +78,30 @@
           "ending_id": "human"
         }
       ]
+    },
+    {
+      "id": "awaken_complete_song",
+      "phase": "MORNING",
+      "label": "唱出那首完整的歌",
+      "conditions": [
+        {
+          "type": "story_flag",
+          "key": "true_ending_unlocked",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "actions": [
+        {
+          "type": "set_story_flag",
+          "key": "ending_route_true",
+          "value": true
+        },
+        {
+          "type": "request_ending",
+          "ending_id": "true"
+        }
+      ]
     }
   ]
 }

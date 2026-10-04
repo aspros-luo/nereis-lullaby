@@ -1,0 +1,34 @@
+{
+  "id": "v04_forest_d54",
+  "priority": 70,
+  "once": true,
+  "manual": false,
+  "start_day": 54,
+  "end_day": 54,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "act2_started",
+      "operator": "==",
+      "value": true
+    },
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "hero",
+      "timeline": "v04_forest_d54_hero"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "forest_side_54",
+      "value": true
+    }
+  ]
+}

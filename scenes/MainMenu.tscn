@@ -1,8 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://assets/ui/demo_ending_bg.svg" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/ui/nereis_motif.svg" id="3_motif"]
+[ext_resource type="Texture2D" path="res://assets/npc/mite.svg" id="4_mite"]
 
 [sub_resource type="StyleBoxFlat" id="Panel"]
 bg_color = Color(0.035, 0.031, 0.043, 0.92)
@@ -93,6 +94,14 @@ theme_override_colors/font_color = Color(0.63, 0.59, 0.54, 1)
 theme_override_font_sizes/font_size = 15
 text = "灯火之下，森林在做梦。"
 horizontal_alignment = 1
+
+[node name="Portrait" type="TextureRect" parent="Center/Panel/VBox"]
+custom_minimum_size = Vector2(0, 170)
+layout_mode = 2
+texture = ExtResource("4_mite")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
 
 [node name="Subtitle" type="Label" parent="Center/Panel/VBox"]
 layout_mode = 2

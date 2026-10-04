@@ -1,0 +1,34 @@
+{
+  "id": "v04_forest_d27",
+  "priority": 70,
+  "once": true,
+  "manual": false,
+  "start_day": 27,
+  "end_day": 27,
+  "conditions": [
+    {
+      "type": "story_flag",
+      "key": "act2_started",
+      "operator": "==",
+      "value": true
+    },
+    {
+      "type": "story_flag",
+      "key": "route_forest",
+      "operator": "==",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "queue_npc_dialogue",
+      "npc_id": "merchant",
+      "timeline": "v04_forest_d27_merchant"
+    },
+    {
+      "type": "set_story_flag",
+      "key": "forest_side_27",
+      "value": true
+    }
+  ]
+}

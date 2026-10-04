@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420">
+<defs>
+ <radialGradient id="bg" cx=".48" cy=".34" r=".8"><stop stop-color="#49365b"/><stop offset=".55" stop-color="#1a1826"/><stop offset="1" stop-color="#07090f"/></radialGradient>
+ <linearGradient id="cloak" x2="0" y2="1"><stop stop-color="#69517d"/><stop offset="1" stop-color="#171622"/></linearGradient>
+ <radialGradient id="skin"><stop stop-color="#dfad8b"/><stop offset="1" stop-color="#754d52"/></radialGradient>
+ <linearGradient id="hair" x2=".8" y2="1"><stop stop-color="#20202b"/><stop offset="1" stop-color="#07090e"/></linearGradient>
+</defs>
+<rect width="320" height="420" rx="22" fill="url(#bg)"/>
+<circle cx="160" cy="132" r="115" fill="none" stroke="#c79bcb" stroke-opacity=".12" stroke-width="2"/>
+<circle cx="160" cy="132" r="92" fill="none" stroke="#d7b56e" stroke-opacity=".12"/>
+<path d="M18 414Q32 286 160 247Q288 286 302 414Z" fill="url(#cloak)" stroke="#d2ad74" stroke-opacity=".34" stroke-width="3"/>
+<path d="M72 290Q160 328 248 290L226 414H94Z" fill="#0f111b"/>
+<path d="M82 150Q68 56 160 32Q252 56 238 150Q220 108 160 111Q100 108 82 150Z" fill="url(#hair)"/>
+<ellipse cx="160" cy="165" rx="78" ry="90" fill="url(#skin)"/>
+<path d="M81 151Q98 92 137 92Q177 112 235 71Q246 116 239 151Q210 115 160 114Q111 115 81 151Z" fill="url(#hair)"/>
+<ellipse cx="130" cy="169" rx="7" ry="9" fill="#120f16"/>
+<ellipse cx="190" cy="169" rx="7" ry="9" fill="#120f16"/>
+<path d="M151 195Q160 202 169 195" fill="none" stroke="#8a5a5e" stroke-width="4"/>
+<path d="M121 222Q160 243 199 222" fill="none" stroke="#4a283b" stroke-width="5"/>
+<path d="M112 253Q160 279 208 253" fill="none" stroke="#caa36e" stroke-opacity=".55" stroke-width="4"/>
+<path d="M160 275L160 374" stroke="#e0cfb1" stroke-opacity=".24" stroke-width="2"/>
+<path d="M129 303Q160 319 191 303" fill="none" stroke="#dfc896" stroke-opacity=".25" stroke-width="3"/>
+<circle cx="160" cy="335" r="23" fill="none" stroke="#d8b56e" stroke-opacity=".42" stroke-width="2"/>
+<path d="M160 314L168 332L160 354L152 332Z" fill="#d8b56e" fill-opacity=".12" stroke="#d8b56e" stroke-opacity=".55" stroke-width="2"/>
+<path d="M76 378Q160 350 244 378" fill="none" stroke="#e7d7ba" stroke-opacity=".14"/>
+</svg>

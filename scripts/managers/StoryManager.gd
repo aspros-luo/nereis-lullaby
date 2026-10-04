@@ -451,7 +451,23 @@ func get_npc_choices(npc_id:String)->Array:
 	if data.is_empty():
 		return []
 
-	return data.get("choices", [])
+	return _filter_available_choices(data.get("choices", []))
+
+
+func _filter_available_choices(raw_choices)->Array:
+
+	var result:Array = []
+	if not raw_choices is Array:
+		return result
+
+	for choice in raw_choices:
+		if not choice is Dictionary:
+			continue
+		var conditions:Array = choice.get("conditions", [])
+		if conditions.is_empty() or check_conditions(conditions):
+			result.append(choice)
+
+	return result
 
 
 func consume_npc_choices(npc_id:String)->Array:
@@ -507,7 +523,7 @@ func get_phase_choices(phase:String)->Array:
 	if data.is_empty():
 		return []
 
-	return data.get("choices", [])
+	return _filter_available_choices(data.get("choices", []))
 
 
 func choose_phase_choice(phase:String, choice_id:String)->bool:

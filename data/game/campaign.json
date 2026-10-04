@@ -1,21 +1,43 @@
 {
-  "title": "Nereis' Lullaby — Longform Campaign",
+  "version": "0.4",
   "target_hours": 40,
+  "target_hours_range": [
+    36,
+    44
+  ],
   "target_days": 120,
+  "chapters": 7,
+  "routes": [
+    "forest",
+    "church",
+    "human"
+  ],
+  "route_side_story_beats": 22,
+  "route_side_story_total": 66,
+  "major_decision_days": [
+    3,
+    6,
+    9,
+    11,
+    16,
+    40,
+    58,
+    78,
+    98,
+    120
+  ],
+  "endings": [
+    "outer_god",
+    "church",
+    "human",
+    "true"
+  ],
+  "true_ending_requires_all_major_endings": true,
   "new_game_plus": {
     "reserved": true,
-    "cycle": 2,
-    "carry_over": ["hero_memory", "ng_plus"],
-    "future_hooks": ["hidden_dialogue", "true_route", "alternate_finale"]
+    "starts_cycle": 2,
+    "memory_hook_day": 12
   },
-  "chapters": [
-    {"id":"I","title":"酒馆的灯","start_day":1,"end_day":11,"target_hours":4},
-    {"id":"II","title":"潮痕","start_day":12,"end_day":24,"target_hours":4},
-    {"id":"III","title":"深井之下","start_day":25,"end_day":40,"target_hours":6},
-    {"id":"IV","title":"无月森林","start_day":41,"end_day":58,"target_hours":6},
-    {"id":"V","title":"盐海圣堂","start_day":59,"end_day":78,"target_hours":7},
-    {"id":"VI","title":"梦境王座","start_day":79,"end_day":98,"target_hours":6},
-    {"id":"VII","title":"蜜忒之歌","start_day":99,"end_day":120,"target_hours":7}
-  ],
-  "pacing_note": "40小时为内容与流程目标，不以空转等待强行拉长；最终时长需通过实际试玩校准。"
+  "pacing": "120 in-game days with morning decisions, 3-person tavern interaction, chapter milestones, route-specific scenes and optional dialogue.",
+  "playtime_note": "Designed for roughly 36-44 hours for a normal reading pace and full longform route completion. Actual duration varies with reading speed and interaction style."
 }

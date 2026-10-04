@@ -28,6 +28,7 @@ func start_new_game(ng_plus:bool = false):
 	if ng_plus:
 		StoryState.set_flag("ng_plus", true)
 		StoryState.set_flag("ng_plus_cycle", run_cycle)
+		StoryState.set_flag("true_ending_unlocked", SaveManager.has_true_ending_unlocked())
 		WorldState.set_value("hero_memory", 2)
 		WorldState.set_value("mite_humanity", 98)
 

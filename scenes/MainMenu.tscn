@@ -71,7 +71,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="Panel" parent="Center"]
-custom_minimum_size = Vector2(560, 620)
+custom_minimum_size = Vector2(560, 700)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
 
@@ -124,6 +124,11 @@ text = "新的旅途"
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "新游戏+"
+
+[node name="Archive" type="Button" parent="Center/Panel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "结局图鉴"
 
 [node name="Status" type="Label" parent="Center/Panel/VBox"]
 custom_minimum_size = Vector2(0, 36)

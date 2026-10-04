@@ -54,8 +54,8 @@ for event in longform_events:
 
 finale = events.get("longform_d120_finale")
 check(finale is not None, "D120 finale event missing")
-check(len(finale.get("choices", [])) == 3, "D120 must keep three endings")
-valid_endings = {"outer_god", "church", "human"}
+check(len(finale.get("choices", [])) == 4, "D120 must expose three major endings plus the gated true ending")
+valid_endings = {"outer_god", "church", "human", "true"}
 actual_endings = {
     str(action.get("ending_id", ""))
     for choice in finale["choices"]
@@ -63,6 +63,9 @@ actual_endings = {
     if action.get("type") == "request_ending"
 }
 check(actual_endings == valid_endings, f"D120 endings mismatch: {actual_endings}")
+true_choice = next((choice for choice in finale["choices"] if choice.get("id") == "awaken_complete_song"), None)
+check(true_choice is not None, "True ending choice missing")
+check(true_choice.get("conditions") == [{"type":"story_flag","key":"true_ending_unlocked","operator":"==","value":True}], "True ending is not gated by NG+ meta progression")
 
 speakers = set()
 speaker_pattern = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*):")
@@ -83,4 +86,9 @@ print("PASS: v0.4 content audit")
 print(f"PASS: {len(longform_events)} longform events discovered")
 print("PASS: 40-hour / 120-day campaign manifest")
 print("PASS: NG+ reservation")
-print("PASS: D120 has three actual ending requests")
+route_side_events = {route: [e for e in events.values() if e["id"].startswith(f"v04_{route}_d")] for route in ("forest","church","village")}
+for route, items in route_side_events.items():
+    check(len(items) >= 8, f"{route} route side-story coverage too small: {len(items)}")
+
+print("PASS: D120 has three major ending requests plus gated true ending")
+print("PASS: each major route has at least eight supplemental story beats")

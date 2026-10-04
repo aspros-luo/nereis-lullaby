@@ -11,6 +11,8 @@ var load_button:Button
 var new_game_button:Button
 var ng_plus_button:Button
 var main_menu_button:Button
+var archive_button:Button
+var chapter_label:Label
 
 const BG := Color("090a0e")
 const PANEL := Color("16151a")
@@ -88,9 +90,17 @@ func _build_ui():
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	panel.add_child(subtitle)
 
+	chapter_label = Label.new()
+	chapter_label.position = Vector2(28, 88)
+	chapter_label.size = Vector2(324, 24)
+	chapter_label.add_theme_font_size_override("font_size", 15)
+	chapter_label.add_theme_color_override("font_color", ACCENT)
+	chapter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(chapter_label)
+
 	status_label = Label.new()
-	status_label.position = Vector2(28, 92)
-	status_label.size = Vector2(324, 46)
+	status_label.position = Vector2(28, 114)
+	status_label.size = Vector2(324, 38)
 	status_label.add_theme_font_size_override("font_size", 13)
 	status_label.add_theme_color_override("font_color", TEXT)
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -117,6 +127,10 @@ func _build_ui():
 	var journal := _button("旅途记录")
 	journal.pressed.connect(_show_journal)
 	box.add_child(journal)
+
+	archive_button = _button("结局图鉴")
+	archive_button.pressed.connect(_show_archive)
+	box.add_child(archive_button)
 
 	ng_plus_button = _button("新游戏+")
 	ng_plus_button.pressed.connect(_start_ng_plus)
@@ -189,7 +203,9 @@ func _button_style(bg:Color)->StyleBoxFlat:
 
 func _update_state():
 	status_label.text = "第 %d 天  ·  第 %d 周目" % [GameManager.current_day, GameManager.run_cycle]
+	chapter_label.text = _chapter_title()
 	ng_plus_button.disabled = not SaveManager.has_completed_run()
+	archive_button.text = "结局图鉴 · %d/4" % SaveManager.get_discovered_endings().size()
 
 func _save():
 	SaveManager.save_game(0)
@@ -204,6 +220,25 @@ func _load():
 func _show_journal():
 	journal_panel.visible = true
 	journal_label.text = _journal_text()
+
+func _show_archive():
+	journal_panel.visible = true
+	var endings := SaveManager.get_discovered_endings()
+	var labels := {"outer_god":"潮声","church":"圣火之下","human":"留下来","true":"潮声之心"}
+	var lines:Array[String] = ["结局图鉴", "", "已发现：%d / 4" % endings.size(), ""]
+	for id in ["outer_god", "church", "human", "true"]:
+		lines.append(("◆ " if endings.has(id) else "◇ ") + labels[id])
+	journal_label.text = "\n".join(lines)
+
+func _chapter_title()->String:
+	var day := GameManager.current_day
+	if day <= 11: return "第一章 · 酒馆的灯"
+	if day <= 24: return "第二章 · 潮痕"
+	if day <= 40: return "第三章 · 深井之下"
+	if day <= 58: return "第四章 · 无月森林"
+	if day <= 78: return "第五章 · 盐海圣堂"
+	if day <= 98: return "第六章 · 梦境王座"
+	return "第七章 · 蜜忒之歌"
 
 func _journal_text()->String:
 	var stage := StoryManager.get_mainline_stage()

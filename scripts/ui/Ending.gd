@@ -26,6 +26,11 @@ func _apply_ending():
 			body_label.text = "你把看到的一切交给了教会。\n村庄暂时恢复了平静。\n但你开始怀疑，他们究竟在守护什么。"
 			hint_label.text = "结局 B · 圣火之下 · 第 %d 周目" % GameManager.run_cycle
 
+		"true":
+			title_label.text = "潮声之心"
+			body_label.text = "你终于想起了自己是谁。\n不是神的容器，也不是村庄的囚徒。\n你把森林、圣火与酒馆留下的名字全部带走。\n这一次，歌声不是从深处传来。\n它从你身边响起。"
+			hint_label.text = "真结局 — 多个周目之后，完整的歌终于被听见。"
+
 		"human":
 			title_label.text = "留下来"
 			body_label.text = "你没有回应森林，也没有把一切交给教会。\n你选择留下来。\n至少今晚，酒馆的灯还亮着。"

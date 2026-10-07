@@ -1,0 +1,67 @@
+name: v0.4 Sandbox Game Self Check
+
+on:
+  push:
+    branches:
+      - test/v0.4-sandbox
+  workflow_dispatch:
+
+jobs:
+  sandbox-self-check:
+    name: Godot 4.6.1 isolated sandbox
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.6.1
+    steps:
+      - name: Checkout isolated sandbox branch
+        uses: actions/checkout@v4
+
+      - name: Parse and import entire project
+        run: godot --headless --editor --quit --path .
+
+      - name: Static story branch audit
+        run: python3 tests/v03_flow_audit.py
+
+      - name: Engine smoke test
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v03_engine_smoke.tscn > /tmp/v03_engine_smoke.log 2>&1
+          code=$?
+          cat /tmp/v03_engine_smoke.log
+          grep -q "PASS: v0.3 engine smoke assertions complete" /tmp/v03_engine_smoke.log
+          test $? -eq 0 || exit $code
+
+      - name: Full D1-D11 story flow
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v03_full_flow_engine.tscn > /tmp/v03_full_flow.log 2>&1
+          code=$?
+          cat /tmp/v03_full_flow.log
+          grep -q "PASS: v0.3 full story engine flow D1-D11 complete" /tmp/v03_full_flow.log
+          test $? -eq 0 || exit $code
+
+      - name: Full longform D1-D120 story flow
+        run: |
+          set +e
+          timeout 30s godot --headless --path . res://tests/v04_longform_flow.tscn > /tmp/v04_longform.log 2>&1
+          code=$?
+          cat /tmp/v04_longform.log
+          grep -q "PASS: v0.4 full longform route D1-D120 complete" /tmp/v04_longform.log
+          test $? -eq 0 || exit $code
+
+      - name: Campaign manifest sanity
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("data/game/campaign.json")
+          data = json.loads(p.read_text())
+          assert data["target_hours"] == 40
+          lo, hi = data["target_hours_range"]
+          assert lo <= data["target_hours"] <= hi
+          assert data["target_days"] == 120
+          assert data["chapters"] == 7
+          assert len(data["endings"]) >= 4
+          assert data["new_game_plus"]["reserved"] is True
+          print("PASS: campaign manifest targets ~40h / 120 days / NG+ reservation")
+          PY

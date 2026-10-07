@@ -14,8 +14,11 @@ jobs:
       - name: Checkout isolated sandbox branch
         uses: actions/checkout@v4
 
-      - name: Run exhaustive story branch audit
+      - name: Run exhaustive v0.3 story branch audit
         run: python3 tests/v03_flow_audit.py
+
+      - name: Run v0.4 content and registration audit
+        run: python3 tests/v04_content_audit.py
 
       - name: Campaign manifest sanity
         run: |
@@ -70,4 +73,13 @@ jobs:
           code=$?
           cat /tmp/v04_longform.log
           grep -q "PASS: v0.4 full longform route D1-D120 complete" /tmp/v04_longform.log
+          test $? -eq 0 || exit $code
+
+      - name: All three routes D1-D120 plus NG+ true ending
+        run: |
+          set +e
+          timeout 45s godot --headless --path . res://tests/v04_all_routes_engine.tscn > /tmp/v04_all_routes.log 2>&1
+          code=$?
+          cat /tmp/v04_all_routes.log
+          grep -q "PASS: v0.4 all three routes D1-D120 complete" /tmp/v04_all_routes.log
           test $? -eq 0 || exit $code

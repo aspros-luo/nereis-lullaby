@@ -4,26 +4,17 @@ extends Node
 var current_npc:NPCBase = null
 
 
-
 signal interaction_result(result)
 
 
-
-# =========================
-# 开始交互
-# =========================
 
 func start_interaction(
 	id:String
 ):
 
-
 	current_npc = NPCManager.get_npc(id)
 
-
-
 	if current_npc == null:
-
 
 		print(
 			"NPC Missing:",
@@ -32,31 +23,20 @@ func start_interaction(
 
 		return
 
-
-
 	print(
 		"Start Interaction:",
 		current_npc.npc_name
 	)
 
-
 	show_options()
 
 
 
-
-
-# =========================
-# 显示选项
-# =========================
-
 func show_options():
-
 
 	if current_npc == null:
 
 		return
-
 
 	print(
 		"Interaction Options:"
@@ -76,112 +56,78 @@ func show_options():
 
 
 
-
-
-# =========================
-# 对话
-# =========================
-
 func talk():
-
 
 	if current_npc == null:
 
 		return
 
-
-
 	var result = current_npc.talk()
-
-
 
 	print(
 		"Talk Result:",
 		result
 	)
 
-
 	interaction_result.emit(
 		result
 	)
-
-
 
 	return result
 
 
 
-
-
-# =========================
-# 喝酒
-# =========================
-
 func drink(
 	type:String="normal"
 ):
-
 
 	if current_npc == null:
 
 		return
 
+	var drink_id = "ale"
 
+	if type == "special":
 
-	var result = current_npc.drink(
-		type
+		drink_id = "moon_wine"
+
+	var result = DrinkManager.serve_drink(
+		drink_id,
+		current_npc.id
 	)
-
-
 
 	print(
 		"Drink Result:",
 		result
 	)
 
-
 	interaction_result.emit(
 		result
 	)
-
-
 
 	return result
 
 
 
-
-
-# =========================
-# 特殊行为
-# =========================
-
 func special():
-
 
 	if current_npc == null:
 
 		return
 
-
-
 	var result = current_npc.trade()
-
-
 
 	print(
 		"Special Result:",
 		result
 	)
 
-
 	interaction_result.emit(
 		result
 	)
 
-
-
 	return result
+
 
 
 func debug():
@@ -189,7 +135,6 @@ func debug():
 	if current_npc == null:
 
 		return
-
 
 	print("================")
 	print(current_npc.npc_name)
@@ -199,7 +144,6 @@ func debug():
 		current_npc.state.permanent
 	)
 
-
 	print(
 		"Temporary:",
 		current_npc.state.temporary
@@ -208,11 +152,7 @@ func debug():
 	print("================")
 
 
-# =========================
-# 结束
-# =========================
 
 func end():
 
-
-	current_npc=null
+	current_npc = null

@@ -111,7 +111,6 @@ directories/dtl_directory={
 "longform_d119_final_prep": "res://data/dialogic/timelines/longform_d119_final_prep.dtl",
 "longform_d120_finale": "res://data/dialogic/timelines/longform_d120_finale.dtl",
 "ng_plus_d12_whisper": "res://data/dialogic/timelines/ng_plus_d12_whisper.dtl",
-}
 "forest_delayed_entry": "res://data/dialogic/timelines/forest_delayed_entry.dtl"
 "hunter_forest_route": "res://data/dialogic/timelines/hunter_forest_route.dtl"
 "hunter_forest_wait": "res://data/dialogic/timelines/hunter_forest_wait.dtl"
@@ -153,6 +152,7 @@ directories/dtl_directory={
 "v04_village_d75_hunter": "res://data/dialogic/timelines/v04_village_d75_hunter.dtl"
 "v04_village_d85_merchant": "res://data/dialogic/timelines/v04_village_d85_merchant.dtl"
 "v04_village_d87_hero": "res://data/dialogic/timelines/v04_village_d87_hero.dtl"
+}
 layout/style_directory={}
 
 [editor_plugins]

@@ -81,7 +81,7 @@ def static_audit() -> tuple[dict[str, dict[str, Any]], dict[str, str], dict[str,
                 if action.get("type") == "request_ending":
                     ending_id = str(action.get("ending_id", ""))
                     check(
-                        ending_id in {"outer_god", "church", "human"},
+                        ending_id in {"outer_god", "church", "human", "true"},
                         f"Unknown ending id in {event_id}: {ending_id}",
                     )
 

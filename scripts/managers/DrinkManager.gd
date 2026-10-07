@@ -20,18 +20,15 @@ func load_drinks():
 		FileAccess.READ
 	)
 
-
 	if file == null:
 
 		print("Drink data missing")
 
 		return
 
-
 	drinks = JSON.parse_string(
 		file.get_as_text()
 	)
-
 
 	print(
 		"Loaded Drinks:",
@@ -55,33 +52,39 @@ func serve_drink(
 		drink_id
 	)
 
-
 	if drink == null:
 
-		return
+		print(
+			"Drink missing:",
+			drink_id
+		)
 
+		return null
 
-	print(
-		"Serve:",
-		drink["name"]
+	var npc = NPCManager.get_npc(npc_id)
+
+	if npc == null:
+
+		print(
+			"NPC missing:",
+			npc_id
+		)
+
+		return null
+
+	var result = NPCManager.drink(
+		npc_id,
+		drink_id
 	)
-
 
 	WorldState.add_value(
 		"village_corruption",
-		drink["corruption"]
+		int(drink.get("corruption",0))
 	)
 
-
-	NPCManager.change_relation(
+	NPCManager.change_trust(
 		npc_id,
-		drink["relation"]
+		int(drink.get("relation",0))
 	)
 
-
-	NPCManager.add_corruption(
-		npc_id,
-		drink["corruption"]
-	)
-	
-	WorldState.debug_print()
+	return result

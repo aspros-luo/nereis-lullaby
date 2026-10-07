@@ -7,8 +7,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  sandbox-self-check:
-    name: Godot 4.6.1 isolated sandbox
+  static-audit:
+    name: Static story and campaign audit
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout isolated sandbox branch
+        uses: actions/checkout@v4
+
+      - name: Run exhaustive story branch audit
+        run: python3 tests/v03_flow_audit.py
+
+      - name: Campaign manifest sanity
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("data/game/campaign.json").read_text())
+          assert data["target_hours"] == 40
+          lo, hi = data["target_hours_range"]
+          assert lo <= data["target_hours"] <= hi
+          assert data["target_days"] == 120
+          assert data["chapters"] == 7
+          assert len(data["endings"]) >= 4
+          assert data["new_game_plus"]["reserved"] is True
+          print("PASS: campaign manifest targets ~40h / 120 days / NG+ reservation")
+          PY
+
+  godot-sandbox:
+    name: Godot 4.6.1 isolated game sandbox
     runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.6.1
@@ -18,9 +44,6 @@ jobs:
 
       - name: Parse and import entire project
         run: godot --headless --editor --quit --path .
-
-      - name: Static story branch audit
-        run: python3 tests/v03_flow_audit.py
 
       - name: Engine smoke test
         run: |
@@ -48,20 +71,3 @@ jobs:
           cat /tmp/v04_longform.log
           grep -q "PASS: v0.4 full longform route D1-D120 complete" /tmp/v04_longform.log
           test $? -eq 0 || exit $code
-
-      - name: Campaign manifest sanity
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          p = Path("data/game/campaign.json")
-          data = json.loads(p.read_text())
-          assert data["target_hours"] == 40
-          lo, hi = data["target_hours_range"]
-          assert lo <= data["target_hours"] <= hi
-          assert data["target_days"] == 120
-          assert data["chapters"] == 7
-          assert len(data["endings"]) >= 4
-          assert data["new_game_plus"]["reserved"] is True
-          print("PASS: campaign manifest targets ~40h / 120 days / NG+ reservation")
-          PY

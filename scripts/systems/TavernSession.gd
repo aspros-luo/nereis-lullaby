@@ -43,6 +43,7 @@ func load_today_guests():
 		var npc = NPCManager.get_npc(id)
 
 		if npc:
+
 			print(
 				npc.npc_name
 			)
@@ -52,6 +53,7 @@ func load_today_guests():
 func get_current_guest():
 
 	if current_guest_index < guests.size():
+
 		return guests[current_guest_index]
 
 	return null
@@ -63,6 +65,7 @@ func get_current_guest_data():
 	var id = get_current_guest()
 
 	if id == null:
+
 		return null
 
 	return NPCManager.get_npc(id)
@@ -79,6 +82,7 @@ func serve_normal_drink():
 	var id = get_current_guest()
 
 	if id == null:
+
 		return null
 
 	print(
@@ -86,23 +90,19 @@ func serve_normal_drink():
 		id
 	)
 
-	NPCManager.drink(
-		id,
-		"normal"
-	)
-
-	var trust = NPCManager.change_trust(
-		id,
-		1
+	var result = DrinkManager.serve_drink(
+		"ale",
+		id
 	)
 
 	var npc = NPCManager.get_npc(id)
 
 	if npc:
+
 		print(
 			npc.npc_name,
-			" trust +1 => ",
-			trust
+			" normal drink => ",
+			result
 		)
 
 	return npc
@@ -114,6 +114,7 @@ func serve_special_drink():
 	var id = get_current_guest()
 
 	if id == null:
+
 		return null
 
 	print(
@@ -121,19 +122,19 @@ func serve_special_drink():
 		id
 	)
 
-	NPCManager.drink(
-		id,
-		"special"
-	)
-
-	NPCManager.add_corruption(
-		id,
-		1
+	var result = DrinkManager.serve_drink(
+		"moon_wine",
+		id
 	)
 
 	WorldState.add_value(
 		"outer_god_progress",
 		1
+	)
+
+	print(
+		"Special drink result:",
+		result
 	)
 
 	return NPCManager.get_npc(id)
@@ -150,9 +151,11 @@ func next_guest():
 	current_guest_index += 1
 
 	if current_guest_index >= guests.size():
+
 		end_session()
 
 	else:
+
 		print(
 			"Next Guest:",
 			get_current_guest()

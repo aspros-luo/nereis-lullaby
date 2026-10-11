@@ -46,12 +46,12 @@ func _build_ui() -> void:
 	scroll.add_child(root)
 
 	var title := Label.new()
-	title.text = "蜜忒之歌｜村庄日常原型"
+	title.text = "蜜忒之歌｜村庄日常"
 	title.add_theme_font_size_override("font_size", 28)
 	root.add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "原型内容仅用于验证日程、探索与线索记录；隐藏真相不会自动写入蜜忒的认知。"
+	subtitle.text = "村子里的每一天都很平常……至少现在看起来是这样。"
 	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(subtitle)
 

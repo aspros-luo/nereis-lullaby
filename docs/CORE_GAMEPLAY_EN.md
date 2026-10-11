@@ -53,6 +53,14 @@ Start with three villagers whose behavior differs meaningfully. Do not simulate 
 - One major world transformation;
 - At least three observable changes to existing content after the transformation.
 
+## Current vertical-slice implementation (prototype content, not finalized canon)
+
+The current code implements the three daily periods as one meaningful action per period. Travel and observation do not consume that action; conversations and everyday activities do, with limited relationship feedback. This is a prototype pacing rule and may be adjusted after playtesting.
+
+Seven destinations are currently available: Mite's home area, village commons, public shrine, clinic, village path, forest path, and forest clearing. A prototype anomaly occurs on the evening of Day 7. Afterwards, some location descriptions, NPC responses, and discoverable clues change. The player can optionally end this prologue after revisiting three locations.
+
+The anomaly's specific presentation, timing, and evidence are **prototype story proposals**, not finalized world canon. This slice is intended to test the loop of everyday life, contradictory clues, world change, and revisiting familiar locations.
+
 ## Validation questions
 
 1. Does the player choose activities rather than only advance dialogue?

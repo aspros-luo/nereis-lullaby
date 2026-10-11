@@ -41,6 +41,7 @@ var schedule_manager
 var clue_journal
 
 var status_label: Label
+var objective_label: Label
 var location_label: Label
 var description_label: Label
 var action_state_label: Label
@@ -94,6 +95,11 @@ func _build_ui() -> void:
 	subtitle.text = "平常的日子里，总有许多值得记住的小事。"
 	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(subtitle)
+
+	objective_label = Label.new()
+	objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	objective_label.add_theme_font_size_override("font_size", 16)
+	root.add_child(objective_label)
 
 	status_label = Label.new()
 	status_label.add_theme_font_size_override("font_size", 18)
@@ -215,6 +221,7 @@ func _refresh_ui() -> void:
 	status_label.text = "第 %d 天 · %s · %s" % [
 		game_state.day_index, game_state.get_slot_label(), phase_label
 	]
+	objective_label.text = _get_current_objective()
 	location_label.text = "我现在在：%s" % schedule_manager.get_location_name(game_state.current_location)
 	description_label.text = _get_location_description(game_state.current_location)
 	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
@@ -279,6 +286,28 @@ func _refresh_ui() -> void:
 		and game_state.investigation_state["visited_after_anomaly"].size() >= 3
 	)
 	restart_button.visible = game_state.world_state["phase"] == "demo_complete"
+
+
+func _get_current_objective() -> String:
+	var phase: String = str(game_state.world_state["phase"])
+	if phase == "demo_complete":
+		return "本段目标：序章已结束。你可以查看线索簿，或重新开始体验不同的日常安排。"
+	if phase == "after_week":
+		var visited: Array = game_state.investigation_state["visited_after_anomaly"]
+		return "当前目标：回访至少三个地点（%d/3），观察熟悉的环境有哪些变化。线索不需要立刻得出结论。" % mini(visited.size(), 3)
+	match game_state.day_index:
+		1, 2:
+			return "今日建议：先熟悉村庄。移动与观察不消耗主要行动；与在场村民交谈或做日常活动会消耗一个时段。"
+		3:
+			return "今日建议：如果有机会，去诊疗处找医生聊聊。关于最近睡眠不佳的说法，也许只是普通的烦恼。"
+		4:
+			return "今日建议：分别听听照料者与礼拜主持者如何解释村里的习俗。留意他们说法的相似处与不同处。"
+		5:
+			return "今日建议：观察公开礼拜场所或公共空间，也可以去林间采花。记下看到的事，不必急着解释。"
+		6:
+			return "今日建议：医生正在核对诊疗记录。若能遇见他，可以听听日期方面的小疑问。"
+		_:
+			return "今日建议：继续完成平常的一天。到了第七日傍晚，若想继续故事，可以再推进一次时间。"
 
 func _get_location_description(location_id: String) -> String:
 	var description := str(LOCATION_DESCRIPTIONS.get(location_id, "这里很安静。"))

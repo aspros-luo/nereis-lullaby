@@ -87,3 +87,58 @@ func advance_time() -> void:
 func complete_demo() -> void:
 	if world_state["phase"] == "after_week":
 		world_state["phase"] = "demo_complete"
+
+
+func to_save_data() -> Dictionary:
+	return {
+		"day_index": day_index,
+		"slot_index": slot_index,
+		"current_location": current_location,
+		"action_used_this_slot": action_used_this_slot,
+		"relationship_state": relationship_state.duplicate(true),
+		"investigation_state": investigation_state.duplicate(true),
+		"world_state": world_state.duplicate(true),
+		"action_history": action_history.duplicate(true),
+	}
+
+func load_save_data(data: Dictionary) -> bool:
+	var saved_day: int = int(data.get("day_index", 0))
+	var saved_slot: int = int(data.get("slot_index", -1))
+	var saved_phase: String = str(data.get("world_state", {}).get("phase", ""))
+	if saved_day < 1 or saved_day > FINAL_DAY:
+		return false
+	if saved_slot < 0 or saved_slot >= SLOT_KEYS.size():
+		return false
+	if not [ "ordinary", "after_week", "demo_complete" ].has(saved_phase):
+		return false
+
+	day_index = saved_day
+	slot_index = saved_slot
+	var saved_location: String = str(data.get("current_location", "HOME"))
+	current_location = saved_location
+	action_used_this_slot = bool(data.get("action_used_this_slot", false))
+
+	var saved_relationships: Dictionary = data.get("relationship_state", {})
+	for npc_id in relationship_state.keys():
+		relationship_state[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
+
+	var saved_investigation: Dictionary = data.get("investigation_state", {})
+	var saved_fact_ids: Array = saved_investigation.get("observed_fact_ids", [])
+	var saved_visits: Array = saved_investigation.get("visited_after_anomaly", [])
+	investigation_state = {
+		"observed_fact_ids": saved_fact_ids.duplicate(true),
+		"visited_after_anomaly": saved_visits.duplicate(true),
+	}
+
+	var saved_world: Dictionary = data.get("world_state", {})
+	var saved_flags: Dictionary = saved_world.get("flags", {})
+	world_state = {
+		"phase": saved_phase,
+		"flags": saved_flags.duplicate(true),
+	}
+	var saved_history: Array = data.get("action_history", [])
+	action_history.clear()
+	for entry in saved_history:
+		if entry is Dictionary:
+			action_history.append(entry.duplicate(true))
+	return true

@@ -29,6 +29,8 @@ func _test_time_progression_and_anomaly() -> void:
 	assert(state.slot_index == 2)
 	assert(state.world_state["phase"] == "after_week")
 	assert(state.world_state["flags"]["village_anomaly"])
+	assert(state.take_action("post_event_1", "first post-event activity"))
+	assert(state.take_action("post_event_2", "second post-event activity"))
 
 func _test_action_economy() -> void:
 	var state = GameStateScript.new()

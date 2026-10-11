@@ -216,8 +216,10 @@ func _refresh_ui() -> void:
 	else:
 		for npc_id in present:
 			var npc_button := Button.new()
-			npc_button.text = "和%s聊聊" % schedule_manager.get_npc_name(npc_id)
-			npc_button.disabled = not game_state.can_take_action()
+			var talked_after_anomaly: Dictionary = game_state.world_state["flags"].get("post_anomaly_talked", {})
+			var already_talked: bool = game_state.world_state["phase"] == "after_week" and talked_after_anomaly.has(str(npc_id))
+			npc_button.text = ("和%s聊过了" if already_talked else "和%s聊聊") % schedule_manager.get_npc_name(npc_id)
+			npc_button.disabled = not game_state.can_take_action() or already_talked
 			npc_button.pressed.connect(_talk_to_npc.bind(npc_id))
 			npc_container.add_child(npc_button)
 
@@ -337,7 +339,7 @@ func _do_daily_activity() -> void:
 	match game_state.current_location:
 		"HOME":
 			activity_text = "我整理了家里的东西，又把门前的花瓶换了水。"
-			if _npc_is_present("caregiver"):
+			if _npc_is_present("caregiver") and game_state.world_state["phase"] == "ordinary":
 				game_state.increase_relationship("caregiver")
 		"COMMONS":
 			activity_text = "我帮忙收拾公共空间，和路过的村民说了几句话。"
@@ -345,11 +347,11 @@ func _do_daily_activity() -> void:
 				game_state.increase_relationship("caregiver")
 		"SHRINE":
 			activity_text = "我帮忙把布料和花束摆整齐。大家看起来都很满意。"
-			if _npc_is_present("worship_leader"):
+			if _npc_is_present("worship_leader") and game_state.world_state["phase"] == "ordinary":
 				game_state.increase_relationship("worship_leader")
 		"CLINIC":
 			activity_text = "我帮忙分拣干燥的草药，屋里都是淡淡的苦香。"
-			if _npc_is_present("doctor"):
+			if _npc_is_present("doctor") and game_state.world_state["phase"] == "ordinary":
 				game_state.increase_relationship("doctor")
 		"PATH":
 			activity_text = "我沿着小路采了些常见的草叶，准备带回家。"
@@ -364,6 +366,9 @@ func _do_daily_activity() -> void:
 
 func _talk_to_npc(npc_id: String) -> void:
 	if not game_state.can_take_action():
+		return
+	var talked_after_anomaly: Dictionary = game_state.world_state["flags"].get("post_anomaly_talked", {})
+	if game_state.world_state["phase"] == "after_week" and talked_after_anomaly.has(npc_id):
 		return
 	var reply := _get_daily_dialogue(npc_id)
 	var fact_added := false
@@ -403,7 +408,11 @@ func _talk_to_npc(npc_id: String) -> void:
 
 	if not game_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
 		return
-	game_state.increase_relationship(npc_id)
+	if game_state.world_state["phase"] == "ordinary":
+		game_state.increase_relationship(npc_id)
+	else:
+		talked_after_anomaly[npc_id] = true
+		game_state.world_state["flags"]["post_anomaly_talked"] = talked_after_anomaly
 	message_label.text = reply
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"

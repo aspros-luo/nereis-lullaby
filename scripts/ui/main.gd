@@ -172,7 +172,7 @@ func _observe_location() -> void:
 		added = clue_journal.add_fact(
 			"day5_repeated_object_shrine",
 			"礼拜场所里的普通物件",
-			"你注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。",
+			"我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。",
 			game_state.day_index,
 			game_state.get_slot_label(),
 			schedule_manager.get_location_name(game_state.current_location)

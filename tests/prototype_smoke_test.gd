@@ -5,11 +5,13 @@ extends SceneTree
 const GameStateScript = preload("res://scripts/core/game_state.gd")
 const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
+const MainScript = preload("res://scripts/ui/main.gd")
 
 func _initialize() -> void:
 	_test_time_progression_and_anomaly()
 	_test_action_economy()
 	_test_npc_schedules_and_locations()
+	_test_location_content_coverage()
 	_test_clue_deduplication()
 	_test_relationship_bounds()
 	_test_save_roundtrip()
@@ -118,3 +120,14 @@ func _test_save_roundtrip_after_anomaly() -> void:
 	var completed = GameStateScript.new()
 	assert(completed.load_save_data(restored.to_save_data()))
 	assert(completed.world_state["phase"] == "demo_complete")
+
+
+func _test_location_content_coverage() -> void:
+	assert(MainScript.LOCATION_ORDER.size() == 7)
+	for location_id in MainScript.LOCATION_ORDER:
+		assert(MainScript.LOCATION_DESCRIPTIONS.has(location_id))
+		assert(MainScript.OBSERVATION_TEXT.has(location_id))
+		assert(MainScript.ANOMALY_OBSERVATION_TEXT.has(location_id))
+		assert(MainScript.ACTIVITY_LABELS.has(location_id))
+	for day in range(2, 8):
+		assert(MainScript.DAY_OPENING_TEXT.has(day))

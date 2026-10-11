@@ -8,6 +8,24 @@ const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const LOCATION_ORDER: Array[String] = [
 	"HOME", "COMMONS", "SHRINE", "CLINIC", "PATH", "FOREST", "GROVE"
 ]
+const ACTIVITY_LABELS: Dictionary = {
+	"HOME": "整理家里",
+	"COMMONS": "帮忙做些杂事",
+	"SHRINE": "整理礼拜用品",
+	"CLINIC": "分拣草药",
+	"PATH": "采些常见草叶",
+	"FOREST": "采摘野花",
+	"GROVE": "坐下休息",
+}
+const OBSERVATION_TEXT: Dictionary = {
+	"HOME": "窗边放着几本旧书，门口的花瓶里插着新鲜的枝叶。屋子里有熟悉的木头和面包香。",
+	"COMMONS": "有人把篮子放在长椅边，远处传来谈笑声。每个人看起来都有忙不完的小事。",
+	"SHRINE": "木台被擦得很干净，花束和折好的布料整齐摆在一旁。这里没有什么特别的地方。",
+	"CLINIC": "干燥的叶片装在小罐子里，纸页上记着日期和名字。药草的气味有点苦，却让人安心。",
+	"PATH": "泥土上留着浅浅的脚印。一只空篮子靠在路边，大概有人回家时忘了带走。",
+	"FOREST": "树根旁长着细小的野花。枝叶间偶尔有鸟叫，风吹过时，光斑就在地上慢慢移动。",
+	"GROVE": "草地柔软，几块石头被晒得暖暖的。花朵随着风轻轻摇动。",
+}
 const LOCATION_DESCRIPTIONS: Dictionary = {
 	"HOME": "熟悉的屋子和门前小路。照料者总能把普通的一天安排得妥妥当当。",
 	"COMMONS": "村民交换食物、闲聊和帮忙的地方。这里的热闹让人觉得安心。",
@@ -115,7 +133,7 @@ func _build_ui() -> void:
 	action_row.add_child(observe_button)
 
 	action_button = Button.new()
-	action_button.text = "做点日常的事"
+	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
 	action_button.pressed.connect(_do_daily_activity)
 	action_row.add_child(action_button)
 
@@ -346,7 +364,7 @@ func _do_daily_activity() -> void:
 func _talk_to_npc(npc_id: String) -> void:
 	if not game_state.can_take_action():
 		return
-	var reply := "我们聊了些日常琐事。对方没有提到什么特别的事。"
+	var reply := _get_daily_dialogue(npc_id)
 	var fact_added := false
 	if game_state.world_state["phase"] == "after_week":
 		match npc_id:
@@ -389,6 +407,31 @@ func _talk_to_npc(npc_id: String) -> void:
 	if fact_added:
 		message_label.text += " 我把听到的内容记进了线索簿。"
 	_refresh_ui()
+
+func _get_daily_dialogue(npc_id: String) -> String:
+	var day := game_state.day_index
+	match npc_id:
+		"caregiver":
+			if day == 1:
+				return "你醒啦？我把面包放在桌上了。今天不用急，天气不错，想去哪儿走走都行。"
+			if day == 2:
+				return "窗边的花开得真好。你小时候也总喜欢把路边的小花带回来。"
+			if day <= 4:
+				return "村里的人都互相照应着，日子就能过得安稳些。你也别忘了照顾自己。"
+			return "最近大家似乎都睡得不太好。大概是天气变化吧，等过几天就好了。"
+		"worship_leader":
+			if day <= 2:
+				return "早晨好。礼拜一直是村里人聚在一起的机会，谁有空就来帮一点忙。"
+			if day <= 4:
+				return "有些习俗流传了很久，未必每个人都记得最初的缘由。重要的是大家仍愿意一起做。"
+			return "准备工作都很顺利。大家各自做一点，最后就能把事情安排妥当。"
+		"doctor":
+			if day <= 2:
+				return "药草晒得差不多了。最近没有什么大病，大家只是偶尔累着，休息一下就好。"
+			if day <= 5:
+				return "这几天来诊疗处的人多了一点，不过症状都不严重。我还在整理他们的记录。"
+			return "我正在核对几份记录。日期有些对不上，也许只是病人记错了，先不能急着下结论。"
+	return "我们聊了些日常琐事。对方没有提到什么特别的事。"
 
 func _npc_is_present(npc_id: String) -> bool:
 	return schedule_manager.get_location(

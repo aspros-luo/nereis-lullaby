@@ -49,7 +49,7 @@ With Godot available:
 godot --headless --path . -s res://tests/prototype_smoke_test.gd
 ```
 
-The smoke-test script covers time progression, the anomaly phase, action limits, NPC schedule coverage, clue de-duplication, relationship bounds, and save restoration. The script has been updated in the repository but **has not been executed in the current tool environment**. Static inspection is not a substitute for an engine run or a human playtest.
+The smoke-test script covers time progression, the anomaly phase, action limits, NPC schedule coverage, location-content coverage, clue de-duplication, relationship bounds, and save restoration. The script has been updated in the repository but **has not been executed in the current tool environment**. Static inspection is not a substitute for an engine run or a human playtest.
 
 ## 可试玩垂直切片原型
 
@@ -77,7 +77,7 @@ The smoke-test script covers time progression, the anomaly phase, action limits,
 godot --headless --path . -s res://tests/prototype_smoke_test.gd
 ```
 
-测试脚本覆盖时间推进、异变阶段、行动次数限制、NPC 日程、线索去重、关系值边界与存档恢复。脚本已经更新写入仓库，但**当前工具环境尚未执行测试**。静态检查不能代替引擎运行或人工游玩。
+测试脚本覆盖时间推进、异变阶段、行动次数限制、NPC 日程、七个地点的观察内容覆盖、线索去重、关系值边界与存档恢复。脚本已经更新写入仓库，但**当前工具环境尚未执行测试**。静态检查不能代替引擎运行或人工游玩。
 
 ## Narrative contract / 叙事约束
 

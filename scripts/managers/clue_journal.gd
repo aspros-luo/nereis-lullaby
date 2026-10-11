@@ -27,4 +27,7 @@ func add_fact(
 	return true
 
 func get_entries() -> Array[Dictionary]:
-	return entries.duplicate(true)
+	var copied_entries: Array[Dictionary] = []
+	for entry in entries:
+		copied_entries.append(entry.duplicate(true))
+	return copied_entries

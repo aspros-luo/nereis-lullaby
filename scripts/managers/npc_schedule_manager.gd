@@ -46,6 +46,8 @@ const LOCATION_NAMES: Dictionary = {
 	"SHRINE": "公开礼拜场所",
 	"CLINIC": "诊疗处",
 	"PATH": "村庄通路",
+	"FOREST": "林间小径",
+	"GROVE": "林中空地",
 }
 
 var schedule_overrides: Dictionary = {}

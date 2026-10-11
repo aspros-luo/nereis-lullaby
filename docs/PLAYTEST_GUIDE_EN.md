@@ -6,7 +6,7 @@
 
 1. Open `project.godot` in Godot 4.6.x.
 2. Run the main scene.
-3. The game starts on Day 1 morning. Save/load is not implemented yet, so restarting begins a new run.
+3. The game starts on Day 1 morning. Use “Save Progress” and “Load Progress” to preserve and restore the current run locally.
 
 ## Core rules
 
@@ -30,7 +30,7 @@
 ## Known limitations
 
 - This is a text UI prototype, without final map art, character portraits, animation, music, or sound effects.
-- Save/load is not implemented; closing the game loses the current run.
+- Local save/load is implemented as a single-slot demo save in Godot's user data directory; there is no multi-slot management yet.
 - Characters and plot text are prototype content. Specific ritual mechanics and hidden identities are not finalized canon.
 - The automated smoke-test script is in the repository but has not yet been run by Godot in the current tool environment.
 - If Godot reports an error, save the full error text and the steps that triggered it.

@@ -194,6 +194,7 @@ func _refresh_ui() -> void:
 	]
 	location_label.text = "我现在在：%s" % schedule_manager.get_location_name(game_state.current_location)
 	description_label.text = _get_location_description(game_state.current_location)
+	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
 
 	for button_index in range(location_buttons.size()):
 		var location_id: String = LOCATION_ORDER[button_index]

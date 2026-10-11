@@ -276,7 +276,7 @@ func _on_location_selected(location_id: String) -> void:
 	game_state.mark_post_anomaly_visit(location_id)
 	message_label.text = "我来到了%s。" % schedule_manager.get_location_name(location_id)
 	if game_state.world_state["phase"] == "after_week":
-		_record_anomaly_clue_if_available(location_id)
+		message_label.text += " 这里好像和之前有些不一样。"
 	_refresh_ui()
 
 func _advance_time() -> void:

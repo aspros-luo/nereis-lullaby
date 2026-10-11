@@ -7,6 +7,9 @@ Before any new conversation or development task, read this file and its Chinese 
 - `docs/CORE_GAMEPLAY_CN.md` / `docs/CORE_GAMEPLAY_EN.md`
 - `docs/ROADMAP_CN.md` / `docs/ROADMAP_EN.md`
 
+## Cross-project narrative sync (required)
+Before continuing work on plot, NPCs, clues, or world state, check the latest commit on Hero's `development` branch and follow the [Cross-Project Narrative Sync Ledger](CROSS_PROJECT_STORY_SYNC_CN_EN.md). The games have independent gameplay but compatible worldbuilding; newer explicit user decisions override older docs. Ending directions remain open, and Hero endings must not require physical union with Mite.
+
 ## Project boundary
 This repository is only for Nereis Lullaby: daily-life simulation + free exploration + visual novel. Do not mix in Nereis-Hero's side-scrolling action-RPG code or systems.
 

@@ -1,33 +1,45 @@
-# Required Context for New Sessions
+# Required Context for New Conversations: Nereis Lullaby
+
+Before any new conversation or development task, read this file and its Chinese counterpart, then read:
+- `docs/PROJECT_BASELINE_CN.md` / `docs/PROJECT_BASELINE_EN.md`
+- `docs/WORLDVIEW_CN.md` / `docs/WORLDVIEW_EN.md`
+- `docs/DESIGN_CONTRACTS_CN.md` / `docs/DESIGN_CONTRACTS_EN.md`
+- `docs/CORE_GAMEPLAY_CN.md` / `docs/CORE_GAMEPLAY_EN.md`
+- `docs/ROADMAP_CN.md` / `docs/ROADMAP_EN.md`
 
 ## Project boundary
-- This repository is exclusively for **Nereis Lullaby / 蜜忒之歌**, a text-adventure / visual-novel game.
-- **Nereis-Hero** is a separate action-exploration RPG with its own repository and development workflow. Do not implement RPG work here.
-- The games share a world, but need not retell the same scenes. Their established facts, timeline, character knowledge, and event outcomes must not contradict each other.
-- This repository is a clean design baseline. Previous code is not an architectural or gameplay constraint.
+This repository is only for Nereis Lullaby: daily-life simulation + free exploration + visual novel. Do not mix in Nereis-Hero's side-scrolling action-RPG code or systems.
 
-## Highest-priority creative rules
-1. **A proposal is not canon.** Examples, candidate plots, and possible endings must remain proposals unless explicitly approved.
-2. **Do not decide endings unilaterally.** This includes Hero's fate, whether the restoration army becomes corrupt, Mite's fate, and cross-game causal chains.
-3. When the user gives an opinion, internally weigh opposing considerations and provide a clear recommendation. Do not expose internal debate.
-4. Mark important undecided narrative decisions as “Proposal / Open”; only move them to “Confirmed” after explicit user approval.
-5. Maintain Chinese and English documentation together. Do not trigger GitHub Actions.
-6. Report repository changes, tests, and runtime validation accurately; never claim work that was not performed.
+## Confirmed project baseline
+- Three action periods per day: morning, daytime, and evening.
+- Region map plus location-based exploration.
+- Key NPCs have states and schedules, driven by autonomous simulation and authored events together.
+- Primarily Mite's viewpoint, with limited objective evidence creating narrative contrast.
+- Relationships, clue/investigation progress, and world state are tracked separately and jointly influence endings.
+- Prototype core systems before building a vertical slice.
 
-## Confirmed direction
-- The game is primarily told from Mite's perspective. She is an agent of an outer god but does not know this. Her innocence and emotions are genuine, not simply a disguise or deliberate manipulation.
-- The game needs richer play than a short, purely linear text visual novel. Exploration, daily activities, autonomous characters, and clue-based investigation are candidate core systems.
-- Mite and villagers should actively live and act, not remain static NPCs waiting for the player.
-- Mite's everyday actions, both before and after meeting Hero, may objectively participate in a ritual she does not understand. The exact ritual rules remain open.
-- Village routines, relationships, and key events jointly drive the narrative.
-- Character relationships and investigation / ending conditions are related but distinct. Physical intimacy or one romance event must not become a hard gate for a major ending.
+## Most important narrative constraint
+Mite is an innocent village girl who knows nothing of her role. Her feelings are sincere; she does not know her relationship to the Outer God or the ritual. **Do not design an insight meter or supernatural-awareness progression that Mite actively uses.** The clue journal supports player observation and deduction; it does not mean Mite understands the truth.
 
-## Not yet canon
-- Whether the cult's ritual center is inside the village, in the nearby forest, or distributed across both.
-- The ritual's true purpose, mechanics, timeline, and each character's knowledge.
-- Specific post-arrival behavior for Hero and any cross-game plot.
-- Final content and conditions for “A Grave for Mortals,” “Eternal Paradise,” and “Heaven's Retribution.”
-- The idea that villagers may become one hundred cultists to protect Mite is a promising candidate, not a finalized event and not assigned to a particular ending.
+Always distinguish:
+1. Mite's actual experience and understanding;
+2. the player's deductions from evidence;
+3. objective facts about the world.
 
-## Development principle
-Build and validate a small playable vertical slice of the core loop before expanding the full plot, cast, and map. New sessions should read this file and the four bilingual design documents.
+These layers may differ, but causality must remain coherent. The Outer God's deception of the player should emerge from believable everyday life, information asymmetry, and retrospectively supported twists—not unsupported narrative lies.
+
+## Canon-status discipline
+Label design material as:
+- **Confirmed**: a direction or fact explicitly approved by the user;
+- **Proposed**: a candidate for discussion or prototype validation, not canon;
+- **Open**: important plot, causality, ending, or timeline decisions that remain unresolved.
+
+Do not finalize ritual mechanics, the cult base location, mass-villager events, Hero's fate, the Restoration Army's ending, or the exact conditions for the three endings without approval.
+
+## Working rules
+- Update Chinese and English design documents together.
+- Continue work on the `development` branch.
+- Do not intentionally trigger GitHub Actions.
+- Validate the gameplay loop before expanding the full map and script.
+- Weigh important decisions with pros and cons, then give a recommendation without exposing internal deliberation.
+- Reports must distinguish work committed to the repository, work verified, and work not yet verified.

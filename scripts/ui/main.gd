@@ -283,6 +283,10 @@ func _refresh_ui() -> void:
 	location_label.text = "我现在在：%s" % schedule_manager.get_location_name(game_state.current_location)
 	description_label.text = _get_location_description(game_state.current_location)
 	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
+	if game_state.world_state["phase"] == "after_week":
+		action_button.text = "时间停在这里了"
+	elif game_state.world_state["phase"] == "demo_complete":
+		action_button.text = "序章已结束"
 
 	for button_index in range(location_buttons.size()):
 		var location_id: String = LOCATION_ORDER[button_index]
@@ -311,7 +315,7 @@ func _refresh_ui() -> void:
 			npc_button.pressed.connect(_talk_to_npc.bind(npc_id))
 			npc_container.add_child(npc_button)
 
-	action_button.disabled = not game_state.can_take_action()
+	action_button.disabled = not game_state.can_take_action() or game_state.world_state["phase"] != "ordinary"
 	advance_button.disabled = game_state.world_state["phase"] != "ordinary"
 	advance_button.text = "等到下一个时段" if game_state.world_state["phase"] == "ordinary" else "傍晚的时间停住了"
 	observe_button.disabled = game_state.world_state["phase"] == "demo_complete"
@@ -448,7 +452,7 @@ func _observe_location() -> void:
 	_refresh_ui()
 
 func _do_daily_activity() -> void:
-	if not game_state.can_take_action():
+	if game_state.world_state["phase"] != "ordinary" or not game_state.can_take_action():
 		return
 	var action_id := "activity_" + game_state.current_location.to_lower()
 	var activity_text := ""

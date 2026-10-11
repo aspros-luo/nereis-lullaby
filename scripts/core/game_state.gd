@@ -132,6 +132,8 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	if not ["ordinary", "after_week", "demo_complete"].has(saved_phase):
 		return false
+	if saved_phase != "ordinary" and (saved_day != FINAL_DAY or saved_slot != SLOT_KEYS.size() - 1):
+		return false
 	if saved_location.is_empty():
 		return false
 	if not (saved_flags_value is Dictionary):
@@ -140,6 +142,11 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 
 	var saved_flags: Dictionary = saved_flags_value
+	if saved_flags.has("post_anomaly_talked") and not (saved_flags["post_anomaly_talked"] is Dictionary):
+		return false
+	for visited_location in saved_visits_value:
+		if not (visited_location is String):
+			return false
 	var restored_relationships: Dictionary = {}
 	for npc_id in relationship_state.keys():
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)

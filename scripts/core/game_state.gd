@@ -139,6 +139,7 @@ func load_save_data(data: Dictionary) -> bool:
 	if not (saved_fact_ids_value is Array) or not (saved_visits_value is Array):
 		return false
 
+	var saved_flags: Dictionary = saved_flags_value
 	var restored_relationships: Dictionary = {}
 	for npc_id in relationship_state.keys():
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
@@ -158,7 +159,7 @@ func load_save_data(data: Dictionary) -> bool:
 	}
 	world_state = {
 		"phase": saved_phase,
-		"flags": (saved_flags_value as Dictionary).duplicate(true),
+		"flags": saved_flags.duplicate(true),
 	}
 	action_history = restored_history
 	return true

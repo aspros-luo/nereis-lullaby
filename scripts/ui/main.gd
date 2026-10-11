@@ -53,6 +53,8 @@ var observe_button: Button
 var advance_button: Button
 var finish_button: Button
 var restart_button: Button
+var save_button: Button
+var load_button: Button
 var location_buttons: Array[Button] = []
 
 func _ready() -> void:
@@ -142,6 +144,20 @@ func _build_ui() -> void:
 	advance_button.text = "等到下一个时段"
 	advance_button.pressed.connect(_advance_time)
 	action_row.add_child(advance_button)
+
+	var save_row := HBoxContainer.new()
+	save_row.add_theme_constant_override("separation", 8)
+	root.add_child(save_row)
+
+	save_button = Button.new()
+	save_button.text = "保存进度"
+	save_button.pressed.connect(_save_game)
+	save_row.add_child(save_button)
+
+	load_button = Button.new()
+	load_button.text = "读取进度"
+	load_button.pressed.connect(_load_game)
+	save_row.add_child(load_button)
 
 	action_state_label = Label.new()
 	action_state_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -493,6 +509,47 @@ func _record_anomaly_clue_if_available(location_id: String) -> bool:
 	if fact_id.is_empty():
 		return false
 	return _add_fact(fact_id, title, detail)
+
+const SAVE_PATH: String = "user://nereis_lullaby_demo.cfg"
+
+func _save_game() -> void:
+	var config := ConfigFile.new()
+	config.set_value("save", "version", 1)
+	config.set_value("save", "game_state", game_state.to_save_data())
+	config.set_value("save", "clue_entries", clue_journal.get_entries())
+	var error: Error = config.save(SAVE_PATH)
+	if error == OK:
+		message_label.text = "进度已保存。下次启动游戏后，可以读取这份记录继续游玩。"
+	else:
+		message_label.text = "保存失败（错误码 %d）。请检查游戏是否有可写入的用户数据目录。" % error
+	_refresh_ui()
+
+func _load_game() -> void:
+	var config := ConfigFile.new()
+	var error: Error = config.load(SAVE_PATH)
+	if error != OK:
+		message_label.text = "还没有可读取的存档。先游玩一段，再选择“保存进度”。"
+		return
+	var version: int = int(config.get_value("save", "version", 0))
+	if version != 1:
+		message_label.text = "这份存档版本不受当前 Demo 支持。"
+		return
+	var saved_state: Variant = config.get_value("save", "game_state", {})
+	if not (saved_state is Dictionary):
+		message_label.text = "存档内容无法识别，当前进度没有改变。"
+		return
+	var restored_state = GameStateScript.new()
+	if not restored_state.load_save_data(saved_state):
+		message_label.text = "存档中的时间或世界阶段无效，当前进度没有改变。"
+		return
+	game_state = restored_state
+	schedule_manager = ScheduleManagerScript.new()
+	clue_journal = ClueJournalScript.new()
+	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
+	if saved_entries is Array:
+		clue_journal.load_entries(saved_entries)
+	message_label.text = "已读取进度。时间、关系、调查记录和线索簿都已恢复。"
+	_refresh_ui()
 
 func _finish_demo() -> void:
 	game_state.complete_demo()

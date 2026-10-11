@@ -34,6 +34,15 @@ const OBSERVATION_TEXT: Dictionary = {
 	"FOREST": "树根旁长着细小的野花。枝叶间偶尔有鸟叫，风吹过时，光斑就在地上慢慢移动。",
 	"GROVE": "草地柔软，几块石头被晒得暖暖的。花朵随着风轻轻摇动。",
 }
+const ANOMALY_OBSERVATION_TEXT: Dictionary = {
+	"HOME": "门边的花束换了方向。花瓶底部没有积水，枝叶却像刚被人轻轻转过。",
+	"SHRINE": "木台上留着一圈浅浅的潮痕。屋顶没有漏水，附近也没有打翻的水盆。",
+	"FOREST": "林子里的鸟鸣忽然停了片刻。风没有变，树叶却像被什么看不见的东西压低了。",
+	"GROVE": "空地中央有一小块泥土没有沾上露水，边缘却没有明显的脚印。",
+	"CLINIC": "医生把几份记录收进抽屉。纸页边缘有反复翻动留下的折痕。",
+	"COMMONS": "村民们照常说笑，但几个人同时停下来，像是在等远处某个声音过去。",
+	"PATH": "小路上的脚印在一处突然变浅，往前几步又恢复了原样。",
+}
 const LOCATION_DESCRIPTIONS: Dictionary = {
 	"HOME": "熟悉的屋子和门前小路。照料者总能把普通的一天安排得妥妥当当。",
 	"COMMONS": "村民交换食物、闲聊和帮忙的地方。这里的热闹让人觉得安心。",
@@ -413,7 +422,8 @@ func _observe_location() -> void:
 	if game_state.world_state["phase"] == "after_week":
 		game_state.mark_post_anomaly_visit(game_state.current_location)
 		var added_after := _record_anomaly_clue_if_available(game_state.current_location)
-		message_label.text = "我仔细看了看周围。" if not added_after else "我发现了一处不太寻常的细节。（线索簿已更新。）"
+		var anomaly_observation: String = str(ANOMALY_OBSERVATION_TEXT.get(game_state.current_location, "我仔细看了看周围，暂时没有发现能解释变化的东西。"))
+		message_label.text = anomaly_observation + ("（线索簿已更新。）" if added_after else " 我暂时没有发现新的记录。")
 		_refresh_ui()
 		return
 
@@ -433,7 +443,8 @@ func _observe_location() -> void:
 			"forest_flower_observation", "林间的野花",
 			"林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
 		)
-	message_label.text = "线索簿更新了。这件事也许有普通的解释。" if added else "我没发现新的明确线索，但这里还有值得慢慢看的地方。"
+	var ordinary_observation: String = str(OBSERVATION_TEXT.get(game_state.current_location, "这里暂时没有什么特别的发现。"))
+	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
 
 func _do_daily_activity() -> void:

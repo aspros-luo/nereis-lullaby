@@ -343,7 +343,7 @@ func _do_daily_activity() -> void:
 				game_state.increase_relationship("caregiver")
 		"COMMONS":
 			activity_text = "我帮忙收拾公共空间，和路过的村民说了几句话。"
-			if _npc_is_present("caregiver"):
+			if _npc_is_present("caregiver") and game_state.world_state["phase"] == "ordinary":
 				game_state.increase_relationship("caregiver")
 		"SHRINE":
 			activity_text = "我帮忙把布料和花束摆整齐。大家看起来都很满意。"
@@ -419,7 +419,7 @@ func _talk_to_npc(npc_id: String) -> void:
 	_refresh_ui()
 
 func _get_daily_dialogue(npc_id: String) -> String:
-	var day := game_state.day_index
+	var day: int = int(game_state.day_index)
 	match npc_id:
 		"caregiver":
 			if day == 1:

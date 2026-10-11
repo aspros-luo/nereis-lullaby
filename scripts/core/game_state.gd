@@ -105,59 +105,60 @@ func load_save_data(data: Dictionary) -> bool:
 	var saved_day: int = int(data.get("day_index", 0))
 	var saved_slot: int = int(data.get("slot_index", -1))
 	var saved_world_value: Variant = data.get("world_state", {})
+	var saved_relationships_value: Variant = data.get("relationship_state", {})
+	var saved_investigation_value: Variant = data.get("investigation_state", {})
+	var saved_history_value: Variant = data.get("action_history", [])
 	if not (saved_world_value is Dictionary):
 		return false
-	var saved_world_input: Dictionary = saved_world_value
-	var saved_phase: String = str(saved_world_input.get("phase", ""))
+	if not (saved_relationships_value is Dictionary):
+		return false
+	if not (saved_investigation_value is Dictionary):
+		return false
+	if not (saved_history_value is Array):
+		return false
+
+	var saved_world: Dictionary = saved_world_value
+	var saved_relationships: Dictionary = saved_relationships_value
+	var saved_investigation: Dictionary = saved_investigation_value
+	var saved_history: Array = saved_history_value
+	var saved_phase: String = str(saved_world.get("phase", ""))
+	var saved_location: String = str(data.get("current_location", "HOME"))
+	var saved_flags_value: Variant = saved_world.get("flags", {})
+	var saved_fact_ids_value: Variant = saved_investigation.get("observed_fact_ids", [])
+	var saved_visits_value: Variant = saved_investigation.get("visited_after_anomaly", [])
 	if saved_day < 1 or saved_day > FINAL_DAY:
 		return false
 	if saved_slot < 0 or saved_slot >= SLOT_KEYS.size():
 		return false
-	if not [ "ordinary", "after_week", "demo_complete" ].has(saved_phase):
+	if not ["ordinary", "after_week", "demo_complete"].has(saved_phase):
 		return false
+	if saved_location.is_empty():
+		return false
+	if not (saved_flags_value is Dictionary):
+		return false
+	if not (saved_fact_ids_value is Array) or not (saved_visits_value is Array):
+		return false
+
+	var restored_relationships: Dictionary = {}
+	for npc_id in relationship_state.keys():
+		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
+	var restored_history: Array[Dictionary] = []
+	for entry in saved_history:
+		if entry is Dictionary:
+			restored_history.append(entry.duplicate(true))
 
 	day_index = saved_day
 	slot_index = saved_slot
-	var saved_location: String = str(data.get("current_location", "HOME"))
 	current_location = saved_location
 	action_used_this_slot = bool(data.get("action_used_this_slot", false))
-
-	var saved_relationships_value: Variant = data.get("relationship_state", {})
-	if not (saved_relationships_value is Dictionary):
-		return false
-	var saved_relationships: Dictionary = saved_relationships_value
-	var saved_investigation_value: Variant = data.get("investigation_state", {})
-	if not (saved_investigation_value is Dictionary):
-		return false
-	var saved_investigation: Dictionary = saved_investigation_value
-	var saved_fact_ids_value: Variant = saved_investigation.get("observed_fact_ids", [])
-	var saved_visits_value: Variant = saved_investigation.get("visited_after_anomaly", [])
-	if not (saved_fact_ids_value is Array) or not (saved_visits_value is Array):
-		return false
-	for npc_id in relationship_state.keys():
-		relationship_state[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
-
-	var saved_fact_ids: Array = saved_fact_ids_value
-	var saved_visits: Array = saved_visits_value
+	relationship_state = restored_relationships
 	investigation_state = {
-		"observed_fact_ids": saved_fact_ids.duplicate(true),
-		"visited_after_anomaly": saved_visits.duplicate(true),
+		"observed_fact_ids": saved_fact_ids_value.duplicate(true),
+		"visited_after_anomaly": saved_visits_value.duplicate(true),
 	}
-
-	var saved_flags_value: Variant = saved_world_input.get("flags", {})
-	if not (saved_flags_value is Dictionary):
-		return false
-	var saved_flags: Dictionary = saved_flags_value
 	world_state = {
 		"phase": saved_phase,
-		"flags": saved_flags.duplicate(true),
+		"flags": (saved_flags_value as Dictionary).duplicate(true),
 	}
-	var saved_history_value: Variant = data.get("action_history", [])
-	if not (saved_history_value is Array):
-		return false
-	var saved_history: Array = saved_history_value
-	action_history.clear()
-	for entry in saved_history:
-		if entry is Dictionary:
-			action_history.append(entry.duplicate(true))
+	action_history = restored_history
 	return true

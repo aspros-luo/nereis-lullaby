@@ -13,6 +13,7 @@ func _initialize() -> void:
 	_test_clue_deduplication()
 	_test_relationship_bounds()
 	_test_save_roundtrip()
+	_test_save_roundtrip_after_anomaly()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -99,3 +100,21 @@ func _test_save_roundtrip() -> void:
 	restored_journal.load_entries(journal.get_entries())
 	assert(restored_journal.get_entries().size() == 1)
 	assert(not restored_journal.add_fact("save_clue", "Duplicate", "Duplicate", 2, "白天", "林间小径"))
+
+
+func _test_save_roundtrip_after_anomaly() -> void:
+	var state = GameStateScript.new()
+	for _step in range(21):
+		state.advance_time()
+	assert(state.world_state["phase"] == "after_week")
+	state.mark_post_anomaly_visit("HOME")
+	state.mark_post_anomaly_visit("SHRINE")
+	var restored = GameStateScript.new()
+	assert(restored.load_save_data(state.to_save_data()))
+	assert(restored.world_state["phase"] == "after_week")
+	assert(restored.world_state["flags"]["village_anomaly"])
+	assert(restored.investigation_state["visited_after_anomaly"].size() == 2)
+	restored.complete_demo()
+	var completed = GameStateScript.new()
+	assert(completed.load_save_data(restored.to_save_data()))
+	assert(completed.world_state["phase"] == "demo_complete")

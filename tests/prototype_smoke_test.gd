@@ -12,6 +12,7 @@ func _initialize() -> void:
 	_test_npc_schedules_and_locations()
 	_test_clue_deduplication()
 	_test_relationship_bounds()
+	_test_save_roundtrip()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -69,3 +70,26 @@ func _test_relationship_bounds() -> void:
 	assert(state.relationship_state["caregiver"] == 10)
 	state.increase_relationship("caregiver", -30)
 	assert(state.relationship_state["caregiver"] == -5)
+
+
+func _test_save_roundtrip() -> void:
+	var original = GameStateScript.new()
+	original.advance_time()
+	assert(original.take_action("save_test", "save test activity"))
+	original.increase_relationship("caregiver", 3)
+	original.register_fact("save_test_fact")
+	var restored = GameStateScript.new()
+	assert(restored.load_save_data(original.to_save_data()))
+	assert(restored.day_index == original.day_index)
+	assert(restored.slot_index == original.slot_index)
+	assert(restored.action_used_this_slot == original.action_used_this_slot)
+	assert(restored.relationship_state["caregiver"] == 3)
+	assert(restored.investigation_state["observed_fact_ids"].has("save_test_fact"))
+	assert(restored.action_history.size() == 1)
+
+	var journal = ClueJournalScript.new()
+	assert(journal.add_fact("save_clue", "Saved clue", "Clue details", 2, "白天", "林间小径"))
+	var restored_journal = ClueJournalScript.new()
+	restored_journal.load_entries(journal.get_entries())
+	assert(restored_journal.get_entries().size() == 1)
+	assert(not restored_journal.add_fact("save_clue", "Duplicate", "Duplicate", 2, "白天", "林间小径"))

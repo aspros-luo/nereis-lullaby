@@ -86,6 +86,12 @@ func _test_save_roundtrip() -> void:
 	assert(restored.relationship_state["caregiver"] == 3)
 	assert(restored.investigation_state["observed_fact_ids"].has("save_test_fact"))
 	assert(restored.action_history.size() == 1)
+	var protected_state = GameStateScript.new()
+	protected_state.day_index = 4
+	var invalid_data: Dictionary = original.to_save_data()
+	invalid_data["world_state"] = "corrupt"
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
 
 	var journal = ClueJournalScript.new()
 	assert(journal.add_fact("save_clue", "Saved clue", "Clue details", 2, "白天", "林间小径"))

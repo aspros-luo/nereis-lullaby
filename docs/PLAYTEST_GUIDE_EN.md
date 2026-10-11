@@ -12,7 +12,8 @@
 
 - Each day has morning, daytime, and evening.
 - During ordinary days, take one meaningful action per period: talk to a present villager or perform an everyday activity at the current location.
-- Travel and observation do not consume the main action.
+- Travel and observation do not consume the main action. Observation displays location-specific details and adds a clue when a discovery condition is met.
+- The contextual objective hint changes with the day and anomaly phase. It is optional guidance, not a checklist that must be completed line by line.
 - Relationship values exist to test state feedback; they are not a finalized affection or ending formula.
 - The clue journal records encountered evidence. It does not reveal the correct answer or imply that Mite understands the hidden truth.
 - Advancing time from the evening of Day 7 triggers the prototype anomaly. Time then stays at evening while the player can freely travel, talk, and explore.

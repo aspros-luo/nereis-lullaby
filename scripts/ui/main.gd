@@ -52,6 +52,7 @@ var action_button: Button
 var observe_button: Button
 var advance_button: Button
 var finish_button: Button
+var restart_button: Button
 var location_buttons: Array[Button] = []
 
 func _ready() -> void:
@@ -185,6 +186,12 @@ func _build_ui() -> void:
 	finish_button.pressed.connect(_finish_demo)
 	root.add_child(finish_button)
 
+	restart_button = Button.new()
+	restart_button.text = "重新开始序章"
+	restart_button.visible = false
+	restart_button.pressed.connect(_restart_demo)
+	root.add_child(restart_button)
+
 func _refresh_ui() -> void:
 	var phase_label := "日常" if game_state.world_state["phase"] == "ordinary" else "村庄发生了变化"
 	if game_state.world_state["phase"] == "demo_complete":
@@ -255,6 +262,7 @@ func _refresh_ui() -> void:
 		game_state.world_state["phase"] == "after_week"
 		and game_state.investigation_state["visited_after_anomaly"].size() >= 3
 	)
+	restart_button.visible = game_state.world_state["phase"] == "demo_complete"
 
 func _get_location_description(location_id: String) -> String:
 	var description := str(LOCATION_DESCRIPTIONS.get(location_id, "这里很安静。"))
@@ -489,4 +497,11 @@ func _record_anomaly_clue_if_available(location_id: String) -> bool:
 func _finish_demo() -> void:
 	game_state.complete_demo()
 	message_label.text = "第一段故事结束了。村庄依旧是熟悉的村庄，但有些小事已经无法像从前那样轻易解释。"
+	_refresh_ui()
+
+func _restart_demo() -> void:
+	game_state = GameStateScript.new()
+	schedule_manager = ScheduleManagerScript.new()
+	clue_journal = ClueJournalScript.new()
+	message_label.text = "新的一天开始了。我先在村子里走走。"
 	_refresh_ui()

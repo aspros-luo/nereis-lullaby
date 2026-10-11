@@ -571,6 +571,9 @@ func _load_game() -> void:
 	if not restored_state.load_save_data(saved_state):
 		message_label.text = "存档中的时间或世界阶段无效，当前进度没有改变。"
 		return
+	if not LOCATION_ORDER.has(restored_state.current_location):
+		message_label.text = "存档中的地点无效，当前进度没有改变。"
+		return
 	game_state = restored_state
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()

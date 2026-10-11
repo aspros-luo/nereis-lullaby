@@ -634,8 +634,9 @@ func _load_game() -> void:
 	if not (saved_state is Dictionary):
 		message_label.text = "存档内容无法识别，当前进度没有改变。"
 		return
+	var saved_state_dictionary: Dictionary = saved_state
 	var restored_state = GameStateScript.new()
-	if not restored_state.load_save_data(saved_state):
+	if not restored_state.load_save_data(saved_state_dictionary):
 		message_label.text = "存档中的时间或世界阶段无效，当前进度没有改变。"
 		return
 	if not LOCATION_ORDER.has(restored_state.current_location):
@@ -646,7 +647,8 @@ func _load_game() -> void:
 	clue_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if saved_entries is Array:
-		clue_journal.load_entries(saved_entries)
+		var saved_entries_array: Array = saved_entries
+		clue_journal.load_entries(saved_entries_array)
 	message_label.text = "已读取进度。时间、关系、调查记录和线索簿都已恢复。"
 	_refresh_ui()
 

@@ -103,17 +103,17 @@ func _build_ui() -> void:
 
 	message_label = Label.new()
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	message_label.text = "你可以自由探索村庄。"
+	message_label.text = "我可以自由探索村庄。"
 	root.add_child(message_label)
 
 	var journal_title := Label.new()
-	journal_title.text = "玩家线索簿"
+	journal_title.text = "线索簿"
 	journal_title.add_theme_font_size_override("font_size", 20)
 	root.add_child(journal_title)
 
 	journal_label = Label.new()
 	journal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	journal_label.text = "暂时没有记录。线索簿只整理你亲自观察到的内容，不替你判断真相。"
+	journal_label.text = "暂时没有记录。我只记下自己亲眼观察到的内容，不急着判断真相。"
 	root.add_child(journal_label)
 
 func _refresh_ui() -> void:
@@ -122,7 +122,7 @@ func _refresh_ui() -> void:
 		game_state.get_slot_label(),
 		"日常" if game_state.world_state["phase"] == "ordinary" else "第一周结束",
 	]
-	location_label.text = "当前位置：%s" % schedule_manager.get_location_name(game_state.current_location)
+	location_label.text = "我现在在：%s" % schedule_manager.get_location_name(game_state.current_location)
 
 	for child in npc_container.get_children():
 		npc_container.remove_child(child)
@@ -135,7 +135,7 @@ func _refresh_ui() -> void:
 	)
 	if present.is_empty():
 		var empty_label := Label.new()
-		empty_label.text = "此时没有熟悉的村民在这里。你可以观察环境、换个地点，或推进时间。"
+		empty_label.text = "这里暂时没有熟悉的村民。我可以看看周围、去别处走走，或等一会儿。"
 		empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		npc_container.add_child(empty_label)
 	else:
@@ -147,7 +147,7 @@ func _refresh_ui() -> void:
 
 	var journal_entries: Array[Dictionary] = clue_journal.get_entries()
 	if journal_entries.is_empty():
-		journal_label.text = "暂时没有记录。线索簿只整理你亲自观察到的内容，不替你判断真相。"
+		journal_label.text = "暂时没有记录。我只记下自己亲眼观察到的内容，不急着判断真相。"
 	else:
 		var lines: PackedStringArray = []
 		for entry in journal_entries:
@@ -158,12 +158,12 @@ func _refresh_ui() -> void:
 
 func _on_location_selected(location_id: String) -> void:
 	game_state.current_location = location_id
-	message_label.text = "你来到了%s。" % schedule_manager.get_location_name(location_id)
+	message_label.text = "我来到了%s。" % schedule_manager.get_location_name(location_id)
 	_refresh_ui()
 
 func _advance_time() -> void:
 	game_state.advance_time()
-	message_label.text = "时间向前推进。村民按各自日程继续生活。"
+	message_label.text = "时间又过去了一段。村里的人也在忙着各自的事。"
 	_refresh_ui()
 
 func _observe_location() -> void:
@@ -187,19 +187,19 @@ func _observe_location() -> void:
 			schedule_manager.get_location_name(game_state.current_location)
 		)
 	elif game_state.day_index == 7 and game_state.world_state["phase"] == "ordinary":
-		message_label.text = "你没有发现足以确认异常的新证据。熟悉的地方仍值得之后回来看看。"
+		message_label.text = "我没发现能说明异常的新证据。也许以后再来看看，会有新的发现。"
 		return
 
 	if added:
 		game_state.register_fact("day5_repeated_object_" + game_state.current_location)
-		message_label.text = "你记下了一项观察。它仍有普通解释，线索簿不会替你下结论。"
+		message_label.text = "我把这件事记了下来。不过它也许有普通的解释，现在还不能下结论。"
 	else:
-		message_label.text = "这里暂时没有新的明确发现。你可以换个地点、与在场村民交谈，或推进时段。"
+		message_label.text = "这里暂时没什么新发现。我可以换个地方、和在场的人聊聊，或者等到下一个时段。"
 	_refresh_ui()
 
 func _talk_to_npc(npc_id: String) -> void:
 	var added := false
-	var reply := "你们聊了些日常琐事。对方没有提到任何超出自己认知范围的内容。"
+	var reply := "我们聊了些日常琐事。对方没有提到什么特别的事。"
 
 	if game_state.day_index == 3 and npc_id == "doctor" and game_state.current_location == "CLINIC":
 		added = clue_journal.add_fact(
@@ -242,5 +242,5 @@ func _talk_to_npc(npc_id: String) -> void:
 		)
 		reply = "医生发现几位病患对症状开始的日期说法不一，打算继续核对记录。"
 
-	message_label.text = reply if not added else reply + " 你把实际听到的内容记进了线索簿。"
+	message_label.text = reply if not added else reply + " 我把听到的内容记进了线索簿。"
 	_refresh_ui()

@@ -31,3 +31,20 @@ func get_entries() -> Array[Dictionary]:
 	for entry in entries:
 		copied_entries.append(entry.duplicate(true))
 	return copied_entries
+
+
+func load_entries(saved_entries: Array) -> void:
+	entries.clear()
+	_seen_ids.clear()
+	for entry_variant in saved_entries:
+		if not (entry_variant is Dictionary):
+			continue
+		var entry: Dictionary = entry_variant
+		add_fact(
+			str(entry.get("id", "")),
+			str(entry.get("title", "")),
+			str(entry.get("detail", "")),
+			int(entry.get("day", 1)),
+			str(entry.get("slot", "早晨")),
+			str(entry.get("location", "未知地点"))
+		)

@@ -326,7 +326,7 @@ func _observe_location() -> void:
 			"forest_flower_observation", "林间的野花",
 			"林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
 		)
-	message_label.text = "我把这件事记了下来，不过它也许有普通的解释。" if added else "我没发现新的明确线索，但这里还有值得慢慢看的地方。"
+	message_label.text = "线索簿更新了。这件事也许有普通的解释。" if added else "我没发现新的明确线索，但这里还有值得慢慢看的地方。"
 	_refresh_ui()
 
 func _do_daily_activity() -> void:
@@ -406,7 +406,7 @@ func _talk_to_npc(npc_id: String) -> void:
 	game_state.increase_relationship(npc_id)
 	message_label.text = reply
 	if fact_added:
-		message_label.text += " 我把听到的内容记进了线索簿。"
+		message_label.text += "（线索簿已更新。）"
 	_refresh_ui()
 
 func _get_daily_dialogue(npc_id: String) -> String:

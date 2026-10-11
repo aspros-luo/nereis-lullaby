@@ -17,6 +17,14 @@ const ACTIVITY_LABELS: Dictionary = {
 	"FOREST": "采摘野花",
 	"GROVE": "坐下休息",
 }
+const DAY_OPENING_TEXT: Dictionary = {
+	2: "第二天，村庄照常醒来。照料者说昨晚风有些大，窗边的花却开得很好。",
+	3: "第三天，公共空间里有人提起最近睡得不太安稳。话题很快又回到今天要做的杂事。",
+	4: "第四天，礼拜场所开始整理布料和花束。村民们彼此帮忙，看起来只是寻常准备。",
+	5: "第五天，林地里残留着潮湿的泥土气味。村里的人似乎都在为某件公共活动做准备。",
+	6: "第六天，诊疗处的桌上堆起了几份记录。医生一边整理，一边说有些日期需要再核对。",
+	7: "第七天，村庄显得比平时安静。傍晚前还有许多小事要做，大家却像是默契地避开了某些话题。",
+}
 const OBSERVATION_TEXT: Dictionary = {
 	"HOME": "窗边放着几本旧书，门口的花瓶里插着新鲜的枝叶。屋子里有熟悉的木头和面包香。",
 	"COMMONS": "有人把篮子放在长椅边，远处传来谈笑声。每个人看起来都有忙不完的小事。",
@@ -339,6 +347,7 @@ func _advance_time() -> void:
 	if game_state.world_state["phase"] == "demo_complete":
 		return
 	var was_ordinary: bool = game_state.world_state["phase"] == "ordinary"
+	var previous_day: int = game_state.day_index
 	game_state.advance_time()
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
@@ -351,6 +360,8 @@ func _advance_time() -> void:
 			schedule_manager.get_location_name(game_state.current_location)
 		)
 		game_state.register_fact("day7_village_change")
+	elif game_state.day_index != previous_day:
+		message_label.text = str(DAY_OPENING_TEXT.get(game_state.day_index, "新的一天开始了。村里的人继续忙着各自的事。"))
 	else:
 		message_label.text = "时段过去了。村里的人也继续忙着各自的事。"
 	_refresh_ui()
@@ -585,7 +596,8 @@ func _load_game() -> void:
 
 func _finish_demo() -> void:
 	game_state.complete_demo()
-	message_label.text = "第一段故事结束了。村庄依旧是熟悉的村庄，但有些小事已经无法像从前那样轻易解释。"
+	var clue_count: int = clue_journal.get_entries().size()
+	message_label.text = "夜色渐渐沉下来。有人问我今天过得怎么样，我说不出发生过什么大事。可当我把一路上看见的细节重新想了一遍，它们又像是没有完全对上。也许只是我太累了。\n\n这一段日常暂时结束了：我记录了 %d 条线索，回访了 %d 个地点。线索只是我见过的事情，还不能说明它们为什么发生。" % [clue_count, game_state.investigation_state["visited_after_anomaly"].size()]
 	_refresh_ui()
 
 func _restart_demo() -> void:

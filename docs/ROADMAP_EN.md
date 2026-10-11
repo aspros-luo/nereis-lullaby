@@ -18,7 +18,8 @@
 - [x] Add post-anomaly revisits and an optional prologue ending.
 - [ ] Run the project in Godot and execute the regression tests; fix runtime errors.
 - [ ] Perform a human playtest for action feedback, clue reachability, pacing, and ending conditions.
-- [ ] Add save/load, production art, audio, and a fuller dialogue presentation.
+- [x] Add single-slot local save/load for time, relationships, world phase, action history, and clue journal.
+- [ ] Add production art, audio, and a fuller dialogue presentation.
 
 ## Phase 3: Narrative design
 - [ ] Decide the relationships among the village, forest, Church, and remnants of ancient divine power.

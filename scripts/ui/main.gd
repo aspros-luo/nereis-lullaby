@@ -203,7 +203,8 @@ func _refresh_ui() -> void:
 			npc_container.add_child(npc_button)
 
 	action_button.disabled = not game_state.can_take_action()
-	advance_button.disabled = game_state.world_state["phase"] != "ordinary" and game_state.world_state["phase"] != "after_week"
+	advance_button.disabled = game_state.world_state["phase"] != "ordinary"
+	advance_button.text = "等到下一个时段" if game_state.world_state["phase"] == "ordinary" else "傍晚的时间停住了"
 	observe_button.disabled = game_state.world_state["phase"] == "demo_complete"
 	if game_state.world_state["phase"] == "ordinary":
 		action_state_label.text = "每个时段可以安排一项主要活动。换地点和观察不消耗这项行动。"

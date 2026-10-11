@@ -6,7 +6,7 @@ const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manag
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 
 const LOCATION_ORDER: Array[String] = [
-	"HOME", "COMMONS", "SHRINE", "CLINIC", "PATH", "FOREST", "GROVE"
+	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
 ]
 const ACTIVITY_LABELS: Dictionary = {
 	"HOME": "整理家里",
@@ -97,7 +97,7 @@ func _build_ui() -> void:
 	root.add_child(status_label)
 
 	var map_title := Label.new()
-	map_title.text = "去哪里走走？"
+	map_title.text = "村庄与林地地图 · 选择一个地点"
 	map_title.add_theme_font_size_override("font_size", 18)
 	root.add_child(map_title)
 

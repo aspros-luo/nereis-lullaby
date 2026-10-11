@@ -306,7 +306,7 @@ func _observe_location() -> void:
 	if game_state.world_state["phase"] == "after_week":
 		game_state.mark_post_anomaly_visit(game_state.current_location)
 		var added_after := _record_anomaly_clue_if_available(game_state.current_location)
-		message_label.text = "我仔细看了看周围。" if not added_after else "我发现了一处不太寻常的细节，并把它记了下来。"
+		message_label.text = "我仔细看了看周围。" if not added_after else "我发现了一处不太寻常的细节。（线索簿已更新。）"
 		_refresh_ui()
 		return
 

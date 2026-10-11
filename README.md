@@ -1,6 +1,6 @@
 # Nereis Lullaby / 蜜忒之歌
 
-> A narrative adventure project centered on Mite: daily-life simulation, free exploration, and visual-novel storytelling. The separate Nereis-Hero action RPG is not developed here.
+> A narrative adventure centered on Mite: daily-life simulation, free exploration, and visual-novel storytelling. The separate Nereis-Hero action RPG is not developed here.
 
 ## Start here / 从这里开始
 
@@ -16,49 +16,69 @@
 ## Confirmed identity
 
 - Three action periods per day: morning, daytime, and evening.
-- Region map with location-based exploration.
-- Key NPC schedules and states, driven by both autonomous simulation and authored events.
-- Primarily Mite's viewpoint, with narrative contrast between her sincere everyday understanding and the player's deductions.
-- Relationship, clue/investigation, and world-state variables remain separate but can jointly influence endings.
+- Region-map navigation with location-based exploration.
+- Key NPC schedules and relationship values.
+- Primarily Mite's viewpoint: the player may infer more than Mite understands.
+- Relationship, clues, and world state are tracked separately.
 
-## Prototype status / 原型状态
+## Playable vertical-slice prototype
 
-A minimal Godot 4 project shell is included. Open this repository in Godot 4.6.x and run the project file named project.godot to try the current text-based prototype.
+Open this repository in Godot 4.6.x and run `project.godot`.
 
-Current prototype interactions:
-- Move between five placeholder locations.
-- Advance through morning, daytime, and evening across a seven-day schedule.
-- See which of the three prototype NPCs is present at the current location and time.
-- Talk to NPCs and observe selected locations to collect evidence in the player clue notebook.
-- Review clue entries with day, time, location, and a factual description.
+The current prototype code includes:
+- Seven destinations: Mite's home area, village commons, public shrine, clinic, village path, forest path, and forest clearing.
+- A seven-day schedule with morning, daytime, and evening.
+- One meaningful action per time period, with free travel and observation.
+- Three scheduled NPCs, relationship feedback, and conversation-based evidence.
+- A clue journal that records observations without automatically explaining their meaning.
+- Alternate discovery windows for several early clues, so missing the exact original day does not block them.
+- A staged village anomaly at the end of the seventh day, followed by altered location descriptions, changed NPC responses, and post-event clues.
+- An optional short prologue ending after the player revisits three locations after the anomaly.
 
-A core logic smoke-test script is included. With Godot installed, run: godot --headless --path . -s res://tests/prototype_smoke_test.gd. This test has been added but has not yet been executed in this environment.
+The anomaly and its specific details are **prototype scenario content**, not finalized world canon. The current build is intentionally text-first; art, audio, save/load, and a complete dialogue presentation are still future work.
 
-This is an early system prototype, not a finished vertical slice. It uses text-only UI and placeholder location labels; it does not yet include final art, save/load, a complete dialogue system, a real map, or a finalized world anomaly. The Day 7 anomaly remains a proposal and is not forced by the current prototype.
+### Run the core regression checks
 
-当前已加入最小 Godot 4 项目骨架。请使用 Godot 4.6.x 打开仓库并运行项目文件 project.godot，体验文字界面的系统原型。
+With Godot available:
 
-当前可交互内容：
-- 在五个占位地点之间移动。
-- 按七天日程推进早晨、白天和傍晚。
-- 查看当前地点与时段在场的三名原型 NPC。
-- 与 NPC 交谈、观察指定地点，并把证据记入玩家线索簿。
-- 按日期、时段、地点回顾已记录内容。
+```sh
+godot --headless --path . -s res://tests/prototype_smoke_test.gd
+```
 
-已加入核心逻辑 smoke test 脚本。安装 Godot 后可运行：godot --headless --path . -s res://tests/prototype_smoke_test.gd。该测试脚本已写入仓库，但当前环境尚未实际执行。
+The smoke-test script covers time progression, the anomaly phase, action limits, NPC schedule coverage, clue de-duplication, and relationship bounds. The script has been updated in the repository but **has not been executed in the current tool environment**. Static inspection is not a substitute for an engine run or a human playtest.
 
-这仍是早期系统原型，不是完成的垂直切片。当前使用纯文字 UI 和占位地点名称；尚无最终美术、存档/读档、完整对话系统、正式地图或定稿的世界异变。第七日异变仍为提案，当前原型不会强制触发。
+## 可试玩垂直切片原型
 
-## Narrative contract
+使用 Godot 4.6.x 打开仓库，运行 `project.godot`。
 
-Mite is an innocent village girl who does not know her connection to the Outer God or the ritual. There is no protagonist-facing insight meter. The player investigates through evidence, recurring details, character behavior, and changing context; the clue journal does not mean Mite understands the hidden truth.
+当前原型代码包含：
+- 七个可前往地点：我家附近、村庄公共空间、公开礼拜场所、诊疗处、村庄通路、林间小径和林中空地。
+- 七天、每天早晨／白天／傍晚的日程。
+- 每个时段一项主要行动；移动和观察不消耗该行动。
+- 三名有固定日程的关键 NPC、关系反馈与交谈线索。
+- 只记录玩家见闻、不自动解释真相的线索簿。
+- 部分早期线索提供较宽的触发时间，错过最初日期仍有机会发现。
+- 第七日傍晚的阶段异变；异变后地点描述、NPC 回应和可发现线索都会变化。
+- 异变后回访三个地点即可主动结束序章。
 
-## Project reset and canon discipline
+异变及其具体细节目前属于**原型剧情**，不代表世界观已经正式定稿。当前仍以文字界面为主；美术、音频、存档／读档和完整对话表现仍待开发。
 
-This repository starts from a clean design baseline. Old story examples are not automatically canon. Unresolved world details, endings, and cross-game fates remain proposals until explicitly approved.
+### 运行核心回归检查
 
-## Documentation and workflow
+安装 Godot 后运行：
 
-Chinese and English design documents are maintained together. When a rule changes, update both versions. Do not intentionally trigger GitHub Actions.
+```sh
+godot --headless --path . -s res://tests/prototype_smoke_test.gd
+```
 
-The source has been added through GitHub repository operations. Engine execution and hands-on playtesting have not yet been performed in this environment; do not treat the current code as runtime-verified.
+测试脚本覆盖时间推进、异变阶段、行动次数限制、NPC 日程、线索去重和关系值边界。脚本已经更新写入仓库，但**当前工具环境尚未执行测试**。静态检查不能代替引擎运行或人工游玩。
+
+## Narrative contract / 叙事约束
+
+Mite is innocent and does not know her connection to the Outer God or the ritual. The player may notice contradictions earlier than she does. The clue journal is a player-facing evidence organizer, not Mite's supernatural insight system.
+
+蜜忒仍然纯真且不知道自己与外神、仪式的关系。玩家可以比她更早察觉矛盾；线索簿服务于玩家推理，不是蜜忒的超自然认知系统。
+
+## Project and workflow discipline / 项目纪律
+
+Chinese and English design documents are maintained together. Design proposals must not silently become canon. Do not intentionally trigger GitHub Actions. Report static review, automated tests, engine execution, and human playtesting as separate verification levels.

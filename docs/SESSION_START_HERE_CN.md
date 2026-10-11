@@ -7,6 +7,9 @@
 - `docs/CORE_GAMEPLAY_CN.md` / `docs/CORE_GAMEPLAY_EN.md`
 - `docs/ROADMAP_CN.md` / `docs/ROADMAP_EN.md`
 
+## 跨项目剧情同步（必读）
+每次继续开发剧情、NPC、线索或世界状态前，先检查 Hero 仓库 `development` 分支的最新提交，并遵循 [跨项目剧情同步台账](CROSS_PROJECT_STORY_SYNC_CN_EN.md)。Hero 与本作玩法独立、世界观兼容；较新的明确用户决策优先于旧文档。注意：结局走向仍未锁定，Hero 结局不得以与蜜忒发生身体结合为必要条件。
+
 ## 项目边界
 本仓库只负责《蜜忒之歌》：日程模拟 + 自由探索 + 视觉小说。不要把《Nereis-Hero》的横版动作 RPG 代码或玩法系统混入这里。
 

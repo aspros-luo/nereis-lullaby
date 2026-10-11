@@ -70,8 +70,49 @@ func _ready() -> void:
 	game_state = GameStateScript.new()
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
+	_apply_visual_style()
 	_build_ui()
 	_refresh_ui()
+
+func _apply_visual_style() -> void:
+	var backdrop := ColorRect.new()
+	backdrop.color = Color("#15141b")
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(backdrop)
+	move_child(backdrop, 0)
+
+	var ui_theme := Theme.new()
+	ui_theme.set_color("font_color", "Label", Color("#e8dfd2"))
+	ui_theme.set_color("font_color", "Button", Color("#e8dfd2"))
+	ui_theme.set_color("font_hover_color", "Button", Color("#fff4e6"))
+	ui_theme.set_color("font_pressed_color", "Button", Color("#ffffff"))
+	ui_theme.set_color("font_disabled_color", "Button", Color("#77717b"))
+	ui_theme.set_color("font_focus_color", "Button", Color("#fff4e6"))
+
+	var normal := _make_button_style(Color("#29252f"), Color("#665344"))
+	var hover := _make_button_style(Color("#3b3038"), Color("#c09a6a"))
+	var pressed := _make_button_style(Color("#4a3540"), Color("#d0b17e"))
+	var disabled := _make_button_style(Color("#211f26"), Color("#39343d"))
+	var focus := _make_button_style(Color("#302a35"), Color("#e1bd82"))
+	ui_theme.set_stylebox("normal", "Button", normal)
+	ui_theme.set_stylebox("hover", "Button", hover)
+	ui_theme.set_stylebox("pressed", "Button", pressed)
+	ui_theme.set_stylebox("disabled", "Button", disabled)
+	ui_theme.set_stylebox("focus", "Button", focus)
+	theme = ui_theme
+
+func _make_button_style(fill_color: Color, edge_color: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = fill_color
+	style.border_color = edge_color
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(6)
+	style.content_margin_left = 10.0
+	style.content_margin_right = 10.0
+	style.content_margin_top = 6.0
+	style.content_margin_bottom = 6.0
+	return style
 
 func _build_ui() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

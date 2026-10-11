@@ -34,9 +34,11 @@ The current prototype code includes:
 - A clue journal that records observations without automatically explaining their meaning.
 - Alternate discovery windows for several early clues, so missing the exact original day does not block them.
 - A staged village anomaly at the end of the seventh day, followed by altered location descriptions, changed NPC responses, and post-event clues.
+- Contextual objectives and day-opening story beats to make the seven-day loop easier to follow.
+- Local single-slot save/load for time, relationships, world state, action history, and the clue journal.
 - An optional short prologue ending after the player revisits three locations after the anomaly.
 
-The anomaly and its specific details are **prototype scenario content**, not finalized world canon. The current build is intentionally text-first; art, audio, save/load, and a complete dialogue presentation are still future work.
+The anomaly and its specific details are **prototype scenario content**, not finalized world canon. The current build is intentionally text-first; production art, audio, and a fuller dialogue presentation remain future work. Save/load is implemented as a single local slot.
 
 ### Run the core regression checks
 
@@ -46,7 +48,7 @@ With Godot available:
 godot --headless --path . -s res://tests/prototype_smoke_test.gd
 ```
 
-The smoke-test script covers time progression, the anomaly phase, action limits, NPC schedule coverage, clue de-duplication, and relationship bounds. The script has been updated in the repository but **has not been executed in the current tool environment**. Static inspection is not a substitute for an engine run or a human playtest.
+The smoke-test script covers time progression, the anomaly phase, action limits, NPC schedule coverage, clue de-duplication, relationship bounds, and save restoration. The script has been updated in the repository but **has not been executed in the current tool environment**. Static inspection is not a substitute for an engine run or a human playtest.
 
 ## 可试玩垂直切片原型
 
@@ -60,9 +62,11 @@ The smoke-test script covers time progression, the anomaly phase, action limits,
 - 只记录玩家见闻、不自动解释真相的线索簿。
 - 部分早期线索提供较宽的触发时间，错过最初日期仍有机会发现。
 - 第七日傍晚的阶段异变；异变后地点描述、NPC 回应和可发现线索都会变化。
+- 根据日期显示行动提示与日初叙事片段。
+- 加入单槽本机存档／读档，恢复时间、关系、世界状态、行动记录与线索簿。
 - 异变后回访三个地点即可主动结束序章。
 
-异变及其具体细节目前属于**原型剧情**，不代表世界观已经正式定稿。当前仍以文字界面为主；美术、音频、存档／读档和完整对话表现仍待开发。
+异变及其具体细节目前属于**原型剧情**，不代表世界观已经正式定稿。当前仍以文字界面为主；正式美术、音频和更完整的对话表现仍待开发。存档／读档已提供单槽本机实现。
 
 ### 运行核心回归检查
 
@@ -72,7 +76,7 @@ The smoke-test script covers time progression, the anomaly phase, action limits,
 godot --headless --path . -s res://tests/prototype_smoke_test.gd
 ```
 
-测试脚本覆盖时间推进、异变阶段、行动次数限制、NPC 日程、线索去重和关系值边界。脚本已经更新写入仓库，但**当前工具环境尚未执行测试**。静态检查不能代替引擎运行或人工游玩。
+测试脚本覆盖时间推进、异变阶段、行动次数限制、NPC 日程、线索去重、关系值边界与存档恢复。脚本已经更新写入仓库，但**当前工具环境尚未执行测试**。静态检查不能代替引擎运行或人工游玩。
 
 ## Narrative contract / 叙事约束
 

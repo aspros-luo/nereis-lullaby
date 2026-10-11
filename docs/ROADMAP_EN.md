@@ -16,7 +16,9 @@
 - [x] Write the code for roughly one in-game week, including everyday activities, NPC conversations, relationships, the clue journal, and a staged anomaly.
 - [x] Reuse locations before and after the anomaly while changing descriptions, NPC responses, and discoverable evidence.
 - [x] Add post-anomaly revisits and an optional prologue ending.
+- [x] Add day-specific opening story beats and contextual objective hints.
 - [ ] Run the project in Godot and execute the regression tests; fix runtime errors.
+- [ ] Validate the full save/exit/load flow in Godot, including malformed-save handling.
 - [ ] Perform a human playtest for action feedback, clue reachability, pacing, and ending conditions.
 - [x] Add single-slot local save/load for time, relationships, world phase, action history, and clue journal.
 - [ ] Add production art, audio, and a fuller dialogue presentation.

@@ -32,12 +32,15 @@ func get_slot_label() -> String:
 	return SLOT_LABELS[slot_index]
 
 func can_take_action() -> bool:
-	return not action_used_this_slot and world_state["phase"] != "demo_complete"
+	if world_state["phase"] == "after_week":
+		return true
+	return not action_used_this_slot and world_state["phase"] == "ordinary"
 
 func take_action(action_id: String, description: String) -> bool:
 	if not can_take_action():
 		return false
-	action_used_this_slot = true
+	if world_state["phase"] == "ordinary":
+		action_used_this_slot = true
 	action_history.append({
 		"day": day_index,
 		"slot": get_slot_label(),

@@ -23,7 +23,7 @@
 
 ## Prototype status / 原型状态
 
-A minimal Godot 4 project shell is now included. Open this repository in Godot 4.6.x and run the project file named project.godot to try the current text-based prototype.
+A minimal Godot 4 project shell is included. Open this repository in Godot 4.6.x and run the project file named project.godot to try the current text-based prototype.
 
 Current prototype interactions:
 - Move between five placeholder locations.
@@ -31,6 +31,8 @@ Current prototype interactions:
 - See which of the three prototype NPCs is present at the current location and time.
 - Talk to NPCs and observe selected locations to collect evidence in the player clue notebook.
 - Review clue entries with day, time, location, and a factual description.
+
+A core logic smoke-test script is included. With Godot installed, run: godot --headless --path . -s res://tests/prototype_smoke_test.gd. This test has been added but has not yet been executed in this environment.
 
 This is an early system prototype, not a finished vertical slice. It uses text-only UI and placeholder location labels; it does not yet include final art, save/load, a complete dialogue system, a real map, or a finalized world anomaly. The Day 7 anomaly remains a proposal and is not forced by the current prototype.
 
@@ -42,6 +44,8 @@ This is an early system prototype, not a finished vertical slice. It uses text-o
 - 查看当前地点与时段在场的三名原型 NPC。
 - 与 NPC 交谈、观察指定地点，并把证据记入玩家线索簿。
 - 按日期、时段、地点回顾已记录内容。
+
+已加入核心逻辑 smoke test 脚本。安装 Godot 后可运行：godot --headless --path . -s res://tests/prototype_smoke_test.gd。该测试脚本已写入仓库，但当前环境尚未实际执行。
 
 这仍是早期系统原型，不是完成的垂直切片。当前使用纯文字 UI 和占位地点名称；尚无最终美术、存档/读档、完整对话系统、正式地图或定稿的世界异变。第七日异变仍为提案，当前原型不会强制触发。
 

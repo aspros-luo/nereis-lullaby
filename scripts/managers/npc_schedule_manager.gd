@@ -41,7 +41,7 @@ const NPC_DATA: Dictionary = {
 }
 
 const LOCATION_NAMES: Dictionary = {
-	"HOME": "蜜忒居所附近",
+	"HOME": "我家附近",
 	"COMMONS": "村庄公共空间",
 	"SHRINE": "公开礼拜场所",
 	"CLINIC": "诊疗处",

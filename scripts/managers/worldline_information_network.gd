@@ -39,7 +39,11 @@ func publish_message(
 			source_event = event
 			break
 	var source_facts: Variant = source_event.get("fact_ids", [])
-	var sender_has_source: bool = str(source_event.get("actor_id", "")) == sender_id and source_facts is Array and source_facts.has(fact_id)
+	# Every transmission must cite an event that explicitly supports this fact,
+	# even when the sender learned it earlier through another valid route.
+	if not (source_facts is Array) or not source_facts.has(fact_id):
+		return false
+	var sender_has_source: bool = str(source_event.get("actor_id", "")) == sender_id
 	if not ledger.character_knows(sender_id, fact_id) and not sender_has_source:
 		return false
 	var message := {

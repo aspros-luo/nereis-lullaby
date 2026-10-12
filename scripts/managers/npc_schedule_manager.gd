@@ -59,15 +59,27 @@ func get_location_name(location_id: String) -> String:
 	return str(LOCATION_NAMES.get(location_id, location_id))
 
 func get_location(npc_id: String, day_index: int, slot_index: int) -> String:
+	# Fail closed for invalid time coordinates instead of indexing outside a schedule.
+	if not NPC_DATA.has(npc_id) or day_index < 1 or day_index > 7 or slot_index < 0 or slot_index >= 3:
+		return ""
 	if schedule_overrides.has(npc_id):
-		return str(schedule_overrides[npc_id].get("location_id", "COMMONS"))
-	var npc: Dictionary = NPC_DATA.get(npc_id, {})
+		var override_value: Variant = schedule_overrides[npc_id]
+		if not (override_value is Dictionary):
+			return ""
+		var override_location: String = str(override_value.get("location_id", ""))
+		return override_location if LOCATION_NAMES.has(override_location) else ""
+	var npc: Dictionary = NPC_DATA[npc_id]
 	var schedules: Dictionary = npc.get("schedules", {})
-	var day_schedule: Array = schedules.get(day_index, ["HOME", "COMMONS", "HOME"])
-	return str(day_schedule[slot_index])
+	var day_schedule_value: Variant = schedules.get(day_index, null)
+	if not (day_schedule_value is Array) or day_schedule_value.size() != 3:
+		return ""
+	var location_id: String = str(day_schedule_value[slot_index])
+	return location_id if LOCATION_NAMES.has(location_id) else ""
 
 func get_npcs_at(location_id: String, day_index: int, slot_index: int) -> Array:
 	var present: Array = []
+	if not LOCATION_NAMES.has(location_id) or day_index < 1 or day_index > 7 or slot_index < 0 or slot_index >= 3:
+		return present
 	for npc_id in NPC_DATA.keys():
 		if get_location(str(npc_id), day_index, slot_index) == location_id:
 			present.append(str(npc_id))

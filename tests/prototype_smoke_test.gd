@@ -150,6 +150,20 @@ func _test_save_roundtrip() -> void:
 	invalid_data["world_state"]["flags"]["personal_moments_seen"] = "corrupt"
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["day_index"] = 7
+	invalid_data["slot_index"] = 2
+	invalid_data["world_state"] = {"phase": "after_week", "flags": {}}
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["current_location"] = "UNKNOWN"
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["action_history"] = ["corrupt"]
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
 
 	var journal = ClueJournalScript.new()
 	assert(journal.add_fact("save_clue", "Saved clue", "Clue details", 2, "白天", "林间小径"))

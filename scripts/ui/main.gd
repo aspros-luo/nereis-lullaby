@@ -560,11 +560,11 @@ func _observe_location() -> void:
 func _get_shrine_observation_fact(day_index: int, seen_ids: Dictionary) -> Dictionary:
 	if day_index < 5:
 		return {}
-	if not seen_ids.has("day4_worship_custom"):
+	if not seen_ids.has("day4_worship_custom") and not seen_ids.has("day4_worship_custom_observed"):
 		return {
-			"id": "day4_worship_custom",
-			"title": "关于习俗的公共解释",
-			"detail": "礼拜场所的公开说明把类似安排解释为维护公共传统的一部分。它与生活习惯的解释关注点不同，但不能证明任何人撒谎。",
+			"id": "day4_worship_custom_observed",
+			"title": "礼拜场所里的公开安排",
+			"detail": "折好的布料、花束和整理好的木台显然属于一套重复的公共安排。它可能只是传统活动的准备，具体用途仍不明确。",
 		}
 	if not seen_ids.has("day5_repeated_object_shrine"):
 		return {
@@ -578,11 +578,11 @@ func _get_shrine_observation_fact(day_index: int, seen_ids: Dictionary) -> Dicti
 ## Provide a quiet alternate route when a conversation-based clue was missed.
 ## 玩家错过交谈线索时，允许通过观察地点补足最小证据。
 func _get_alternate_clue_for_observation(location_id: String, day_index: int, seen_ids: Dictionary) -> Dictionary:
-	if location_id == "HOME" and day_index >= 5 and not seen_ids.has("day4_caregiver_custom"):
+	if location_id == "HOME" and day_index >= 5 and not seen_ids.has("day4_caregiver_custom") and not seen_ids.has("day4_caregiver_custom_observed"):
 		return {
-			"id": "day4_caregiver_custom",
-			"title": "关于习俗的生活解释",
-			"detail": "照料者此前把某项安排说成村里沿用已久的生活习惯。即使没能赶上那次交谈，日常生活中的说法仍可作为比较线索。",
+			"id": "day4_caregiver_custom_observed",
+			"title": "家附近的日常安排",
+			"detail": "屋内的物件被放回熟悉的位置，照料者留下的日常清单也把重复安排简单归为村里的老习惯。它可以作为比较线索，但不能说明其他场景的安排必然相同。",
 		}
 	if location_id != "CLINIC" or day_index < 4:
 		return {}
@@ -609,16 +609,22 @@ func _get_anomaly_observation_followup(location_id: String) -> String:
 		"HOME":
 			if seen_ids.has("day4_caregiver_custom"):
 				return "\n\n我想起照料者曾把某项安排解释为生活习惯。现在的变化让我重新想起那句话，但我还无法判断二者是否有关。"
+			if seen_ids.has("day4_caregiver_custom_observed"):
+				return "\n\n家附近那张日常清单把重复安排归为老习惯。眼前的变化让我重新留意到它，但我还不能确定两者有关。"
 		"SHRINE":
 			if seen_ids.has("day5_repeated_object_shrine"):
 				return "\n\n我想起此前在这里见过的相似物件。它们和这圈潮痕是否有关，我还不知道。"
 			if seen_ids.has("day4_worship_custom"):
 				return "\n\n我想起这里曾把某项安排解释为公共传统。眼前的变化让我重新想起那种说法，但它还不能解释发生了什么。"
+			if seen_ids.has("day4_worship_custom_observed"):
+				return "\n\n我想起这里整齐摆放的布料和花束。它们看起来像一套日常公共安排，但眼前的变化仍无法由此解释。"
 		"COMMONS":
 			if seen_ids.has("day5_repeated_object_commons"):
 				return "\n\n之前见到的相似准备还留在记忆里；眼前的人们却像什么也没发生。"
 			if seen_ids.has("day4_caregiver_custom"):
 				return "\n\n照料者曾把类似安排说成生活习惯。公共空间眼下的变化让我想起这句话，但我还不能把两件事联系起来。"
+			if seen_ids.has("day4_caregiver_custom_observed"):
+				return "\n\n家附近的日常清单把重复安排归为老习惯。公共空间眼下的变化让我想起这条记录，但我还不能把两件事联系起来。"
 		"FOREST", "GROVE", "PATH":
 			if seen_ids.has("forest_flower_observation") or seen_ids.has("forest_flower_picked"):
 				return "\n\n我想起之前见过的整齐断口。现在这些变化似乎没有留下能对应的脚印。"

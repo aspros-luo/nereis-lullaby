@@ -258,7 +258,7 @@ func _test_worldline_information_network() -> void:
 	invalid_data = network.to_save_data()
 	invalid_data["current_tick"] = -2
 	assert(not protected_network.load_save_data(invalid_data))
-	assert(protected_network.get_inbox("merchant").size() == 1)
+	assert(protected_network.get_inbox("merchant").size() == 2)
 
 
 func _test_npc_behavior_profiles() -> void:

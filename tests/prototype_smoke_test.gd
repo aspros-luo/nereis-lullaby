@@ -229,6 +229,7 @@ func _test_worldline_information_network() -> void:
 	var network = InformationNetworkScript.new()
 	assert(network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
 	assert(not network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
+	assert(not network.publish_message("forged_rumor", "forest_oddity", "merchant", "doctor", "conversation", 1, 0.5, 3, "merchant_hears", ledger))
 	assert(network.advance_to(4, ledger) == 0)
 	assert(network.get_inbox("merchant").is_empty())
 	assert(not ledger.character_knows("merchant", "forest_oddity"))

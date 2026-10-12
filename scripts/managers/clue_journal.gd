@@ -45,15 +45,22 @@ func load_entries(saved_entries: Array) -> bool:
 		if not (entry_variant is Dictionary):
 			return false
 		var entry: Dictionary = entry_variant
-		var fact_id: String = str(entry.get("id", ""))
-		var title: String = str(entry.get("title", ""))
-		var detail: String = str(entry.get("detail", ""))
+		var fact_id_value: Variant = entry.get("id", null)
+		var title_value: Variant = entry.get("title", null)
+		var detail_value: Variant = entry.get("detail", null)
 		var day_value: Variant = entry.get("day", null)
-		if not (day_value is int):
+		var slot_value: Variant = entry.get("slot", null)
+		var location_value: Variant = entry.get("location", null)
+		if not (fact_id_value is String) or not (title_value is String) or not (detail_value is String):
 			return false
+		if not (day_value is int) or not (slot_value is String) or not (location_value is String):
+			return false
+		var fact_id: String = fact_id_value
+		var title: String = title_value
+		var detail: String = detail_value
 		var day: int = int(day_value)
-		var slot: String = str(entry.get("slot", ""))
-		var location: String = str(entry.get("location", ""))
+		var slot: String = slot_value
+		var location: String = location_value
 		if fact_id.strip_edges().is_empty() or restored_ids.has(fact_id):
 			return false
 		if title.strip_edges().is_empty() or detail.strip_edges().is_empty():

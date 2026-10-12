@@ -614,6 +614,9 @@ func _test_worldline_information_network() -> void:
 	assert(not network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
 	assert(not network.publish_message("forged_rumor", "forest_oddity", "merchant", "doctor", "conversation", 1, 0.5, 3, "merchant_hears", ledger))
 	assert(ledger.record_event("source_observation_2", "lullaby", "doctor", "review_records", "CLINIC", ["forest_oddity"]))
+	assert(ledger.grant_knowledge("doctor", "forest_oddity", "source_observation_2", "direct_observation"))
+	# Even a knowledgeable sender cannot cite an unrelated event as this message's provenance.
+	assert(not network.publish_message("wrong_source_rumor", "forest_oddity", "doctor", "merchant", "conversation", 1, 0.6, 4, "merchant_hears", ledger))
 	assert(network.publish_message("rumor_2", "forest_oddity", "doctor", "merchant", "conversation", 1, 0.6, 4, "source_observation_2", ledger))
 	assert(network.advance_to(4, ledger) == 0)
 	assert(network.get_inbox("merchant").is_empty())

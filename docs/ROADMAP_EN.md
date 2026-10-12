@@ -43,6 +43,7 @@
 - [x] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses (data and bilingual docs are committed; full autonomous decision-making is not yet wired).
 - [ ] Implement discrete NPC behavior simulation and authored-event schedule overrides.
 - [x] Add a discrete information network with travel delay, inboxes, credibility, and belief confidence kept separate; add deduplication and save/load smoke-test code (not yet executed by Godot). See `docs/WORLDLINE_INFORMATION_NETWORK_EN.md`.
+- [x] Route explicit claims from the doctor, caregiver, and worship leader through zero-delay messages and record delivery in the worldline ledger without granting objective knowledge.
 - [ ] Connect concrete character behavior cards, message-send triggers, and observable feedback to the gameplay loop.
 
 ## Phase 4: Content expansion

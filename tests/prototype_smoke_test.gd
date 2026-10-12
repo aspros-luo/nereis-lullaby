@@ -143,9 +143,15 @@ func _test_save_roundtrip() -> void:
 	var journal = ClueJournalScript.new()
 	assert(journal.add_fact("save_clue", "Saved clue", "Clue details", 2, "白天", "林间小径"))
 	var restored_journal = ClueJournalScript.new()
-	restored_journal.load_entries(journal.get_entries())
+	assert(restored_journal.load_entries(journal.get_entries()))
 	assert(restored_journal.get_entries().size() == 1)
 	assert(not restored_journal.add_fact("save_clue", "Duplicate", "Duplicate", 2, "白天", "林间小径"))
+	var invalid_clues: Array = journal.get_entries()
+	invalid_clues.append({"id": "save_clue", "title": "Duplicate ID", "detail": "Invalid duplicate", "day": 2, "slot": "白天", "location": "林间小径"})
+	assert(not restored_journal.load_entries(invalid_clues))
+	assert(restored_journal.get_entries().size() == 1) # Failed restore preserves existing journal.
+	assert(not restored_journal.load_entries([{"id": "broken"}]))
+	assert(restored_journal.get_entries().size() == 1)
 
 
 func _test_save_roundtrip_after_anomaly() -> void:

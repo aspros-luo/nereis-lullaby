@@ -707,11 +707,13 @@ func _load_game() -> void:
 		message_label.text = "存档中的地点无效，当前进度没有改变。"
 		return
 	var saved_ledger: Variant = config.get_value("save", "worldline_ledger", {})
+	if not (saved_ledger is Dictionary):
+		message_label.text = "存档中的世界线事件记录格式无效，当前进度没有改变。"
+		return
 	var restored_ledger = WorldlineLedgerScript.new()
-	if saved_ledger is Dictionary and not saved_ledger.is_empty():
-		if not restored_ledger.load_save_data(saved_ledger):
-			message_label.text = "存档中的世界线事件记录无效，当前进度没有改变。"
-			return
+	if not saved_ledger.is_empty() and not restored_ledger.load_save_data(saved_ledger):
+		message_label.text = "存档中的世界线事件记录无效，当前进度没有改变。"
+		return
 	var restored_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if saved_entries is Array:

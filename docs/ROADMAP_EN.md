@@ -30,7 +30,7 @@
 - [x] Add message delay, inboxes, credibility, and belief confidence as separate concepts.
 - [x] Connect an initial deterministic NPC routine selector, with authored story beats taking priority.
 - [x] Harden ledger save loading: required event fields, fact/first-event consistency, and existence of every event-referenced fact.
-- [x] Validate clue-journal saves atomically; reject malformed or duplicate entries before replacing runtime state.
+- [x] Validate clue-journal saves atomically; reject malformed or duplicate entries and non-string text fields before replacing runtime state.
 - [x] Validate information-network saves: inbox entries must match delivered messages, beliefs require delivered-message evidence, and non-finite credibility, string-coerced clock/confidence values, message send times later than the network clock, and pending messages already due at the saved tick are rejected.
 - [x] Validate cross-system references: source and delivery events must actually contain each message's referenced fact; version 2 saves require every section, and the version field rejects implicit coercion.
 - [x] Validate save consistency: discovered-fact IDs in the clue journal must exactly match investigation state, and each journal fact must have a worldline-ledger source.

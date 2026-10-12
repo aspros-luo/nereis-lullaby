@@ -795,9 +795,13 @@ func _load_game() -> void:
 		return
 	var restored_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
-	if saved_entries is Array:
-		var saved_entries_array: Array = saved_entries
-		restored_journal.load_entries(saved_entries_array)
+	if not (saved_entries is Array):
+		message_label.text = "存档中的线索簿格式无效，当前进度没有改变。"
+		return
+	var saved_entries_array: Array = saved_entries
+	if not restored_journal.load_entries(saved_entries_array):
+		message_label.text = "存档中的线索条目无效或重复，当前进度没有改变。"
+		return
 	# 先验证全部存档部分，再一次性替换运行状态，避免部分恢复。
 	game_state = restored_state
 	schedule_manager = ScheduleManagerScript.new()

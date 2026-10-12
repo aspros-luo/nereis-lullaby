@@ -167,7 +167,10 @@ func load_save_data(data: Dictionary) -> bool:
 		elif arrival_tick <= raw_current_tick:
 			# advance_to() delivers every message due at the saved tick, including this boundary.
 			return false
-		var saved_credibility: float = float(message.get("credibility", -1.0))
+		var credibility_value: Variant = message.get("credibility", null)
+		if not (credibility_value is int or credibility_value is float):
+			return false
+		var saved_credibility: float = float(credibility_value)
 		if not is_finite(saved_credibility) or saved_credibility < 0.0 or saved_credibility > 1.0:
 			return false
 		rebuilt_messages.append(message.duplicate(true))
@@ -194,17 +197,24 @@ func load_save_data(data: Dictionary) -> bool:
 			for field in ["fact_id", "sender_id", "channel", "source_event_id"]:
 				if not entry.has(field) or str(entry[field]) != str(matched_message.get(field, "")):
 					return false
-			if not entry.has("credibility") or not is_equal_approx(float(entry["credibility"]), float(matched_message.get("credibility", -1.0))):
+			var inbox_credibility: Variant = entry.get("credibility", null)
+			if not (inbox_credibility is int or inbox_credibility is float):
+				return false
+			if not is_equal_approx(float(inbox_credibility), float(matched_message.get("credibility", -1.0))):
 				return false
 			if not entry.has("delivery_event_id") or str(entry["delivery_event_id"]) != "lullaby.message.delivered." + inbox_message_id:
 				return false
-			if not entry.has("received_tick") or int(entry["received_tick"]) != int(matched_message.get("delivered_tick", -1)):
+			var received_tick_value: Variant = entry.get("received_tick", null)
+			if not (received_tick_value is int) or int(received_tick_value) != int(matched_message.get("delivered_tick", -1)):
 				return false
 	for character_id in raw_beliefs:
 		if not (raw_beliefs[character_id] is Dictionary):
 			return false
 		for fact_id in raw_beliefs[character_id]:
-			var confidence := float(raw_beliefs[character_id][fact_id])
+			var confidence_value: Variant = raw_beliefs[character_id][fact_id]
+			if not (confidence_value is int or confidence_value is float):
+				return false
+			var confidence := float(confidence_value)
 			if str(fact_id).strip_edges().is_empty() or not is_finite(confidence) or confidence < 0.0 or confidence > 0.95:
 				return false
 			var has_delivered_evidence := false

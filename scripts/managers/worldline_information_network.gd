@@ -153,7 +153,8 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 			if int(message["delivered_tick"]) > raw_current_tick:
 				return false
-		elif int(message.get("arrival_tick", -1)) < raw_current_tick:
+		elif int(message.get("arrival_tick", -1)) <= raw_current_tick:
+			# advance_to() delivers every message due at the saved tick, including this boundary.
 			return false
 		var saved_credibility: float = float(message.get("credibility", -1.0))
 		if not is_finite(saved_credibility) or saved_credibility < 0.0 or saved_credibility > 1.0:

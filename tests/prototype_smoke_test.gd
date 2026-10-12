@@ -8,6 +8,7 @@ const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const MainScript = preload("res://scripts/ui/main.gd")
 const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
 const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
+const NPCBehaviorProfilesScript = preload("res://scripts/data/npc_behavior_profiles.gd")
 
 func _initialize() -> void:
 	_test_time_progression_and_anomaly()
@@ -21,6 +22,7 @@ func _initialize() -> void:
 	_test_save_roundtrip_after_anomaly()
 	_test_worldline_ledger()
 	_test_worldline_information_network()
+	_test_npc_behavior_profiles()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -247,3 +249,17 @@ func _test_worldline_information_network() -> void:
 	invalid_data["messages"] = "corrupt"
 	assert(not protected_network.load_save_data(invalid_data))
 	assert(protected_network.get_inbox("merchant").size() == 1)
+
+
+func _test_npc_behavior_profiles() -> void:
+	var profiles: Dictionary = NPCBehaviorProfilesScript.get_all_profiles()
+	assert(profiles.size() == 3)
+	for npc_id in ["caregiver", "worship_leader", "doctor"]:
+		var profile: Dictionary = NPCBehaviorProfilesScript.get_profile(npc_id)
+		assert(NPCBehaviorProfilesScript.has_required_fields(profile))
+		assert(profile["knowledge_boundaries"].size() >= 3)
+		assert(profile["relationship_dimensions"].size() >= 2)
+	assert(NPCBehaviorProfilesScript.get_profile("unknown_npc").is_empty())
+	var copy: Dictionary = NPCBehaviorProfilesScript.get_profile("doctor")
+	copy["goals"].clear()
+	assert(not NPCBehaviorProfilesScript.get_profile("doctor")["goals"].is_empty())

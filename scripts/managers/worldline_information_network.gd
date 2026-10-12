@@ -137,14 +137,18 @@ func load_save_data(data: Dictionary) -> bool:
 		if not (raw_message is Dictionary):
 			return false
 		var message: Dictionary = raw_message
-		var message_id := str(message.get("message_id", ""))
+		# Identifiers are schema fields, not values to be silently stringified.
+		for text_field in ["message_id", "fact_id", "sender_id", "receiver_id", "channel", "source_event_id", "status"]:
+			if not (message.get(text_field, null) is String):
+				return false
+		var message_id: String = message["message_id"]
 		if message_id.is_empty() or rebuilt_ids.has(message_id):
 			return false
-		if not ["pending", "delivered"].has(str(message.get("status", ""))):
+		if not ["pending", "delivered"].has(message["status"]):
 			return false
-		if str(message.get("fact_id", "")).is_empty() or str(message.get("sender_id", "")).is_empty() or str(message.get("receiver_id", "")).is_empty():
+		if message["fact_id"].is_empty() or message["sender_id"].is_empty() or message["receiver_id"].is_empty():
 			return false
-		if str(message.get("channel", "")).is_empty() or str(message.get("source_event_id", "")).is_empty():
+		if message["channel"].is_empty() or message["source_event_id"].is_empty():
 			return false
 		var sent_tick_value: Variant = message.get("sent_tick", null)
 		var arrival_tick_value: Variant = message.get("arrival_tick", null)
@@ -177,12 +181,17 @@ func load_save_data(data: Dictionary) -> bool:
 		rebuilt_ids[message_id] = true
 	var inbox_message_ids: Dictionary = {}
 	for character_id in raw_inboxes:
-		if not (raw_inboxes[character_id] is Array):
+		if not (character_id is String) or not (raw_inboxes[character_id] is Array):
 			return false
 		for entry in raw_inboxes[character_id]:
-			if not (entry is Dictionary) or not rebuilt_ids.has(str(entry.get("message_id", ""))):
+			if not (entry is Dictionary):
 				return false
-			var inbox_message_id: String = str(entry.get("message_id", ""))
+			for text_field in ["message_id", "fact_id", "sender_id", "channel", "source_event_id", "delivery_event_id"]:
+				if not (entry.get(text_field, null) is String):
+					return false
+			if not rebuilt_ids.has(entry["message_id"]):
+				return false
+			var inbox_message_id: String = entry["message_id"]
 			if inbox_message_ids.has(inbox_message_id):
 				return false
 			inbox_message_ids[inbox_message_id] = true
@@ -208,9 +217,11 @@ func load_save_data(data: Dictionary) -> bool:
 			if not (received_tick_value is int) or int(received_tick_value) != int(matched_message.get("delivered_tick", -1)):
 				return false
 	for character_id in raw_beliefs:
-		if not (raw_beliefs[character_id] is Dictionary):
+		if not (character_id is String) or not (raw_beliefs[character_id] is Dictionary):
 			return false
 		for fact_id in raw_beliefs[character_id]:
+			if not (fact_id is String):
+				return false
 			var confidence_value: Variant = raw_beliefs[character_id][fact_id]
 			if not (confidence_value is int or confidence_value is float):
 				return false

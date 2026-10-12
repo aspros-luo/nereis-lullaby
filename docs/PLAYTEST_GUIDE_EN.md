@@ -24,9 +24,9 @@
 2. From Day 2 onward, talk to the caregiver near home to trigger a one-time memory about an old herb pouch and Mite's childhood habits; this gives extra relationship feedback.
 3. Visit the commons, shrine, and clinic. Different people may be present at different times.
 4. From Day 3 onward, talk to the doctor at the clinic to hear about several villagers' sleep troubles. If you miss the conversation, inspect the case summaries at the clinic from Day 4 onward to recover this clue.
-5. From Day 4 onward, talk to the worship leader at the shrine to trigger a one-time moment about tying a ribbon.
+5. From Day 4 onward, talk to the worship leader at the shrine to trigger a one-time moment about tying a ribbon. If you miss the public explanation of a custom, inspecting the shrine from Day 5 onward can recover it.
 6. From Day 6 onward, talk to the doctor at the clinic; in addition to the record-checking dialogue, a one-time label-sorting moment is available. If you miss the conversation about date discrepancies, inspecting the case summaries from Day 6 onward can recover that evidence.
-7. From Day 5 onward, inspect the commons or shrine; you can also gather flowers or inspect the forest.
+7. From Day 5 onward, inspect the commons or shrine; you can also gather flowers or inspect the forest. If you miss the caregiver's everyday explanation of a custom, inspecting the area near home from Day 5 onward can recover it.
 8. Continue to the evening of Day 7 and pay attention to familiar locations before and after the anomaly.
 9. After the anomaly, revisit at least three locations. Exploration can continue; once three locations have been revisited, the “End This Chapter of Daily Life” button appears.
 

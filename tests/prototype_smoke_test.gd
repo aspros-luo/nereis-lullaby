@@ -22,6 +22,7 @@ func _initialize() -> void:
 	_test_save_roundtrip()
 	_test_save_roundtrip_after_anomaly()
 	_test_state_journal_consistency()
+	_test_observation_and_anomaly_events()
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
@@ -225,6 +226,27 @@ func _test_state_journal_consistency() -> void:
 	var duplicate_state = GameStateScript.new()
 	duplicate_state.investigation_state["observed_fact_ids"] = ["clue_a", "clue_a"]
 	assert(not ui_logic._state_journal_are_consistent(duplicate_state, journal))
+
+
+func _test_observation_and_anomaly_events() -> void:
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	ui_logic.schedule_manager = ScheduleManagerScript.new()
+	ui_logic.clue_journal = ClueJournalScript.new()
+	ui_logic.worldline_ledger = WorldlineLedgerScript.new()
+	ui_logic.game_state.current_location = "FOREST"
+	ui_logic._add_fact("forest_flower_observation", "林间的野花", "观察到的事实",)
+	ui_logic._record_observation_event("forest_flower_observation")
+	assert(ui_logic.worldline_ledger.has_fact("forest_flower_observation"))
+	assert(ui_logic.worldline_ledger.event_ids.has("lullaby.observation.day1.slot0.forest.forest_flower_observation"))
+	ui_logic.game_state.day_index = 7
+	ui_logic.game_state.slot_index = 2
+	ui_logic._record_village_anomaly()
+	assert(ui_logic.game_state.investigation_state["observed_fact_ids"].has("day7_village_change"))
+	assert(ui_logic.clue_journal.get_entries().size() == 2)
+	assert(ui_logic.worldline_ledger.has_fact("day7_village_change"))
+	assert(ui_logic.worldline_ledger.event_ids.has("lullaby.anomaly.day7.evening"))
+	assert(ui_logic._state_journal_are_consistent(ui_logic.game_state, ui_logic.clue_journal))
 
 
 func _test_location_content_coverage() -> void:

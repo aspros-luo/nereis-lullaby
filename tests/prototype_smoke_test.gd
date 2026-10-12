@@ -124,6 +124,8 @@ func _test_alternate_clue_routes() -> void:
 	var no_clues: Dictionary = {}
 	var sleep_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("CLINIC", 4, no_clues)
 	assert(sleep_clue.get("id", "") == "day3_similar_sleep_reports")
+	var custom_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("HOME", 5, no_clues)
+	assert(custom_clue.get("id", "") == "day4_caregiver_custom")
 	assert(ui_logic._get_alternate_clue_for_observation("HOME", 4, no_clues).is_empty())
 	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 3, no_clues).is_empty())
 

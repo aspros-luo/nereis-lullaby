@@ -96,11 +96,14 @@ func load_save_data(data: Dictionary) -> bool:
 		if not (raw_event is Dictionary):
 			return false
 		var event: Dictionary = raw_event
-		var event_id: String = str(event.get("event_id", ""))
+		for text_field in ["event_id", "source_game", "actor_id", "action_id", "location_id"]:
+			if not (event.get(text_field, null) is String):
+				return false
+		var event_id: String = event["event_id"]
 		if event_id.strip_edges().is_empty() or rebuilt_ids.has(event_id):
 			return false
 		for required_text in ["source_game", "actor_id", "action_id"]:
-			if str(event.get(required_text, "")).strip_edges().is_empty():
+			if event[required_text].strip_edges().is_empty():
 				return false
 		var raw_event_facts: Variant = event.get("fact_ids", [])
 		if not (raw_event_facts is Array):
@@ -118,10 +121,15 @@ func load_save_data(data: Dictionary) -> bool:
 		event_facts[event_id] = normalized_event_facts
 
 	for fact_key in raw_facts.keys():
-		var fact_id: String = str(fact_key)
-		if fact_id.strip_edges().is_empty() or not (raw_facts[fact_key] is Dictionary):
+		if not (fact_key is String) or not (raw_facts[fact_key] is Dictionary):
 			return false
-		var first_event_id: String = str(raw_facts[fact_key].get("first_event_id", ""))
+		var fact_id: String = fact_key
+		if fact_id.strip_edges().is_empty():
+			return false
+		var first_event_value: Variant = raw_facts[fact_key].get("first_event_id", null)
+		if not (first_event_value is String):
+			return false
+		var first_event_id: String = first_event_value
 		if not rebuilt_ids.has(first_event_id):
 			return false
 		if not event_facts[first_event_id].has(fact_id):

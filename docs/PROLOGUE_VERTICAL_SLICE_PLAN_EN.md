@@ -27,7 +27,7 @@ These are rough development days, not calendar promises; work packages overlap. 
 
 - [x] Add restrained callbacks to post-anomaly exploration based on evidence the player personally recorded earlier.
 - [x] Add core smoke-test assertions for these callbacks.
-- [x] Add an alternate clinic-observation route for players who miss the doctor's conversations, recovering the sleep-trouble and date-discrepancy evidence with pure-logic test coverage.
+- [x] Add alternate observation routes for missed conversations: clinic records recover sleep-trouble and date-discrepancy evidence, the home area recovers the everyday-custom explanation, and the shrine recovers the public-custom explanation; pure-logic tests cover the reusable route selector.
 - [ ] Audit dialogue and clue conditions for repetition, conflicts, and clues with no alternate discovery route.
 - [ ] Review each day across three layers: what the player sees, what Mite understands, and what objectively happens in the world.
 - [ ] Document stable event IDs, conditions, outcomes, and alternate evidence for key actions.

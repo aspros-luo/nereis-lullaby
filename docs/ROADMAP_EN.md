@@ -40,7 +40,7 @@
 ## Phase 3.5: Relationships and autonomous behavior
 - [x] Establish bilingual NPC relationship and behavior design baselines, separating known ties from open questions.
 - [x] Add an influence matrix and candidate causal network for five cross-regional key actors (design proposal, not yet gameplay).
-- [ ] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses.
+- [x] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses (data and bilingual docs are committed; full autonomous decision-making is not yet wired).
 - [ ] Implement discrete NPC behavior simulation and authored-event schedule overrides.
 - [x] Add a discrete information network with travel delay, inboxes, credibility, and belief confidence kept separate; add deduplication and save/load smoke-test code (not yet executed by Godot).
 - [ ] Connect concrete character behavior cards, message-send triggers, and observable feedback to the gameplay loop.

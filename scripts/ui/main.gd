@@ -550,18 +550,49 @@ func _do_daily_activity() -> void:
 			picked_flower = true
 		"GROVE":
 			activity_text = "我在空地上坐了一会儿，听树叶和鸟儿的声音。"
-	if not game_state.take_action(action_id, activity_text):
+
+	# Stage the action and all causal side effects in temporary subsystem copies.
+	var staged_state = _copy_game_state(game_state)
+	var staged_journal = _copy_clue_journal(clue_journal)
+	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
+	if staged_state == null or staged_journal == null or staged_ledger == null:
+		message_label.text = "这项活动暂时无法安全记录，时间与关系没有改变。"
 		return
-	# Commit side effects only after the primary action has been accepted.
+	if not staged_state.take_action(action_id, activity_text):
+		return
 	if not relationship_target.is_empty():
-		game_state.increase_relationship(relationship_target)
-	var fact_ids: Array = []
+		staged_state.increase_relationship(relationship_target)
+	var fact_ids: Array[String] = []
 	if picked_flower:
-		_add_fact("forest_flower_picked", "带回家的野花", "我在林子里采了几朵野花。花茎上有细小的水珠，闻起来带着雨后的气味。")
-		fact_ids.append("forest_flower_picked")
-	var event_id := "lullaby.activity.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, action_id]
-	worldline_ledger.record_event(event_id, "lullaby", "mite", action_id, game_state.current_location, fact_ids)
+		var flower_id := "forest_flower_picked"
+		if not staged_ledger.record_event(
+			"lullaby.activity.day%d.slot%d.%s" % [staged_state.day_index, staged_state.slot_index, action_id],
+			"lullaby", "mite", action_id, staged_state.current_location, [flower_id]
+		):
+			message_label.text = "这项活动的记录无法提交；本时段行动没有消耗。"
+			return
+		if not staged_journal.add_fact(
+			flower_id, "带回家的野花",
+			"我在林子里采了几朵野花。花茎上有细小的水珠，闻起来带着雨后的气味。",
+			staged_state.day_index, staged_state.get_slot_label(),
+			schedule_manager.get_location_name(staged_state.current_location)
+		):
+			message_label.text = "野花记录无法安全保存；本时段行动没有消耗。"
+			return
+		staged_state.register_fact(flower_id)
+		fact_ids.append(flower_id)
+	else:
+		var event_id := "lullaby.activity.day%d.slot%d.%s" % [staged_state.day_index, staged_state.slot_index, action_id]
+		if not staged_ledger.record_event(event_id, "lullaby", "mite", action_id, staged_state.current_location):
+			message_label.text = "这项活动的记录无法提交；本时段行动没有消耗。"
+			return
+
+	game_state = staged_state
+	clue_journal = staged_journal
+	worldline_ledger = staged_ledger
 	message_label.text = activity_text
+	if not fact_ids.is_empty():
+		message_label.text += "（线索簿已更新。）"
 	_refresh_ui()
 
 func _talk_to_npc(npc_id: String) -> void:

@@ -10,7 +10,7 @@
 ## Stage 1: Required loop checks
 - [ ] Advance from Day 1 through the evening of Day 7; the phase transition occurs only once.
 - [ ] An ordinary time slot permits one primary action; travel and observation do not consume it.
-- [ ] NPCs appear at scheduled locations, and conversation is unavailable when they are elsewhere.
+- [ ] NPCs appear at scheduled locations, and conversation is unavailable when they are elsewhere; off-screen NPC actions are not directly narrated to the player without an explicit information channel.
 - [ ] Activities, conversations, and personal moments consume actions and produce expected relationship/clue changes.
 - [ ] Repeated observations do not create duplicate journal entries.
 - [ ] After the Day 7 anomaly, time remains stopped; exploration, visits, conversations, and completion conditions work. Completion requires at least three distinct valid locations; revisits do not count, and absent or unknown NPCs cannot be addressed.

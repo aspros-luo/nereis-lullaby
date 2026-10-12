@@ -185,6 +185,14 @@ func _test_save_roundtrip() -> void:
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()
+	invalid_data["day_index"] = "4"
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["slot_index"] = 1.5
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
 	invalid_data["action_history"] = ["corrupt"]
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)

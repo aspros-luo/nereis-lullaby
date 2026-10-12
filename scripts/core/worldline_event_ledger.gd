@@ -39,6 +39,17 @@ func grant_knowledge(character_id: String, fact_id: String, source_event_id: Str
 		return false
 	if not event_ids.has(source_event_id) or channel.strip_edges().is_empty():
 		return false
+	# Knowledge must be supported by the cited event, not merely by any existing event.
+	# 角色获得事实必须由来源事件明确支持，不能只引用任意存在的事件。
+	var source_event_supports_fact := false
+	for event in events:
+		if str(event.get("event_id", "")) != source_event_id:
+			continue
+		var source_fact_ids: Variant = event.get("fact_ids", [])
+		source_event_supports_fact = source_fact_ids is Array and source_fact_ids.has(fact_id)
+		break
+	if not source_event_supports_fact:
+		return false
 	if not character_knowledge.has(character_id):
 		character_knowledge[character_id] = {}
 	var known: Dictionary = character_knowledge[character_id]
@@ -154,6 +165,10 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 			var source_id: String = source_value
 			if source_id.is_empty() or not rebuilt_ids.has(source_id) or channel_value.strip_edges().is_empty():
+				return false
+			# The referenced source event must list the same fact.
+			# 来源事件必须明确包含角色声称获知的事实。
+			if not event_facts[source_id].has(fact_id):
 				return false
 
 	for opportunity_id in raw_opportunities.keys():

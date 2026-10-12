@@ -428,49 +428,79 @@ func _on_location_selected(location_id: String) -> void:
 func _advance_time() -> void:
 	if game_state.world_state["phase"] == "demo_complete":
 		return
-	var was_ordinary: bool = game_state.world_state["phase"] == "ordinary"
-	var previous_day: int = game_state.day_index
-	game_state.advance_time()
-	var world_tick: int = (game_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + game_state.slot_index
-	information_network.advance_to(world_tick, worldline_ledger)
+	var staged_state = _copy_game_state(game_state)
+	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
+	var staged_network = _copy_information_network(information_network)
+	var staged_journal = _copy_clue_journal(clue_journal)
+	if staged_state == null or staged_ledger == null or staged_network == null or staged_journal == null:
+		message_label.text = "时间推进暂时无法安全提交；当前时段没有改变。"
+		return
+	var was_ordinary: bool = staged_state.world_state["phase"] == "ordinary"
+	var previous_day: int = staged_state.day_index
+	staged_state.advance_time()
+	var world_tick: int = (staged_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + staged_state.slot_index
+	staged_network.advance_to(world_tick, staged_ledger)
 	var authored_beat_active: bool = (
-		game_state.world_state["phase"] != "ordinary"
-		or game_state.day_index != previous_day
+		staged_state.world_state["phase"] != "ordinary"
+		or staged_state.day_index != previous_day
 	)
 	var autonomous_lines: Array[String] = []
 	if not authored_beat_active:
-		var last_actions: Dictionary = game_state.world_state["flags"].get("npc_last_autonomous_actions", {})
+		var last_actions: Dictionary = staged_state.world_state["flags"].get("npc_last_autonomous_actions", {})
 		for npc_id in ["caregiver", "worship_leader", "doctor"]:
 			var profile: Dictionary = NPCBehaviorProfilesScript.get_profile(npc_id)
-			var inbox: Array = information_network.get_inbox(npc_id)
+			var inbox: Array = staged_network.get_inbox(npc_id)
 			var previous_action: Dictionary = last_actions.get(npc_id, {})
 			var action: Dictionary = NPCBehaviorSimulatorScript.choose_action(
 				npc_id,
 				profile,
 				world_tick,
-				game_state.day_index,
-				game_state.slot_index,
-				int(game_state.relationship_state.get(npc_id, 0)),
+				staged_state.day_index,
+				staged_state.slot_index,
+				int(staged_state.relationship_state.get(npc_id, 0)),
 				false,
 				inbox.size(),
 				str(previous_action.get("id", ""))
 			)
 			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
 				continue
-			last_actions[npc_id] = action.duplicate(true)
 			var action_event_id := "lullaby.npc_action.tick%d.%s" % [world_tick, npc_id]
-			worldline_ledger.record_event(
-				action_event_id,
-				"lullaby",
-				npc_id,
-				str(action["id"]),
-				schedule_manager.get_location(npc_id, game_state.day_index, game_state.slot_index)
-			)
+			if not staged_ledger.record_event(
+				action_event_id, "lullaby", npc_id, str(action["id"]),
+				schedule_manager.get_location(npc_id, staged_state.day_index, staged_state.slot_index)
+			):
+				message_label.text = "村民行动的因果记录无法提交；时间没有改变。"
+				return
+			last_actions[npc_id] = action.duplicate(true)
 			autonomous_lines.append(str(action["line"]))
-		game_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
-	if was_ordinary and game_state.world_state["phase"] == "after_week":
+		staged_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
+
+	var anomaly_started: bool = was_ordinary and staged_state.world_state["phase"] == "after_week"
+	if anomaly_started:
+		var anomaly_fact_id := "day7_village_change"
+		if not staged_ledger.record_event(
+			"lullaby.anomaly.day7.evening", "lullaby", "village",
+			"anomaly_bell", staged_state.current_location, [anomaly_fact_id]
+		):
+			message_label.text = "异变事件无法写入记录；时间没有改变。"
+			return
+		if not staged_journal.add_fact(
+			anomaly_fact_id, "一声从远处传来的鸣响",
+			"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。",
+			staged_state.day_index, staged_state.get_slot_label(),
+			schedule_manager.get_location_name(staged_state.current_location)
+		):
+			message_label.text = "异变线索无法安全保存；时间没有改变。"
+			return
+		staged_state.register_fact(anomaly_fact_id)
+
+	# Publish the new timeline only after every required write succeeds.
+	game_state = staged_state
+	worldline_ledger = staged_ledger
+	information_network = staged_network
+	clue_journal = staged_journal
+	if anomaly_started:
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
-		_record_village_anomaly()
 	elif game_state.day_index != previous_day:
 		message_label.text = str(DAY_OPENING_TEXT.get(game_state.day_index, "新的一天开始了。村里的人继续忙着各自的事。"))
 	else:

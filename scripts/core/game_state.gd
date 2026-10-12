@@ -155,10 +155,38 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 
 	var saved_flags: Dictionary = saved_flags_value
-	if saved_flags.has("post_anomaly_talked") and not (saved_flags["post_anomaly_talked"] is Dictionary):
-		return false
-	if saved_flags.has("personal_moments_seen") and not (saved_flags["personal_moments_seen"] is Dictionary):
-		return false
+	if saved_flags.has("post_anomaly_talked"):
+		if not (saved_flags["post_anomaly_talked"] is Dictionary):
+			return false
+		for npc_id in saved_flags["post_anomaly_talked"]:
+			if not ["caregiver", "worship_leader", "doctor"].has(str(npc_id)):
+				return false
+			if not (saved_flags["post_anomaly_talked"][npc_id] is bool) or not saved_flags["post_anomaly_talked"][npc_id]:
+				return false
+	if saved_flags.has("personal_moments_seen"):
+		if not (saved_flags["personal_moments_seen"] is Dictionary):
+			return false
+		for moment_id in saved_flags["personal_moments_seen"]:
+			if not ["caregiver_memory", "worship_ribbon", "doctor_labels"].has(str(moment_id)):
+				return false
+			if not (saved_flags["personal_moments_seen"][moment_id] is bool) or not saved_flags["personal_moments_seen"][moment_id]:
+				return false
+	if saved_flags.has("npc_last_autonomous_actions"):
+		if not (saved_flags["npc_last_autonomous_actions"] is Dictionary):
+			return false
+		for npc_id in saved_flags["npc_last_autonomous_actions"]:
+			var action_value: Variant = saved_flags["npc_last_autonomous_actions"][npc_id]
+			if not ["caregiver", "worship_leader", "doctor"].has(str(npc_id)) or not (action_value is Dictionary):
+				return false
+			var saved_action: Dictionary = action_value
+			if str(saved_action.get("npc_id", "")) != str(npc_id) or str(saved_action.get("id", "")).strip_edges().is_empty():
+				return false
+			if not (saved_action.get("tick", null) is int) or int(saved_action["tick"]) < 0:
+				return false
+			if not (saved_action.get("day", null) is int) or int(saved_action["day"]) < 1 or int(saved_action["day"]) > FINAL_DAY:
+				return false
+			if not (saved_action.get("slot", null) is int) or int(saved_action["slot"]) < 0 or int(saved_action["slot"]) >= SLOT_KEYS.size():
+				return false
 	var anomaly_flag: Variant = saved_flags.get("village_anomaly", false)
 	if not (anomaly_flag is bool):
 		return false
@@ -178,6 +206,8 @@ func load_save_data(data: Dictionary) -> bool:
 		if validated_visits.has(visited_location):
 			return false
 		validated_visits.append(visited_location)
+	if saved_phase == "demo_complete" and validated_visits.size() < 3:
+		return false
 	var restored_relationships: Dictionary = {}
 	for npc_id in relationship_state.keys():
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)

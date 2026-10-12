@@ -73,7 +73,7 @@ func _test_npc_schedules_and_locations() -> void:
 	ui_logic.game_state = GameStateScript.new()
 	ui_logic.schedule_manager = ScheduleManagerScript.new()
 	assert(ui_logic.game_state.current_location == "HOME")
-	assert(not ui_logic.schedule_manager.get_location("doctor", 1, 0) == "HOME")
+	assert(ui_logic.schedule_manager.get_location("doctor", 1, 0) != "HOME")
 	ui_logic._talk_to_npc("doctor")
 	assert(ui_logic.game_state.action_history.is_empty())
 	ui_logic._talk_to_npc("unknown_npc")

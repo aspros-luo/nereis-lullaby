@@ -529,6 +529,12 @@ func _test_worldline_ledger() -> void:
 	))
 	assert(ledger.has_fact("forest_flower_picked"))
 	assert(not ledger.character_knows("hero", "forest_flower_picked"))
+	assert(not ledger.grant_knowledge(
+		"hero",
+		"forest_flower_picked",
+		"unrelated_existing_event",
+		"direct_observation"
+	))
 	assert(ledger.grant_knowledge(
 		"hero",
 		"forest_flower_picked",
@@ -586,6 +592,10 @@ func _test_worldline_ledger_rejects_inconsistent_save() -> void:
 	assert(protected.event_ids.has("existing"))
 	invalid_data = source.to_save_data()
 	invalid_data["character_knowledge"]["doctor"]["forest_oddity"]["channel"] = 7
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
+	invalid_data = source.to_save_data()
+	invalid_data["character_knowledge"]["doctor"]["forest_oddity"]["source_event_id"] = "unrelated_event"
 	assert(not protected.load_save_data(invalid_data))
 	assert(protected.event_ids.has("existing"))
 	invalid_data = source.to_save_data()

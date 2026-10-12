@@ -25,6 +25,26 @@ const DAY_OPENING_TEXT: Dictionary = {
 	6: "第六天，诊疗处的桌上堆起了几份记录。医生一边整理，一边说有些日期需要再核对。",
 	7: "第七天，村庄显得比平时安静。傍晚前还有许多小事要做，大家却像是默契地避开了某些话题。",
 }
+const PERSONAL_MOMENTS: Dictionary = {
+	"caregiver_memory": {
+		"npc_id": "caregiver",
+		"location_id": "HOME",
+		"minimum_day": 2,
+		"dialogue": "照料者从柜子里拿出一只旧布袋，里面装着几根晒干的香草。她说这是我小时候喜欢闻的味道，问我要不要留着。没等我回答，她又笑着说，晚饭前再拿给我也行。",
+	},
+	"worship_ribbon": {
+		"npc_id": "worship_leader",
+		"location_id": "SHRINE",
+		"minimum_day": 4,
+		"dialogue": "礼拜主持者请我帮忙重新系好一条松开的布带。结打好后，他看了看，说我小时候也总把结系得很认真。我们把布带放回原处，继续整理其他东西。",
+	},
+	"doctor_labels": {
+		"npc_id": "doctor",
+		"location_id": "CLINIC",
+		"minimum_day": 6,
+		"dialogue": "医生让我把几张空白标签按大小分好。做完后，他递给我一杯温水，说这几天来的人比平时多，大家都需要好好休息。他把剩下的纸页收整齐，没有再谈那些记录。",
+	},
+}
 const OBSERVATION_TEXT: Dictionary = {
 	"HOME": "窗边放着几本旧书，门口的花瓶里插着新鲜的枝叶。屋子里有熟悉的木头和面包香。",
 	"COMMONS": "有人把篮子放在长椅边，远处传来谈笑声。每个人看起来都有忙不完的小事。",
@@ -526,10 +546,20 @@ func _talk_to_npc(npc_id: String) -> void:
 			) or fact_added
 			reply += " 医生还发现，几位病患记得的日期并不一致。"
 
+	var personal_moment: Dictionary = _get_available_personal_moment(npc_id)
+	if not personal_moment.is_empty():
+		reply = str(personal_moment["dialogue"])
+
 	if not game_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
 		return
 	if game_state.world_state["phase"] == "ordinary":
-		game_state.increase_relationship(npc_id)
+		if not personal_moment.is_empty():
+			var seen_moments: Dictionary = game_state.world_state["flags"].get("personal_moments_seen", {})
+			seen_moments[str(personal_moment["id"])] = true
+			game_state.world_state["flags"]["personal_moments_seen"] = seen_moments
+			game_state.increase_relationship(npc_id, 2)
+		else:
+			game_state.increase_relationship(npc_id)
 	else:
 		talked_after_anomaly[npc_id] = true
 		game_state.world_state["flags"]["post_anomaly_talked"] = talked_after_anomaly
@@ -537,6 +567,29 @@ func _talk_to_npc(npc_id: String) -> void:
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"
 	_refresh_ui()
+
+func _get_available_personal_moment(npc_id: String) -> Dictionary:
+	if game_state.world_state["phase"] != "ordinary":
+		return {}
+	var seen_value: Variant = game_state.world_state["flags"].get("personal_moments_seen", {})
+	if not (seen_value is Dictionary):
+		return {}
+	var seen: Dictionary = seen_value
+	for moment_id in PERSONAL_MOMENTS:
+		var moment: Dictionary = PERSONAL_MOMENTS[moment_id]
+		if str(moment["npc_id"]) != npc_id:
+			continue
+		if game_state.day_index < int(moment["minimum_day"]):
+			continue
+		if game_state.current_location != str(moment["location_id"]):
+			continue
+		if seen.has(moment_id):
+			continue
+		var available: Dictionary = moment.duplicate(true)
+		available["id"] = moment_id
+		return available
+	return {}
+
 
 func _get_daily_dialogue(npc_id: String) -> String:
 	var day: int = int(game_state.day_index)

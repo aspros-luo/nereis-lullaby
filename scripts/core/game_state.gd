@@ -197,6 +197,39 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 			if action_tick > (saved_day - 1) * SLOT_KEYS.size() + saved_slot:
 				return false
+	if saved_flags.has("npc_observed_traces"):
+		if not (saved_flags["npc_observed_traces"] is Dictionary):
+			return false
+		var allowed_actions: Dictionary = {
+			"caregiver": ["prepare_meal", "tend_home", "check_on_mite"],
+			"worship_leader": ["prepare_public_space", "coordinate_helpers", "preserve_routine"],
+			"doctor": ["review_records", "organize_supplies", "check_patient_notes"],
+		}
+		for trace_location in saved_flags["npc_observed_traces"]:
+			if not (trace_location is String) or not POST_ANOMALY_LOCATIONS.has(trace_location):
+				return false
+			var trace_value: Variant = saved_flags["npc_observed_traces"][trace_location]
+			if not (trace_value is Dictionary):
+				return false
+			var trace: Dictionary = trace_value
+			var trace_npc_value: Variant = trace.get("npc_id", null)
+			var trace_action_value: Variant = trace.get("action_id", null)
+			var trace_tick_value: Variant = trace.get("tick", null)
+			var trace_day_value: Variant = trace.get("day", null)
+			var trace_slot_value: Variant = trace.get("slot", null)
+			if not (trace_npc_value is String) or not (trace_action_value is String):
+				return false
+			if not allowed_actions.has(trace_npc_value) or not allowed_actions[trace_npc_value].has(trace_action_value):
+				return false
+			if not (trace_tick_value is int) or not (trace_day_value is int) or not (trace_slot_value is int):
+				return false
+			if int(trace_day_value) < 1 or int(trace_day_value) > FINAL_DAY:
+				return false
+			if int(trace_slot_value) < 0 or int(trace_slot_value) >= SLOT_KEYS.size():
+				return false
+			var trace_expected_tick: int = (int(trace_day_value) - 1) * SLOT_KEYS.size() + int(trace_slot_value)
+			if int(trace_tick_value) != trace_expected_tick or trace_expected_tick > (saved_day - 1) * SLOT_KEYS.size() + saved_slot:
+				return false
 	var anomaly_flag: Variant = saved_flags.get("village_anomaly", false)
 	if not (anomaly_flag is bool):
 		return false

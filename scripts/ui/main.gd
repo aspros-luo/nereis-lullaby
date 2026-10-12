@@ -796,17 +796,9 @@ func _load_game() -> void:
 		message_label.text = "存档中的信息传播记录无效，当前进度没有改变。"
 		return
 	# Validate cross-system references only after both temporary systems have loaded.
-	for saved_message in restored_network.messages:
-		var referenced_fact_id: String = str(saved_message.get("fact_id", ""))
-		var source_event_id: String = str(saved_message.get("source_event_id", ""))
-		if not restored_ledger.has_fact(referenced_fact_id) or not restored_ledger.event_ids.has(source_event_id):
-			message_label.text = "存档中的消息引用了不存在的事实或事件，当前进度没有改变。"
-			return
-		if str(saved_message.get("status", "")) == "delivered":
-			var delivery_event_id: String = "lullaby.message.delivered." + str(saved_message.get("message_id", ""))
-			if not restored_ledger.event_ids.has(delivery_event_id):
-				message_label.text = "存档中的已送达消息缺少对应事件，当前进度没有改变。"
-				return
+	if not _network_references_are_valid(restored_network, restored_ledger):
+		message_label.text = "存档中的消息引用了不存在的事实或事件，当前进度没有改变。"
+		return
 	var restored_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if not (saved_entries is Array):
@@ -842,3 +834,16 @@ func _restart_demo() -> void:
 	information_network = InformationNetworkScript.new()
 	message_label.text = "新的一天开始了。我先在村子里走走。"
 	_refresh_ui()
+
+
+func _network_references_are_valid(network, ledger) -> bool:
+	for saved_message in network.messages:
+		var referenced_fact_id: String = str(saved_message.get("fact_id", ""))
+		var source_event_id: String = str(saved_message.get("source_event_id", ""))
+		if not ledger.has_fact(referenced_fact_id) or not ledger.event_ids.has(source_event_id):
+			return false
+		if str(saved_message.get("status", "")) == "delivered":
+			var delivery_event_id: String = "lullaby.message.delivered." + str(saved_message.get("message_id", ""))
+			if not ledger.event_ids.has(delivery_event_id):
+				return false
+	return true

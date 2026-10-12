@@ -216,7 +216,15 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	var restored_relationships: Dictionary = {}
 	for npc_id in relationship_state.keys():
-		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
+		if not saved_relationships.has(npc_id):
+			return false
+		var relationship_value: Variant = saved_relationships[npc_id]
+		if not (relationship_value is int) or int(relationship_value) < -5 or int(relationship_value) > 10:
+			return false
+		restored_relationships[npc_id] = int(relationship_value)
+	for saved_npc_id in saved_relationships.keys():
+		if not relationship_state.has(saved_npc_id):
+			return false
 	var restored_history: Array[Dictionary] = []
 	var ordinary_action_slots: Dictionary = {}
 	var current_tick: int = (saved_day - 1) * SLOT_KEYS.size() + saved_slot

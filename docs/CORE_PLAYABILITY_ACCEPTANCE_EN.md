@@ -17,6 +17,7 @@
 - [ ] After saving, quitting, restarting, and loading, time, location, relationships, phase, action history, personal-moment flags, journal, ledger, and information network remain consistent.
 - [ ] Invalid save data does not partially overwrite the current runtime state.
 - [ ] Event IDs are deduplicated; facts have supporting events; character knowledge has an explicit source; receiving a message does not automatically become objective knowledge.
+- [ ] Clues from ordinary observations and the Day 7 anomaly have provenance events; failed conversations do not mutate clues or relationships.
 - [ ] Complete one end-to-end playthrough and record blockers, softlocks, misleading feedback, and missable content.
 
 ## Current code baseline

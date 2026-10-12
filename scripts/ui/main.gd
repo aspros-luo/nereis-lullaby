@@ -431,7 +431,7 @@ func _advance_time() -> void:
 	var was_ordinary: bool = game_state.world_state["phase"] == "ordinary"
 	var previous_day: int = game_state.day_index
 	game_state.advance_time()
-	var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
+	var world_tick: int = (game_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + game_state.slot_index
 	information_network.advance_to(world_tick, worldline_ledger)
 	var authored_beat_active: bool = (
 		game_state.world_state["phase"] != "ordinary"
@@ -646,7 +646,7 @@ func _talk_to_npc(npc_id: String) -> void:
 	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location)
 	message_label.text = reply
 	var received_report := false
-	var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
+	var world_tick: int = (game_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + game_state.slot_index
 	for reported_fact_id in reported_fact_ids:
 		var report_event_id := "lullaby.report.day%d.slot%d.%s.%s" % [
 			game_state.day_index, game_state.slot_index, npc_id, reported_fact_id
@@ -908,7 +908,7 @@ func _restart_demo() -> void:
 
 
 func _network_tick_is_valid(state, network) -> bool:
-	var state_tick: int = (int(state.day_index) - 1) * 3 + int(state.slot_index)
+	var state_tick: int = (int(state.day_index) - 1) * GameStateScript.SLOT_KEYS.size() + int(state.slot_index)
 	return int(network.current_tick) <= state_tick
 
 

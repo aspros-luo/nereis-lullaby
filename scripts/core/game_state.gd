@@ -112,8 +112,12 @@ func to_save_data() -> Dictionary:
 	}
 
 func load_save_data(data: Dictionary) -> bool:
-	var saved_day: int = int(data.get("day_index", 0))
-	var saved_slot: int = int(data.get("slot_index", -1))
+	var saved_day_value: Variant = data.get("day_index", null)
+	var saved_slot_value: Variant = data.get("slot_index", null)
+	if not (saved_day_value is int) or not (saved_slot_value is int):
+		return false
+	var saved_day: int = int(saved_day_value)
+	var saved_slot: int = int(saved_slot_value)
 	var saved_world_value: Variant = data.get("world_state", {})
 	var saved_relationships_value: Variant = data.get("relationship_state", {})
 	var saved_investigation_value: Variant = data.get("investigation_state", {})

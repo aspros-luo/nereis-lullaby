@@ -33,6 +33,7 @@ func _initialize() -> void:
 	_test_worldline_information_network()
 	_test_npc_behavior_profiles()
 	_test_npc_behavior_simulator()
+	_test_npc_observable_action_traces()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -713,3 +714,24 @@ func _test_npc_behavior_simulator() -> void:
 	assert(NPCBehaviorSimulatorScript.choose_action("doctor", NPCBehaviorProfilesScript.get_profile("doctor"), 3, 2, 0, 0, true).is_empty())
 	assert(NPCBehaviorSimulatorScript.choose_action("unknown_npc", {}, 3, 2, 0, 0, false).is_empty())
 	assert(not NPCBehaviorSimulatorScript.validate_action({"id": "incomplete"}))
+
+
+func _test_npc_observable_action_traces() -> void:
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	var ordinary_description: String = ui_logic._get_location_description("CLINIC")
+	assert(not ordinary_description.contains("两处标记等待核对"))
+	ui_logic.game_state.world_state["flags"]["npc_observed_traces"] = {
+		"CLINIC": {
+			"npc_id": "doctor",
+			"action_id": "review_records",
+			"tick": 4,
+			"day": 2,
+			"slot": 1,
+		}
+	}
+	var witnessed_description: String = ui_logic._get_location_description("CLINIC")
+	assert(witnessed_description.contains("两处标记等待核对"))
+	assert(not ui_logic._get_location_description("HOME").contains("两处标记等待核对"))
+	ui_logic.game_state.world_state["phase"] = "after_week"
+	assert(not ui_logic._get_location_description("CLINIC").contains("两处标记等待核对"))

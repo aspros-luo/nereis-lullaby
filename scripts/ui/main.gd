@@ -521,9 +521,14 @@ func _observe_location() -> void:
 	var fact_title := ""
 	var fact_detail := ""
 	if game_state.day_index >= 5 and game_state.current_location == "SHRINE":
-		fact_id = "day5_repeated_object_shrine"
-		fact_title = "礼拜场所里的普通物件"
-		fact_detail = "我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。"
+		if not clue_journal._seen_ids.has("day4_worship_custom"):
+			fact_id = "day4_worship_custom"
+			fact_title = "关于习俗的公共解释"
+			fact_detail = "礼拜场所的公开说明把类似安排解释为维护公共传统的一部分。它与生活习惯的解释关注点不同，但不能证明任何人撒谎。"
+		else:
+			fact_id = "day5_repeated_object_shrine"
+			fact_title = "礼拜场所里的普通物件"
+			fact_detail = "我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。"
 	elif game_state.day_index >= 5 and game_state.current_location == "COMMONS":
 		fact_id = "day5_repeated_object_commons"
 		fact_title = "公共空间里的相似准备"
@@ -557,6 +562,12 @@ func _observe_location() -> void:
 ## Provide a quiet alternate route when a conversation-based clue was missed.
 ## 玩家错过交谈线索时，允许通过查看诊疗记录补足最小证据。
 func _get_alternate_clue_for_observation(location_id: String, day_index: int, seen_ids: Dictionary) -> Dictionary:
+	if location_id == "HOME" and day_index >= 5 and not seen_ids.has("day4_caregiver_custom"):
+		return {
+			"id": "day4_caregiver_custom",
+			"title": "关于习俗的生活解释",
+			"detail": "照料者此前把某项安排说成村里沿用已久的生活习惯。即使没能赶上那次交谈，日常生活中的说法仍可作为比较线索。",
+		}
 	if location_id != "CLINIC" or day_index < 4:
 		return {}
 	if not seen_ids.has("day3_similar_sleep_reports"):

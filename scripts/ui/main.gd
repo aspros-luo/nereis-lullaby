@@ -401,6 +401,9 @@ func _get_current_objective() -> String:
 
 func _get_location_description(location_id: String) -> String:
 	var description := str(LOCATION_DESCRIPTIONS.get(location_id, "这里很安静。"))
+	var trace_text := _get_npc_action_trace_text(location_id)
+	if not trace_text.is_empty() and game_state.world_state["phase"] == "ordinary":
+		description += "\n" + trace_text
 	if game_state.world_state["phase"] == "after_week":
 		match location_id:
 			"HOME":
@@ -414,6 +417,39 @@ func _get_location_description(location_id: String) -> String:
 			"CLINIC":
 				description += "\n医生把几份记录重新叠在一起，看到我时又把它们收进抽屉。"
 	return description
+
+## Show only physical traces of NPC actions the player actually witnessed.
+## 只呈现蜜忒当时确实在场见过的行动痕迹；不把屏外行为写成她的记忆。
+func _get_npc_action_trace_text(location_id: String) -> String:
+	if game_state == null or not (game_state.world_state.get("flags", {}) is Dictionary):
+		return ""
+	var traces_value: Variant = game_state.world_state["flags"].get("npc_observed_traces", {})
+	if not (traces_value is Dictionary):
+		return ""
+	var trace_value: Variant = traces_value.get(location_id, {})
+	if not (trace_value is Dictionary):
+		return ""
+	var action_id: String = str(trace_value.get("action_id", ""))
+	match action_id:
+		"prepare_meal":
+			return "餐桌已经收拾妥当，厨房里也补齐了常用食物。看起来有人刚忙完一轮家务。"
+		"tend_home":
+			return "门边的花束被重新摆正，散落的小物件也各自回到了原处。"
+		"check_on_mite":
+			return "刚才有人特意确认过我的情况。那句简单的关心还留在心里。"
+		"prepare_public_space":
+			return "公共区域的通道被留了出来，桌椅和布置也比刚才更整齐。"
+		"coordinate_helpers":
+			return "几项杂事已经分派妥当，清单上多了几处完成标记。"
+		"preserve_routine":
+			return "例行布置又被检查了一遍，所有东西都回到熟悉的位置。"
+		"review_records":
+			return "几份记录被重新按日期排好，仍有两处标记等待核对。"
+		"organize_supplies":
+			return "药草标签已经补齐，另有几份记录被单独放在一旁。"
+		"check_patient_notes":
+			return "病患备注被重新翻阅过，几张纸页上留下了轻浅的折痕。"
+	return ""
 
 func _on_location_selected(location_id: String) -> void:
 	if game_state.world_state["phase"] == "demo_complete":
@@ -478,6 +514,16 @@ func _advance_time() -> void:
 			# 第一人称视角：蜜忒不在场时，不得把 NPC 的行动当成她亲眼所见。
 			if action_location == staged_state.current_location:
 				autonomous_lines.append(str(action["line"]))
+				var observed_traces_value: Variant = staged_state.world_state["flags"].get("npc_observed_traces", {})
+				var observed_traces: Dictionary = observed_traces_value.duplicate(true) if observed_traces_value is Dictionary else {}
+				observed_traces[action_location] = {
+					"npc_id": npc_id,
+					"action_id": str(action["id"]),
+					"tick": world_tick,
+					"day": staged_state.day_index,
+					"slot": staged_state.slot_index,
+				}
+				staged_state.world_state["flags"]["npc_observed_traces"] = observed_traces
 		staged_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 
 	var anomaly_started: bool = was_ordinary and staged_state.world_state["phase"] == "after_week"

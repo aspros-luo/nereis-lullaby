@@ -235,7 +235,7 @@ func _test_observation_and_anomaly_events() -> void:
 	ui_logic.clue_journal = ClueJournalScript.new()
 	ui_logic.worldline_ledger = WorldlineLedgerScript.new()
 	ui_logic.game_state.current_location = "FOREST"
-	ui_logic._add_fact("forest_flower_observation", "林间的野花", "观察到的事实",)
+	ui_logic._add_fact("forest_flower_observation", "林间的野花", "观察到的事实")
 	ui_logic._record_observation_event("forest_flower_observation")
 	assert(ui_logic.worldline_ledger.has_fact("forest_flower_observation"))
 	assert(ui_logic.worldline_ledger.event_ids.has("lullaby.observation.day1.slot0.forest.forest_flower_observation"))

@@ -129,6 +129,18 @@ func _test_alternate_clue_routes() -> void:
 	assert(ui_logic._get_alternate_clue_for_observation("HOME", 4, no_clues).is_empty())
 	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 3, no_clues).is_empty())
 
+	var shrine_custom: Dictionary = ui_logic._get_shrine_observation_fact(5, no_clues)
+	assert(shrine_custom.get("id", "") == "day4_worship_custom")
+	assert(ui_logic._get_shrine_observation_fact(4, no_clues).is_empty())
+	var seen_public_custom: Dictionary = {"day4_worship_custom": true}
+	var shrine_object: Dictionary = ui_logic._get_shrine_observation_fact(5, seen_public_custom)
+	assert(shrine_object.get("id", "") == "day5_repeated_object_shrine")
+	var seen_both_shrine_facts: Dictionary = {
+		"day4_worship_custom": true,
+		"day5_repeated_object_shrine": true,
+	}
+	assert(ui_logic._get_shrine_observation_fact(5, seen_both_shrine_facts).is_empty())
+
 	var seen_sleep: Dictionary = {"day3_similar_sleep_reports": true}
 	var date_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("CLINIC", 6, seen_sleep)
 	assert(date_clue.get("id", "") == "day6_date_discrepancy")

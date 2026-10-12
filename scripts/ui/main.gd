@@ -455,9 +455,6 @@ func _advance_time() -> void:
 			)
 			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
 				continue
-			var previous_action: Dictionary = last_actions.get(npc_id, {})
-			if str(previous_action.get("id", "")) == str(action["id"]):
-				continue
 			last_actions[npc_id] = action.duplicate(true)
 			var action_event_id := "lullaby.npc_action.tick%d.%s" % [world_tick, npc_id]
 			worldline_ledger.record_event(

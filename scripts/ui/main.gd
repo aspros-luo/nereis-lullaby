@@ -856,10 +856,6 @@ func _load_game() -> void:
 	if not _network_tick_is_valid(restored_state, restored_network):
 		message_label.text = "存档中的信息传播时间超前于游戏时间，当前进度没有改变。"
 		return
-	# The information network must not advance beyond the restored game clock.
-	if not _network_tick_is_valid(restored_state, restored_network):
-		message_label.text = "存档中的信息传播时间超前于游戏时间，当前进度没有改变。"
-		return
 	# Validate cross-system references only after both temporary systems have loaded.
 	if not _network_references_are_valid(restored_network, restored_ledger):
 		message_label.text = "存档中的消息引用了不存在的事实或事件，当前进度没有改变。"
@@ -909,11 +905,6 @@ func _restart_demo() -> void:
 	information_network = InformationNetworkScript.new()
 	message_label.text = "新的一天开始了。我先在村子里走走。"
 	_refresh_ui()
-
-
-func _network_tick_is_valid(state, network) -> bool:
-	var state_tick: int = (int(state.day_index) - 1) * 3 + int(state.slot_index)
-	return int(network.current_tick) <= state_tick
 
 
 func _network_tick_is_valid(state, network) -> bool:

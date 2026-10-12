@@ -16,6 +16,13 @@ Before continuing work on plot, NPCs, clues, or world state, check the latest co
 - Key NPCs use individual goals, memory, knowledge boundaries, relationship dimensions, and stress responses; ordinary NPCs use lightweight schedule/goal templates; background residents use group simulation.
 - NPCs learn events only through plausible channels. Never sync the player's clue journal to all characters automatically. Keep relationship, investigation, and world state separate.
 
+## Dual-perspective worldlines and causal events (required)
+- Read `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_CN.md` / `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_EN.md`.
+- Hero directly responds to opportunities; Lullaby indirectly changes information, motivation, contact, and opportunity through Mite's everyday life and relationships.
+- Keep world facts, character knowledge/beliefs, intentions, opportunity states, and ending conditions separate. Never switch an ending directly from one hidden score.
+- Restoration Army news, forest investigation, and the third umbilical cord are non-canon examples, not finalized plot conditions.
+- Mite does not know her true identity; her care and innocence are genuine. Important choices need observable consequences in NPC behavior, dialogue, objects, or information access.
+
 ## Project boundary
 This repository is only for Nereis Lullaby: daily-life simulation + free exploration + visual novel. Do not mix in Nereis-Hero's side-scrolling action-RPG code or systems.
 

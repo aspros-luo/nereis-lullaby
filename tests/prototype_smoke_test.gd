@@ -503,6 +503,7 @@ func _test_worldline_information_network() -> void:
 	# A pending message due exactly at the saved clock should already have been delivered.
 	var due_data: Dictionary = pending_network.to_save_data()
 	due_data["current_tick"] = 2
+	due_data["messages"][0]["arrival_tick"] = 2
 	var protected_due_network = InformationNetworkScript.new()
 	assert(not protected_due_network.load_save_data(due_data))
 	assert(protected_due_network.current_tick == -1)

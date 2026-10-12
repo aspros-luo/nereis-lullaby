@@ -742,7 +742,7 @@ func _test_information_delivery_aborts_time_step() -> void:
 	))
 	assert(ui_logic.information_network.publish_message(
 		"blocked_time_step", "forest_oddity", "mite", "doctor", "conversation",
-		0, 0.5, 0, "source_observation", ui_logic.worldline_ledger
+		1, 0.5, 0, "source_observation", ui_logic.worldline_ledger
 	))
 	assert(ui_logic.worldline_ledger.record_event(
 		"lullaby.message.delivered.blocked_time_step", "lullaby", "doctor", "receive_message", "", []

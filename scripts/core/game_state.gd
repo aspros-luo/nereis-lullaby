@@ -118,6 +118,9 @@ func load_save_data(data: Dictionary) -> bool:
 	var saved_relationships_value: Variant = data.get("relationship_state", {})
 	var saved_investigation_value: Variant = data.get("investigation_state", {})
 	var saved_history_value: Variant = data.get("action_history", [])
+	var saved_action_used_value: Variant = data.get("action_used_this_slot", false)
+	if not (saved_action_used_value is bool):
+		return false
 	if not (saved_world_value is Dictionary):
 		return false
 	if not (saved_relationships_value is Dictionary):
@@ -144,7 +147,7 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	if saved_phase != "ordinary" and (saved_day != FINAL_DAY or saved_slot != SLOT_KEYS.size() - 1):
 		return false
-	if saved_location.is_empty():
+	if not POST_ANOMALY_LOCATIONS.has(saved_location):
 		return false
 	if not (saved_flags_value is Dictionary):
 		return false
@@ -156,6 +159,18 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	if saved_flags.has("personal_moments_seen") and not (saved_flags["personal_moments_seen"] is Dictionary):
 		return false
+	var anomaly_flag: Variant = saved_flags.get("village_anomaly", false)
+	if not (anomaly_flag is bool):
+		return false
+	if saved_phase != "ordinary" and not anomaly_flag:
+		return false
+	if saved_phase == "ordinary" and anomaly_flag:
+		return false
+	var validated_fact_ids: Array[String] = []
+	for raw_fact_id in saved_fact_ids_value:
+		if not (raw_fact_id is String) or raw_fact_id.strip_edges().is_empty() or validated_fact_ids.has(raw_fact_id):
+			return false
+		validated_fact_ids.append(raw_fact_id)
 	var validated_visits: Array[String] = []
 	for visited_location in saved_visits_value:
 		if not (visited_location is String) or not POST_ANOMALY_LOCATIONS.has(visited_location):
@@ -168,16 +183,25 @@ func load_save_data(data: Dictionary) -> bool:
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
 	var restored_history: Array[Dictionary] = []
 	for entry in saved_history:
-		if entry is Dictionary:
-			restored_history.append(entry.duplicate(true))
+		if not (entry is Dictionary):
+			return false
+		if int(entry.get("day", 0)) < 1 or int(entry.get("day", 0)) > FINAL_DAY:
+			return false
+		if not SLOT_LABELS.has(str(entry.get("slot", ""))):
+			return false
+		if not POST_ANOMALY_LOCATIONS.has(str(entry.get("location", ""))):
+			return false
+		if str(entry.get("id", "")).strip_edges().is_empty() or str(entry.get("description", "")).strip_edges().is_empty():
+			return false
+		restored_history.append(entry.duplicate(true))
 
 	day_index = saved_day
 	slot_index = saved_slot
 	current_location = saved_location
-	action_used_this_slot = bool(data.get("action_used_this_slot", false))
+	action_used_this_slot = saved_action_used_value
 	relationship_state = restored_relationships
 	investigation_state = {
-		"observed_fact_ids": saved_fact_ids_value.duplicate(true),
+		"observed_fact_ids": validated_fact_ids,
 		"visited_after_anomaly": saved_visits_value.duplicate(true),
 	}
 	world_state = {

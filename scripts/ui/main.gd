@@ -820,10 +820,25 @@ func _load_game() -> void:
 	if error != OK:
 		message_label.text = "还没有可读取的存档。先游玩一段，再选择“保存进度”。"
 		return
-	var version: int = int(config.get_value("save", "version", 0))
+	# Never coerce a malformed version or silently replace missing v2 sections with empty defaults.
+	if not config.has_section_key("save", "version"):
+		message_label.text = "存档缺少版本信息，当前进度没有改变。"
+		return
+	var version_value: Variant = config.get_value("save", "version")
+	if not (version_value is int):
+		message_label.text = "存档版本字段无效，当前进度没有改变。"
+		return
+	var version: int = int(version_value)
 	if not [1, 2].has(version):
 		message_label.text = "这份存档版本不受当前 Demo 支持。"
 		return
+	var required_keys: Array[String] = ["game_state", "clue_entries"]
+	if version == 2:
+		required_keys.append_array(["worldline_ledger", "information_network"])
+	for required_key in required_keys:
+		if not config.has_section_key("save", required_key):
+			message_label.text = "存档缺少必要数据（%s），当前进度没有改变。" % required_key
+			return
 	var saved_state: Variant = config.get_value("save", "game_state", {})
 	if not (saved_state is Dictionary):
 		message_label.text = "存档内容无法识别，当前进度没有改变。"
@@ -916,13 +931,26 @@ func _network_references_are_valid(network, ledger) -> bool:
 	for saved_message in network.messages:
 		var referenced_fact_id: String = str(saved_message.get("fact_id", ""))
 		var source_event_id: String = str(saved_message.get("source_event_id", ""))
-		if not ledger.has_fact(referenced_fact_id) or not ledger.event_ids.has(source_event_id):
+		if not ledger.has_fact(referenced_fact_id):
+			return false
+		if not _event_supports_fact(ledger, source_event_id, referenced_fact_id):
 			return false
 		if str(saved_message.get("status", "")) == "delivered":
 			var delivery_event_id: String = "lullaby.message.delivered." + str(saved_message.get("message_id", ""))
-			if not ledger.event_ids.has(delivery_event_id):
+			if not _event_supports_fact(ledger, delivery_event_id, referenced_fact_id):
 				return false
 	return true
+
+
+func _event_supports_fact(ledger, event_id: String, fact_id: String) -> bool:
+	if event_id.is_empty() or fact_id.is_empty():
+		return false
+	for event in ledger.events:
+		if str(event.get("event_id", "")) != event_id:
+			continue
+		var event_facts: Variant = event.get("fact_ids", [])
+		return event_facts is Array and event_facts.has(fact_id)
+	return false
 
 
 func _migrate_legacy_clue_provenance(journal, ledger) -> bool:

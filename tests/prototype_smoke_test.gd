@@ -391,7 +391,7 @@ func _test_npc_behavior_profiles() -> void:
 		var profile: Dictionary = NPCBehaviorProfilesScript.get_profile(npc_id)
 		assert(NPCBehaviorProfilesScript.has_required_fields(profile))
 		assert(profile["action_preferences"].size() >= 2)
-	assert(profile["knowledge_boundaries"].size() >= 3)
+		assert(profile["knowledge_boundaries"].size() >= 3)
 		assert(profile["relationship_dimensions"].size() >= 2)
 	assert(NPCBehaviorProfilesScript.get_profile("unknown_npc").is_empty())
 	var copy: Dictionary = NPCBehaviorProfilesScript.get_profile("doctor")

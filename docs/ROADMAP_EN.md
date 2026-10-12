@@ -29,6 +29,12 @@
 - [ ] Design full routes and endings after systems can be tested.
 - [ ] Keep ending names and concepts labeled as proposals until approved.
 
+## Phase 3.5: Relationships and autonomous behavior
+- [x] Establish bilingual NPC relationship and behavior design baselines, separating known ties from open questions.
+- [ ] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses.
+- [ ] Implement discrete NPC behavior simulation and authored-event schedule overrides.
+- [ ] Add regression tests for information flow, relationship changes, action consequences, and save/load.
+
 ## Phase 4: Content expansion
 - [x] Add one-time personal everyday moments for the three key villagers, with seen-state persisted in the save data (prototype content, not finalized canon).
 - [ ] Expand maps, villagers, personal stories, communal events, and transformation stages.

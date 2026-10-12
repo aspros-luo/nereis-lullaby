@@ -7,7 +7,7 @@ Villagers should continue observable daily routines when the player is not talki
 ## Behavior rules
 
 - After each time-step advance, the system chooses one routine action for the caregiver, worship leader, and doctor.
-- Choices use that character's behavior card, current time period, relationship value, and their own inbox size; they do not read global hidden truths.
+- Choices use the character card's action preferences, current time period, relationship value, and their own inbox size. Only actions matching the card's preference tags are eligible; the simulation does not read global hidden truths.
 - Identical inputs produce identical choices, making regression tests reproducible.
 - A stronger Mite–caregiver relationship prioritizes checking on Mite; a doctor with incoming messages prioritizes reviewing records. These are prototype rules, not finalized character canon.
 - Every autonomous action creates a unique worldline event containing actor, action, tick, and scheduled location.

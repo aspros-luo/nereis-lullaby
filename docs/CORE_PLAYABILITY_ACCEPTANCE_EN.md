@@ -1,0 +1,30 @@
+# Core Playability Acceptance Checklist (Development)
+
+> Status: the code prototype contains the main loop, but Godot engine execution and human playtesting are not complete. This is an acceptance gate, not a claim that the gate has passed.
+
+## Development order
+1. Validate the core gameplay loop and save/load regression.
+2. Connect the character matrix to actual decisions and observable consequences.
+3. Expand story, side quests, endings, and presentation.
+
+## Stage 1: Required loop checks
+- [ ] Advance from Day 1 through the evening of Day 7; the phase transition occurs only once.
+- [ ] An ordinary time slot permits one primary action; travel and observation do not consume it.
+- [ ] NPCs appear at scheduled locations, and conversation is unavailable when they are elsewhere.
+- [ ] Activities, conversations, and personal moments consume actions and produce expected relationship/clue changes.
+- [ ] Repeated observations do not create duplicate journal entries.
+- [ ] After the Day 7 anomaly, time remains stopped; exploration, visits, conversations, and completion conditions work.
+- [ ] After saving, quitting, restarting, and loading, time, location, relationships, phase, action history, personal-moment flags, journal, ledger, and information network remain consistent.
+- [ ] Invalid save data does not partially overwrite the current runtime state.
+- [ ] Event IDs are deduplicated; facts have supporting events; character knowledge has an explicit source; receiving a message does not automatically become objective knowledge.
+- [ ] Complete one end-to-end playthrough and record blockers, softlocks, misleading feedback, and missable content.
+
+## Current code baseline
+- Implemented: 7 locations, 7 days × 3 slots, 3 key NPCs, action economy, schedules, scalar relationships, clue journal, phase anomaly, post-anomaly investigation, and a single-slot save.
+- Implemented: event ledger, explicit knowledge grants, delayed information transfer, and an initial deterministic NPC routine selector.
+- New protection: ledger save loading validates required event fields, fact-to-first-event consistency, and that every event-referenced fact exists.
+- Not yet accepted: actual execution in Godot 4.6.1, full UI playtesting, and real save-file recovery after process restart.
+- Tool limitation: static review cannot replace engine tests if a Godot executable is unavailable. Never report an unexecuted test script as passed.
+
+## Gate for Stage 2
+Do not expand the runtime character matrix until engine checks, save/load regression, and human playtesting for Stage 1 have been addressed. The matrix may continue as design documentation, but candidate characters, relationships, and causal links must not be treated as finalized story canon prematurely.

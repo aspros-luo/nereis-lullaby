@@ -30,6 +30,7 @@
 - [ ] Keep ending names and concepts labeled as proposals until approved.
 
 ## Phase 4: Content expansion
+- [x] Add one-time personal everyday moments for the three key villagers, with seen-state persisted in the save data (prototype content, not finalized canon).
 - [ ] Expand maps, villagers, personal stories, communal events, and transformation stages.
 - [ ] Add music, art, presentation, and narrative content.
 - [ ] Use regression tests to check event order, missed clues, and ending reachability.

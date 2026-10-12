@@ -572,12 +572,7 @@ func _talk_to_npc(npc_id: String) -> void:
 		talked_after_anomaly[npc_id] = true
 		game_state.world_state["flags"]["post_anomaly_talked"] = talked_after_anomaly
 	var talk_event_id := "lullaby.talk.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, npc_id]
-	var known_fact_ids: Array = []
-	if fact_added:
-		for entry in clue_journal.get_entries():
-			if str(entry.get("day", -1)) == str(game_state.day_index) and str(entry.get("slot", "")) == game_state.get_slot_label():
-				known_fact_ids.append(str(entry.get("id", "")))
-	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location, known_fact_ids)
+	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location)
 	message_label.text = reply
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"

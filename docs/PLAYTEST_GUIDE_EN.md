@@ -23,15 +23,18 @@
 1. Talk to the caregiver or perform an everyday activity near home.
 2. Visit the commons, shrine, and clinic. Different people may be present at different times.
 3. From Day 3 onward, talk to the doctor at the clinic to hear about several villagers' sleep troubles.
-4. From Day 4 onward, talk to the relevant characters near home and at the shrine, then compare their ordinary explanations of a village custom.
-5. From Day 5 onward, inspect the commons or shrine; you can also gather flowers or inspect the forest.
-6. Continue to the evening of Day 7 and pay attention to familiar locations before and after the anomaly.
-7. After the anomaly, revisit at least three locations. Exploration can continue; once three locations have been revisited, the “End This Chapter of Daily Life” button appears.
+4. From Day 2 onward, talk to the caregiver near home to trigger a one-time memory about an old herb pouch and Mite's childhood habits; this gives extra relationship feedback.
+5. From Day 4 onward, talk to the worship leader at the shrine to trigger a one-time moment about tying a ribbon.
+6. From Day 3 onward, talk to the doctor at the clinic to hear about villagers' sleep troubles; from Day 6 onward, a one-time label-sorting moment is available there.
+7. From Day 5 onward, inspect the commons or shrine; you can also gather flowers or inspect the forest.
+8. Continue to the evening of Day 7 and pay attention to familiar locations before and after the anomaly.
+9. After the anomaly, revisit at least three locations. Exploration can continue; once three locations have been revisited, the “End This Chapter of Daily Life” button appears.
 
 ## Known limitations
 
 - This is a text UI prototype, without final map art, character portraits, animation, music, or sound effects.
 - Local save/load is implemented as a single-slot demo save in Godot's user data directory; there is no multi-slot management yet.
+- Each of the three villagers has one one-time everyday character moment. First-time scenes persist in save data and provide extra relationship feedback.
 - Characters and plot text are prototype content. Specific ritual mechanics and hidden identities are not finalized canon.
 - The automated smoke-test script is in the repository but has not yet been run by Godot in the current tool environment.
 - If Godot reports an error, save the full error text and the steps that triggered it.

@@ -32,7 +32,16 @@ static func choose_action(
 ) -> Dictionary:
 	if authored_override or not ACTIONS.has(npc_id) or profile.is_empty() or tick < 0:
 		return {}
-	var options: Array = ACTIONS[npc_id]
+	var all_options: Array = ACTIONS[npc_id]
+	var preferences_value: Variant = profile.get("action_preferences", [])
+	if not (preferences_value is Array) or preferences_value.is_empty():
+		return {}
+	var options: Array = []
+	for candidate in all_options:
+		if preferences_value.has(str(candidate.get("goal", ""))):
+			options.append(candidate)
+	if options.is_empty():
+		return {}
 	var index: int = posmod(tick + day + maxi(0, relationship + 5) + received_message_count, options.size())
 	if npc_id == "doctor" and received_message_count > 0:
 		for candidate_index in range(options.size()):

@@ -864,14 +864,19 @@ func _state_journal_are_consistent(state, journal) -> bool:
 	if not (observed_value is Array):
 		return false
 	var observed_ids: Dictionary = {}
-	for fact_id in observed_value:
-		if not (fact_id is String) or fact_id.strip_edges().is_empty() or observed_ids.has(fact_id):
+	for observed_id in observed_value:
+		if not (observed_id is String) or observed_id.strip_edges().is_empty() or observed_ids.has(observed_id):
 			return false
-		observed_ids[fact_id] = true
+		observed_ids[observed_id] = true
 	var journal_ids: Dictionary = {}
 	for entry in journal.get_entries():
-		var fact_id: String = str(entry.get("id", ""))
-		if fact_id.is_empty() or journal_ids.has(fact_id):
+		var journal_id: String = str(entry.get("id", ""))
+		if journal_id.is_empty() or journal_ids.has(journal_id):
 			return false
-		journal_ids[fact_id] = true
-	return observed_ids.size() == journal_ids.size() and observed_ids.keys().all(func(id): return journal_ids.has(id))
+		journal_ids[journal_id] = true
+	if observed_ids.size() != journal_ids.size():
+		return false
+	for observed_id in observed_ids:
+		if not journal_ids.has(observed_id):
+			return false
+	return true

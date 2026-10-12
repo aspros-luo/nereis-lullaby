@@ -50,17 +50,6 @@ func grant_knowledge(character_id: String, fact_id: String, source_event_id: Str
 		break
 	if not source_event_supports_fact:
 		return false
-	# Knowledge must be supported by the cited event, not merely by any existing event.
-	# 角色获得事实必须由来源事件明确支持，不能只引用任意存在的事件。
-	var source_event_supports_fact := false
-	for event in events:
-		if str(event.get("event_id", "")) != source_event_id:
-			continue
-		var source_fact_ids: Variant = event.get("fact_ids", [])
-		source_event_supports_fact = source_fact_ids is Array and source_fact_ids.has(fact_id)
-		break
-	if not source_event_supports_fact:
-		return false
 	if not character_knowledge.has(character_id):
 		character_knowledge[character_id] = {}
 	var known: Dictionary = character_knowledge[character_id]

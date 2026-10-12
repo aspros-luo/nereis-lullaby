@@ -131,6 +131,20 @@ func _test_save_roundtrip() -> void:
 	original.increase_relationship("caregiver", 3)
 	original.register_fact("save_test_fact")
 	original.world_state["flags"]["personal_moments_seen"] = {"caregiver_memory": true}
+	original.world_state["flags"]["npc_last_autonomous_actions"] = {
+		"caregiver": {
+			"npc_id": "caregiver",
+			"id": "tend_home",
+			"tick": 1,
+			"day": 1,
+			"slot": 1,
+			"label": "整理家中",
+			"line": "照料者整理了门边的花束。",
+			"goal": "stability",
+			"relationship_at_choice": 0,
+			"decision_basis": "routine_goals_and_local_state",
+		},
+	}
 	var restored = GameStateScript.new()
 	assert(restored.load_save_data(original.to_save_data()))
 	assert(restored.day_index == original.day_index)
@@ -140,6 +154,7 @@ func _test_save_roundtrip() -> void:
 	assert(restored.investigation_state["observed_fact_ids"].has("save_test_fact"))
 	assert(restored.action_history.size() == 1)
 	assert(restored.world_state["flags"]["personal_moments_seen"]["caregiver_memory"])
+	assert(restored.world_state["flags"]["npc_last_autonomous_actions"]["caregiver"]["id"] == "tend_home")
 	var protected_state = GameStateScript.new()
 	protected_state.day_index = 4
 	var invalid_data: Dictionary = original.to_save_data()
@@ -174,6 +189,10 @@ func _test_save_roundtrip() -> void:
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()
 	invalid_data["world_state"]["flags"]["personal_moments_seen"] = {"unknown_moment": true}
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["npc_id"] = "doctor"
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
 

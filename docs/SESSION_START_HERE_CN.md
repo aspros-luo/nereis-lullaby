@@ -8,7 +8,7 @@
 - `docs/ROADMAP_CN.md` / `docs/ROADMAP_EN.md`
 
 ## 跨项目剧情同步（必读）
-每次继续开发剧情、NPC、线索或世界状态前，先检查 Hero 仓库 `development` 分支的最新提交，并遵循 [跨项目剧情同步台账](CROSS_PROJECT_STORY_SYNC_CN_EN.md)。Hero 与本作玩法独立、世界观兼容；较新的明确用户决策优先于旧文档。注意：结局走向仍未锁定，Hero 结局不得以与蜜忒发生身体结合为必要条件。
+每次继续开发剧情、NPC、线索或世界状态前，先检查 Hero 仓库 `development` 分支的最新提交，并遵循 [跨项目剧情同步台账](CROSS_PROJECT_STORY_SYNC_CN_EN.md)。Hero 与本作玩法独立、世界观兼容；较新的明确用户决策优先于旧文档。注意：遵循 Hero 仓库最新故事基线：凡人之墓不发生身体结合；永恒乐园与烈火天罚均涉及身体结合，但因关键遗物与 Hero 保持自主性的程度而走向不同。Lullaby 不直接决定结局，只影响信息、人物动机和机会条件。
 
 ## 人物关系与自主行为基线
 - 人物关系矩阵与行为设计见 `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_CN.md` / `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_EN.md`。
@@ -20,7 +20,7 @@
 - 阅读 `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_CN.md` / `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_EN.md`。
 - 《Hero》负责英雄对机会的直接回应；《Lullaby》负责通过蜜忒的日常与关系间接改变信息、动机、接触和机会。
 - 严格区分世界事实、角色知识/信念、行为意图、机会状态与结局条件；不要用单个隐藏数值直接切结局。
-- 复国军消息、森林调查、第三根脐带等当前只是非定稿示例，不得直接写成正式剧情条件。
+- 复国军消息的传播、森林调查与第三根脐带的具体获取条件仍是待设计内容；Hero 已确认的三个结局情感身份不可被旧文档中的冲突表述覆盖。
 - 蜜忒不知晓自己真实身份；她的关心与纯真是真实的。重要选择必须通过 NPC 行为、对白、物件或信息可达性产生可观察反馈。
 
 ## 项目边界

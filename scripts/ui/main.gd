@@ -476,6 +476,11 @@ func _advance_time() -> void:
 	staged_state.advance_time()
 	var world_tick: int = (staged_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + staged_state.slot_index
 	staged_network.advance_to(world_tick, staged_ledger)
+	# If a due message cannot be recorded consistently, abort the whole time-step.
+	for pending_message in staged_network.messages:
+		if str(pending_message.get("status", "")) == "pending" and int(pending_message.get("arrival_tick", -1)) <= world_tick:
+			message_label.text = "信息传播记录无法安全提交；当前时段没有改变。"
+			return
 	var authored_beat_active: bool = (
 		staged_state.world_state["phase"] != "ordinary"
 		or staged_state.day_index != previous_day
@@ -880,6 +885,9 @@ func _talk_to_npc(npc_id: String) -> void:
 			return
 		received_report = true
 		staged_network.advance_to(world_tick, staged_ledger)
+		if str(staged_network.messages.back().get("status", "")) != "delivered":
+			message_label.text = "交谈已准备，但信息传播无法安全提交；当前时段没有消耗。"
+			return
 
 	game_state = staged_state
 	clue_journal = staged_journal

@@ -470,15 +470,21 @@ func _advance_time() -> void:
 		game_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
-		clue_journal.add_fact(
-			"day7_village_change",
-			"一声从远处传来的鸣响",
-			"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。",
-			game_state.day_index,
-			game_state.get_slot_label(),
-			schedule_manager.get_location_name(game_state.current_location)
+		var anomaly_fact_id := "day7_village_change"
+		var anomaly_event_id := "lullaby.anomaly.day7.evening"
+		worldline_ledger.record_event(
+			anomaly_event_id,
+			"lullaby",
+			"village",
+			"anomaly_bell",
+			game_state.current_location,
+			[anomaly_fact_id]
 		)
-		game_state.register_fact("day7_village_change")
+		_add_fact(
+			anomaly_fact_id,
+			"一声从远处传来的鸣响",
+			"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。"
+		)
 	elif game_state.day_index != previous_day:
 		message_label.text = str(DAY_OPENING_TEXT.get(game_state.day_index, "新的一天开始了。村里的人继续忙着各自的事。"))
 	else:
@@ -515,6 +521,15 @@ func _observe_location() -> void:
 			"林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
 		)
 	var ordinary_observation: String = str(OBSERVATION_TEXT.get(game_state.current_location, "这里暂时没有什么特别的发现。"))
+	if added:
+		var observed_fact_id := ""
+		if game_state.day_index >= 5 and game_state.current_location == "SHRINE":
+			observed_fact_id = "day5_repeated_object_shrine"
+		elif game_state.day_index >= 5 and game_state.current_location == "COMMONS":
+			observed_fact_id = "day5_repeated_object_commons"
+		else:
+			observed_fact_id = "forest_flower_observation"
+		_record_observation_event(observed_fact_id)
 	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
 
@@ -746,7 +761,28 @@ func _record_anomaly_clue_if_available(location_id: String) -> bool:
 			detail = "医生把几份记录收进抽屉。也许是病人的隐私，不方便让人看见。"
 	if fact_id.is_empty():
 		return false
-	return _add_fact(fact_id, title, detail)
+	var added: bool = _add_fact(fact_id, title, detail)
+	if added:
+		_record_observation_event(fact_id)
+	return added
+
+func _record_observation_event(fact_id: String) -> void:
+	if fact_id.strip_edges().is_empty():
+		return
+	var event_id := "lullaby.observation.day%d.slot%d.%s.%s" % [
+		game_state.day_index,
+		game_state.slot_index,
+		game_state.current_location.to_lower(),
+		fact_id,
+	]
+	worldline_ledger.record_event(
+		event_id,
+		"lullaby",
+		"mite",
+		"observe_" + game_state.current_location.to_lower(),
+		game_state.current_location,
+		[fact_id]
+	)
 
 const SAVE_PATH: String = "user://nereis_lullaby_demo.cfg"
 

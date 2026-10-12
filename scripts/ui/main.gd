@@ -815,6 +815,9 @@ func _load_game() -> void:
 	if not restored_journal.load_entries(saved_entries_array):
 		message_label.text = "存档中的线索条目无效或重复，当前进度没有改变。"
 		return
+	if not _state_journal_are_consistent(restored_state, restored_journal):
+		message_label.text = "存档中的线索簿与调查记录不一致，当前进度没有改变。"
+		return
 	# 先验证全部存档部分，再一次性替换运行状态，避免部分恢复。
 	game_state = restored_state
 	schedule_manager = ScheduleManagerScript.new()
@@ -854,3 +857,21 @@ func _network_references_are_valid(network, ledger) -> bool:
 			if not ledger.event_ids.has(delivery_event_id):
 				return false
 	return true
+
+
+func _state_journal_are_consistent(state, journal) -> bool:
+	var observed_value: Variant = state.investigation_state.get("observed_fact_ids", [])
+	if not (observed_value is Array):
+		return false
+	var observed_ids: Dictionary = {}
+	for fact_id in observed_value:
+		if not (fact_id is String) or fact_id.strip_edges().is_empty() or observed_ids.has(fact_id):
+			return false
+		observed_ids[fact_id] = true
+	var journal_ids: Dictionary = {}
+	for entry in journal.get_entries():
+		var fact_id: String = str(entry.get("id", ""))
+		if fact_id.is_empty() or journal_ids.has(fact_id):
+			return false
+		journal_ids[fact_id] = true
+	return observed_ids.size() == journal_ids.size() and observed_ids.keys().all(func(id): return journal_ids.has(id))

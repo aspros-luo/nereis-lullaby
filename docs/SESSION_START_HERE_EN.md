@@ -66,6 +66,7 @@ Do not finalize ritual mechanics, the cult base location, mass-villager events, 
 - `scripts/ui/main.gd` now contains seven destinations, a seven-day loop, one meaningful action per period, NPC conversations, everyday activities, relationship feedback, a clue journal, before/after anomaly changes, and an optional prologue ending.
 - Day-opening story beats, contextual objectives, detailed location observations, a dark UI theme, and single-slot local save/load have been added.
 - `scripts/core/game_state.gd` includes action limits, relationship bounds, clue IDs, and anomaly phases.
+- `scripts/core/worldline_event_ledger.gd` provides a first event ledger separating events, world facts, character knowledge, and opportunities. Routine activities and conversations are recorded; older saves without this field remain compatible.
 - `tests/prototype_smoke_test.gd` covers time progression, anomaly triggering, action limits, NPC schedules, seven-location content coverage, clue de-duplication, relationship bounds, and save restoration in ordinary/anomaly/completed phases.
 - Bilingual playtest guides are in `docs/PLAYTEST_GUIDE_CN.md` and `docs/PLAYTEST_GUIDE_EN.md`.
 - **Important: code is on GitHub, but the current execution environment has no usable Godot executable; the expanded prototype and smoke tests have not been run in-engine.** The user's confirmation that an earlier version launched does not verify this expanded version.

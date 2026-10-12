@@ -457,6 +457,10 @@ func _test_worldline_ledger_rejects_inconsistent_save() -> void:
 	invalid_data["events"][0]["fact_ids"] = ["missing_fact"]
 	assert(not protected.load_save_data(invalid_data))
 	assert(protected.event_ids.has("existing"))
+	invalid_data = source.to_save_data()
+	invalid_data["events"][0]["event_id"] = 123
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
 
 
 func _test_worldline_information_network() -> void:
@@ -514,6 +518,10 @@ func _test_worldline_information_network() -> void:
 	assert(protected_network.get_inbox("merchant").size() == 2)
 	invalid_data = network.to_save_data()
 	invalid_data["messages"][0]["sent_tick"] = "2"
+	assert(not protected_network.load_save_data(invalid_data))
+	assert(protected_network.get_inbox("merchant").size() == 2)
+	invalid_data = network.to_save_data()
+	invalid_data["messages"][0]["fact_id"] = 42
 	assert(not protected_network.load_save_data(invalid_data))
 	assert(protected_network.get_inbox("merchant").size() == 2)
 	invalid_data = network.to_save_data()

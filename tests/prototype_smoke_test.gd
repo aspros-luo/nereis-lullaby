@@ -7,6 +7,7 @@ const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manag
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const MainScript = preload("res://scripts/ui/main.gd")
 const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
+const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
 
 func _initialize() -> void:
 	_test_time_progression_and_anomaly()
@@ -19,6 +20,7 @@ func _initialize() -> void:
 	_test_save_roundtrip()
 	_test_save_roundtrip_after_anomaly()
 	_test_worldline_ledger()
+	_test_worldline_information_network()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -216,3 +218,32 @@ func _test_worldline_ledger() -> void:
 	invalid_data["character_knowledge"] = "corrupt"
 	assert(not protected_ledger.load_save_data(invalid_data))
 	assert(protected_ledger.event_ids.has("existing"))
+
+
+func _test_worldline_information_network() -> void:
+	var ledger = WorldlineLedgerScript.new()
+	assert(ledger.record_event("source_observation", "lullaby", "mite", "observe_forest", "FOREST", ["forest_oddity"]))
+	assert(ledger.record_event("merchant_hears", "lullaby", "merchant", "hear_report", "COMMONS"))
+	var network = InformationNetworkScript.new()
+	assert(network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
+	assert(not network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
+	assert(network.advance_to(4) == 0)
+	assert(network.get_inbox("merchant").is_empty())
+	assert(not ledger.character_knows("merchant", "forest_oddity"))
+	assert(network.advance_to(5) == 1)
+	assert(network.get_inbox("merchant").size() == 1)
+	assert(network.get_belief_confidence("merchant", "forest_oddity") > 0.0)
+	assert(network.get_belief_confidence("merchant", "forest_oddity") < 0.8)
+	# Receipt creates a report and tentative belief, not objective knowledge.
+	assert(not ledger.character_knows("merchant", "forest_oddity"))
+	assert(network.advance_to(5) == 0)
+	var restored = InformationNetworkScript.new()
+	assert(restored.load_save_data(network.to_save_data()))
+	assert(restored.get_inbox("merchant").size() == 1)
+	assert(is_equal_approx(restored.get_belief_confidence("merchant", "forest_oddity"), network.get_belief_confidence("merchant", "forest_oddity")))
+	var protected_network = InformationNetworkScript.new()
+	assert(protected_network.load_save_data(network.to_save_data()))
+	var invalid_data: Dictionary = network.to_save_data()
+	invalid_data["messages"] = "corrupt"
+	assert(not protected_network.load_save_data(invalid_data))
+	assert(protected_network.get_inbox("merchant").size() == 1)

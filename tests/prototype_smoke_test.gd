@@ -483,6 +483,12 @@ func _test_worldline_information_network() -> void:
 	assert(broken_ledger.load_save_data(ledger.to_save_data()))
 	broken_ledger.event_ids.erase("lullaby.message.delivered.rumor_1")
 	assert(not ui_logic._network_references_are_valid(restored, broken_ledger))
+	# A source event must actually support the fact being transmitted, not merely exist.
+	var original_source_event: String = str(restored.messages[0]["source_event_id"])
+	restored.messages[0]["source_event_id"] = "merchant_hears"
+	assert(not ui_logic._network_references_are_valid(restored, ledger))
+	restored.messages[0]["source_event_id"] = original_source_event
+	assert(ui_logic._network_references_are_valid(restored, ledger))
 	var protected_network = InformationNetworkScript.new()
 	assert(protected_network.load_save_data(network.to_save_data()))
 	var invalid_data: Dictionary = network.to_save_data()

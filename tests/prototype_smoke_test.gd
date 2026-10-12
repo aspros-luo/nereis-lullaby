@@ -138,18 +138,21 @@ func _test_alternate_clue_routes() -> void:
 	var sleep_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("CLINIC", 4, no_clues)
 	assert(sleep_clue.get("id", "") == "day3_similar_sleep_reports")
 	var custom_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("HOME", 5, no_clues)
-	assert(custom_clue.get("id", "") == "day4_caregiver_custom")
+	assert(custom_clue.get("id", "") == "day4_caregiver_custom_observed")
 	assert(ui_logic._get_alternate_clue_for_observation("HOME", 4, no_clues).is_empty())
 	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 3, no_clues).is_empty())
 
 	var shrine_custom: Dictionary = ui_logic._get_shrine_observation_fact(5, no_clues)
-	assert(shrine_custom.get("id", "") == "day4_worship_custom")
+	assert(shrine_custom.get("id", "") == "day4_worship_custom_observed")
+	var seen_observed_custom: Dictionary = {"day4_worship_custom_observed": true}
+	var shrine_object_after_observed: Dictionary = ui_logic._get_shrine_observation_fact(5, seen_observed_custom)
+	assert(shrine_object_after_observed.get("id", "") == "day5_repeated_object_shrine")
 	assert(ui_logic._get_shrine_observation_fact(4, no_clues).is_empty())
 	var seen_public_custom: Dictionary = {"day4_worship_custom": true}
 	var shrine_object: Dictionary = ui_logic._get_shrine_observation_fact(5, seen_public_custom)
 	assert(shrine_object.get("id", "") == "day5_repeated_object_shrine")
 	var seen_both_shrine_facts: Dictionary = {
-		"day4_worship_custom": true,
+		"day4_worship_custom_observed": true,
 		"day5_repeated_object_shrine": true,
 	}
 	assert(ui_logic._get_shrine_observation_fact(5, seen_both_shrine_facts).is_empty())

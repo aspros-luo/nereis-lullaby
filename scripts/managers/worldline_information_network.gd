@@ -38,7 +38,9 @@ func publish_message(
 		if str(event.get("event_id", "")) == source_event_id:
 			source_event = event
 			break
-	if not ledger.character_knows(sender_id, fact_id) and str(source_event.get("actor_id", "")) != sender_id:
+	var source_facts: Variant = source_event.get("fact_ids", [])
+	var sender_has_source: bool = str(source_event.get("actor_id", "")) == sender_id and source_facts is Array and source_facts.has(fact_id)
+	if not ledger.character_knows(sender_id, fact_id) and not sender_has_source:
 		return false
 	var message := {
 		"message_id": message_id,
@@ -52,6 +54,7 @@ func publish_message(
 		"source_event_id": source_event_id,
 		"status": "pending",
 	}
+	self.current_tick = maxi(self.current_tick, current_tick)
 	messages.append(message)
 	message_ids[message_id] = true
 	return true
@@ -144,6 +147,8 @@ func load_save_data(data: Dictionary) -> bool:
 			return false
 		if str(message.get("status", "")) == "delivered":
 			if not message.has("delivered_tick") or int(message["delivered_tick"]) < int(message["arrival_tick"]):
+				return false
+			if int(message["delivered_tick"]) > raw_current_tick:
 				return false
 		elif int(message.get("arrival_tick", -1)) < raw_current_tick:
 			return false

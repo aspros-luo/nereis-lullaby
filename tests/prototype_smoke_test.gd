@@ -229,17 +229,18 @@ func _test_worldline_information_network() -> void:
 	var network = InformationNetworkScript.new()
 	assert(network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
 	assert(not network.publish_message("rumor_1", "forest_oddity", "mite", "merchant", "conversation", 2, 0.8, 3, "source_observation", ledger))
-	assert(network.advance_to(4) == 0)
+	assert(network.advance_to(4, ledger) == 0)
 	assert(network.get_inbox("merchant").is_empty())
 	assert(not ledger.character_knows("merchant", "forest_oddity"))
-	assert(network.advance_to(5) == 1)
+	assert(network.advance_to(5, ledger) == 1)
 	assert(network.get_inbox("merchant").size() == 1)
+	assert(ledger.event_ids.has("lullaby.message.delivered.rumor_1"))
 	assert(network.get_belief_confidence("merchant", "forest_oddity") > 0.0)
 	assert(network.get_belief_confidence("merchant", "forest_oddity") < 0.8)
 	# Receipt creates a report and tentative belief, not objective knowledge.
 	assert(not ledger.character_knows("merchant", "forest_oddity"))
-	assert(network.advance_to(5) == 0)
-	assert(network.advance_to(4) == 0) # Time cannot move backwards.
+	assert(network.advance_to(5, ledger) == 0)
+	assert(network.advance_to(4, ledger) == 0) # Time cannot move backwards.
 	var restored = InformationNetworkScript.new()
 	assert(restored.load_save_data(network.to_save_data()))
 	assert(restored.get_inbox("merchant").size() == 1)

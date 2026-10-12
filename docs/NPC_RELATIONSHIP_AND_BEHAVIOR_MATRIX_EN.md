@@ -102,6 +102,50 @@ The prototype does not need frame-by-frame simulation. Update discretely when ti
 
 Ordinary NPCs are not “illogical”; they use lower-cost, explainable logic. Simulate an individual in greater detail only when they enter the narrative focus, are contacted by the player, or affect a key event.
 
+## 6.1 Key actors across regions: influence matrix (proposal)
+
+These five roles occupy different causal nodes. This defines design responsibilities, not finalized plot facts.
+
+| Actor | Resource / leverage | Information sources | Possible downstream effects | Limits |
+|---|---|---|---|---|
+| Hero | First-hand experience, investigation, combat, personal choices | Direct observation, evidence, explicit reports | Discoveries, faction contact, action outcomes | Does not read global truth; the player chooses whether to act |
+| Village cult priest | Local followers, ritual schedule, local anomalies | Participants and personal observation | Villager behavior, anomaly accumulation, chance of discovery | Cannot directly command the Church; reports and decisions must connect the steps |
+| Traveling merchant | Movement, trade network, rumor channels | Travel, customers, other travelers | Message access, encounters, location clues, rumor reliability | Not omniscient; messages may be late, incomplete, distorted, or self-interested |
+| Church clerk | Records, report routing, administrative process | Official documents and work-related conversations | Escalation timing, investigation windows, movement of resources | Limited discretion; cannot dictate senior decisions |
+| Restoration Army quartermaster | Supply stock, route feasibility, local operations | Supply records, assigned unit, direct observation, trusted reports | Supply allocation, route advice, preparation and timing | Cannot decide strategy alone; must respect resources and command |
+
+### Causal network (candidate edges)
+
+```mermaid
+flowchart TD
+    M["Mite's daily choices"] --> P["Village priest"]
+    M --> T["Traveling merchant"]
+    P --> C["Church clerk"]
+    T --> C
+    T --> Q["Restoration Army quartermaster"]
+    H["Hero's observable actions"] --> T
+    H --> Q
+    C --> CH["Church investigation / deployment decision"]
+    CH --> H
+    Q --> RA["Supply / route decision"]
+    RA --> H
+```
+
+Arrows mean **possible influence**, not guaranteed outcomes. Each edge needs a source event, sender, travel delay, credibility, receiver authority, possible response, and visible feedback.
+
+### Why minor officials matter
+
+Their influence should come from limited discretion at critical points, not implausible authority. A merchant may bring an unverified report; the quartermaster compares it with supply use and known route risks, then recommends a change. A superior may accept or reject it. The result may shift a unit's route or arrival time, later intersecting with Hero's actions. A clerk can similarly affect when a report is filed, categorized, reviewed, or seen—but cannot independently summon an army.
+
+### Information rules
+
+- A fact occurring does not mean every faction knows it.
+- Hearing a message does not mean believing it.
+- Belief does not guarantee action; duty, resources, risk, and command matter.
+- An action does not guarantee the intended result.
+- Show consequences through changed routes, delayed arrivals, altered records, dialogue, or missing opportunities.
+- Mite may unknowingly start a causal chain without understanding its kingdom-wide consequences.
+
 ## 7. Relationships are not one affection score
 
 Use independent dimensions for important relationships, initially hidden from the player:

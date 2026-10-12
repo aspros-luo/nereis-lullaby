@@ -10,6 +10,7 @@ Villagers should continue observable daily routines when the player is not talki
 - Choices use the character card's action preferences, current time period, relationship value, and their own inbox size. Only actions matching the card's preference tags are eligible; the simulation does not read global hidden truths.
 - Identical inputs produce identical choices, making regression tests reproducible.
 - A stronger Mite–caregiver relationship prioritizes checking on Mite; a doctor with incoming messages prioritizes reviewing records. These are prototype rules, not finalized character canon.
+- Characters consider their own previous action and generally avoid mechanically repeating the same routine in consecutive periods; this is a preference, not an absolute ban, and relationship/message inputs may change priorities.
 - Every autonomous action creates a unique worldline event containing actor, action, tick, and scheduled location.
 - The latest action is stored in the existing game-state flags and is therefore included in the existing save format.
 - Day changes and the anomaly transition are authored beats; autonomous behavior cannot overwrite them.

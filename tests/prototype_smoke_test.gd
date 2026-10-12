@@ -106,10 +106,15 @@ func _test_anomaly_observation_callbacks() -> void:
 	assert(ui_logic.clue_journal.add_fact(
 		"forest_flower_observation", "Forest flowers", "Previously observed", 2, "早晨", "林间小径"
 	))
+	assert(ui_logic.clue_journal.add_fact(
+		"day5_repeated_object_commons", "Commons preparation", "Previously observed", 5, "白天", "公共空间"
+	))
 	assert(not ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("COMMONS").is_empty())
 	assert(not ui_logic._get_anomaly_observation_followup("CLINIC").is_empty())
 	assert(not ui_logic._get_anomaly_observation_followup("FOREST").is_empty())
 	assert(not ui_logic._get_anomaly_observation_followup("GROVE").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("PATH").is_empty())
 	assert(ui_logic._get_anomaly_observation_followup("HOME").is_empty())
 
 

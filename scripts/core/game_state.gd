@@ -144,6 +144,8 @@ func load_save_data(data: Dictionary) -> bool:
 	var saved_flags: Dictionary = saved_flags_value
 	if saved_flags.has("post_anomaly_talked") and not (saved_flags["post_anomaly_talked"] is Dictionary):
 		return false
+	if saved_flags.has("personal_moments_seen") and not (saved_flags["personal_moments_seen"] is Dictionary):
+		return false
 	for visited_location in saved_visits_value:
 		if not (visited_location is String):
 			return false

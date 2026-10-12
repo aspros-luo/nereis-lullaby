@@ -59,26 +59,49 @@ func publish_message(
 	message_ids[message_id] = true
 	return true
 
-## Delivers all due messages in send order; repeated calls are safe.
+## Deliver due messages only when the ledger can record matching provenance.
+## 只有台账能够记录匹配的来源时才送达消息，避免收件箱与事件台账分叉。
 func advance_to(tick: int, ledger = null) -> int:
 	if tick < current_tick:
 		return 0
+	var due_indices: Array[int] = []
+	for index in range(messages.size()):
+		var candidate: Dictionary = messages[index]
+		if str(candidate.get("status", "")) == "pending" and int(candidate.get("arrival_tick", -1)) <= tick:
+			due_indices.append(index)
+	# Preflight the whole batch before mutating either subsystem.
+	for index in due_indices:
+		if ledger == null:
+			return 0
+		var candidate: Dictionary = messages[index]
+		var fact_id: String = str(candidate.get("fact_id", ""))
+		var source_event_id: String = str(candidate.get("source_event_id", ""))
+		if not ledger.has_fact(fact_id) or not _event_supports_fact(ledger, source_event_id, fact_id):
+			return 0
+		var delivery_event_id := "lullaby.message.delivered." + str(candidate.get("message_id", ""))
+		if ledger.event_ids.has(delivery_event_id):
+			if not _event_supports_fact(ledger, delivery_event_id, fact_id):
+				return 0
+			var existing_event: Dictionary = _find_event(ledger, delivery_event_id)
+			if str(existing_event.get("actor_id", "")) != str(candidate.get("receiver_id", "")) or str(existing_event.get("action_id", "")) != "receive_message":
+				return 0
 	current_tick = tick
 	var delivered_count := 0
-	for index in range(messages.size()):
+	for index in due_indices:
 		var message: Dictionary = messages[index]
-		if str(message.get("status", "")) != "pending" or int(message.get("arrival_tick", -1)) > tick:
-			continue
 		var receiver_id: String = str(message["receiver_id"])
+		var fact_id: String = str(message["fact_id"])
 		var delivery_event_id := "lullaby.message.delivered." + str(message["message_id"])
-		if ledger != null and not ledger.event_ids.has(delivery_event_id):
-			ledger.record_event(delivery_event_id, "lullaby", receiver_id, "receive_message", "", [str(message["fact_id"])])
+		if not ledger.event_ids.has(delivery_event_id):
+			if not ledger.record_event(delivery_event_id, "lullaby", receiver_id, "receive_message", "", [fact_id]):
+				# Preflight makes this an exceptional race/corruption path; never fake delivery.
+				continue
 		if not inboxes.has(receiver_id):
 			inboxes[receiver_id] = []
 		var inbox: Array = inboxes[receiver_id]
 		inbox.append({
 			"message_id": message["message_id"],
-			"fact_id": message["fact_id"],
+			"fact_id": fact_id,
 			"sender_id": message["sender_id"],
 			"channel": message["channel"],
 			"credibility": message["credibility"],
@@ -90,7 +113,6 @@ func advance_to(tick: int, ledger = null) -> int:
 		if not beliefs.has(receiver_id):
 			beliefs[receiver_id] = {}
 		var receiver_beliefs: Dictionary = beliefs[receiver_id]
-		var fact_id: String = str(message["fact_id"])
 		var previous_confidence := float(receiver_beliefs.get(fact_id, 0.0))
 		var incoming_confidence := float(message["credibility"])
 		# Independent reports can strengthen a belief, but never make it certain.
@@ -101,6 +123,17 @@ func advance_to(tick: int, ledger = null) -> int:
 		messages[index] = message
 		delivered_count += 1
 	return delivered_count
+
+func _event_supports_fact(ledger, event_id: String, fact_id: String) -> bool:
+	var event: Dictionary = _find_event(ledger, event_id)
+	var fact_ids: Variant = event.get("fact_ids", [])
+	return not event.is_empty() and fact_ids is Array and fact_ids.has(fact_id)
+
+func _find_event(ledger, event_id: String) -> Dictionary:
+	for event in ledger.events:
+		if str(event.get("event_id", "")) == event_id:
+			return event
+	return {}
 
 func get_inbox(character_id: String) -> Array:
 	return (inboxes.get(character_id, []) as Array).duplicate(true)

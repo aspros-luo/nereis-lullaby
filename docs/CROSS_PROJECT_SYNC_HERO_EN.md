@@ -53,3 +53,8 @@ Whenever either project adds a major plot event, item, character-knowledge fact,
 ## 6. Scope
 
 This file is a cross-project synchronization memo. It does not approve new ending details, ritual mechanics, or character fates, and does not replace either game's design contracts.
+
+
+## 7. Cross-project design tension to track
+
+Lullaby's `DESIGN_CONTRACTS_CN.md` explicitly separates relationship progression from investigation and says physical union or a single intimate event should not become a hard gate for a main ending. Hero's current implementation uses `physical_union_complete` as one requirement for the H08 deep exit. These are initially game-specific gameplay contracts and must not be copied mechanically across projects. If the event is later defined as the same shared historical event in both games, revisit causality and character knowledge; Lullaby's main endings must not become indirectly locked by a single Hero event. This is marked for continued review, not as an unauthorized change to either game's design.

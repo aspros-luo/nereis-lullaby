@@ -6,6 +6,7 @@ const GameStateScript = preload("res://scripts/core/game_state.gd")
 const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const MainScript = preload("res://scripts/ui/main.gd")
+const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
 
 func _initialize() -> void:
 	_test_time_progression_and_anomaly()
@@ -17,6 +18,7 @@ func _initialize() -> void:
 	_test_relationship_bounds()
 	_test_save_roundtrip()
 	_test_save_roundtrip_after_anomaly()
+	_test_worldline_ledger()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -166,3 +168,51 @@ func _test_location_content_coverage() -> void:
 		assert(MainScript.ACTIVITY_LABELS.has(location_id))
 	for day in range(2, 8):
 		assert(MainScript.DAY_OPENING_TEXT.has(day))
+
+
+func _test_worldline_ledger() -> void:
+	var ledger = WorldlineLedgerScript.new()
+	assert(ledger.record_event(
+		"lullaby.activity.day5.slot1.activity_forest",
+		"lullaby",
+		"mite",
+		"activity_forest",
+		"FOREST",
+		["forest_flower_picked"]
+	))
+	assert(not ledger.record_event(
+		"lullaby.activity.day5.slot1.activity_forest",
+		"lullaby",
+		"mite",
+		"activity_forest",
+		"FOREST",
+		["forest_flower_picked"]
+	))
+	assert(ledger.has_fact("forest_flower_picked"))
+	assert(not ledger.character_knows("hero", "forest_flower_picked"))
+	assert(ledger.grant_knowledge(
+		"hero",
+		"forest_flower_picked",
+		"lullaby.activity.day5.slot1.activity_forest",
+		"direct_observation"
+	))
+	assert(ledger.character_knows("hero", "forest_flower_picked"))
+	assert(ledger.set_opportunity(
+		"forest_investigation",
+		true,
+		"lullaby.activity.day5.slot1.activity_forest"
+	))
+	assert(ledger.is_opportunity_open("forest_investigation"))
+
+	var restored = WorldlineLedgerScript.new()
+	assert(restored.load_save_data(ledger.to_save_data()))
+	assert(restored.has_fact("forest_flower_picked"))
+	assert(restored.character_knows("hero", "forest_flower_picked"))
+	assert(restored.is_opportunity_open("forest_investigation"))
+
+	var protected_ledger = WorldlineLedgerScript.new()
+	assert(protected_ledger.record_event("existing", "lullaby", "mite", "observe", "HOME"))
+	var invalid_data: Dictionary = ledger.to_save_data()
+	invalid_data["character_knowledge"] = "corrupt"
+	assert(not protected_ledger.load_save_data(invalid_data))
+	assert(protected_ledger.event_ids.has("existing"))

@@ -10,6 +10,12 @@ Before any new conversation or development task, read this file and its Chinese 
 ## Cross-project narrative sync (required)
 Before continuing work on plot, NPCs, clues, or world state, check the latest commit on Hero's `development` branch and follow the [Cross-Project Narrative Sync Ledger](CROSS_PROJECT_STORY_SYNC_CN_EN.md). The games have independent gameplay but compatible worldbuilding; newer explicit user decisions override older docs. Ending directions remain open, and Hero endings must not require physical union with Mite.
 
+## Relationship and autonomous behavior baseline
+- See `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_CN.md` / `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_EN.md` for the NPC relationship and behavior design.
+- The matrix is **not complete**: only prototype contact types between Mite and the three key NPCs exist; many NPC-to-NPC ties remain open.
+- Key NPCs use individual goals, memory, knowledge boundaries, relationship dimensions, and stress responses; ordinary NPCs use lightweight schedule/goal templates; background residents use group simulation.
+- NPCs learn events only through plausible channels. Never sync the player's clue journal to all characters automatically. Keep relationship, investigation, and world state separate.
+
 ## Project boundary
 This repository is only for Nereis Lullaby: daily-life simulation + free exploration + visual novel. Do not mix in Nereis-Hero's side-scrolling action-RPG code or systems.
 

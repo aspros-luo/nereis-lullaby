@@ -511,6 +511,7 @@ func _test_location_content_coverage() -> void:
 
 func _test_worldline_ledger() -> void:
 	var ledger = WorldlineLedgerScript.new()
+	assert(ledger.record_event("unrelated_existing_event", "lullaby", "doctor", "review_records", "CLINIC"))
 	assert(ledger.record_event(
 		"lullaby.activity.day5.slot1.activity_forest",
 		"lullaby",

@@ -64,7 +64,7 @@ The following scenarios test the design, but are not finalized story or ending c
 2. Those traces affect another character only after that character observes, hears about, or reasonably infers them.
 3. Hero may investigate the forest. In *Lullaby*, the player may avoid, discourage, or alter related interactions out of concern; this may weaken motivation, delay the investigation, or leave an evidence chain incomplete.
 4. Whether Hero investigates deeply and obtains a particular key item must be determined by *Hero*'s exploration, conditions, and recoverable evidence paths.
-5. “The third umbilical cord” is only a candidate key item from the user's example. Its role, acquisition requirements, and relationship to any ending remain undecided.
+5. “The third umbilical cord” is a key item in the user's example. Hero's current story baseline already connects a multi-part hidden artifact with retaining Hero's agency and the 烈火天罚 route. What remains open is its exact acquisition path across both games, the forest investigation's precise role, and whether missing it makes a route harder or unavailable. These unresolved details must not become hardcoded gameplay conditions yet.
 
 These paths illustrate the division: Lullaby affects **information, motivation, contact, and opportunity**; Hero decides **how to respond to opportunities and bear the consequences**.
 
@@ -94,7 +94,7 @@ Avoid using “worldline +1” as the main feedback. Internal values may be usef
 
 ## 7. Guardrails
 
-- Do not promote examples to canon automatically, especially the relationship among the restoration army, forest investigation, third umbilical cord, and endings.
+- Do not automatically promote examples to canon. How restoration-army news changes access, and how forest investigation affects artifact acquisition, still needs cross-project design. Follow Hero's current story baseline: 凡人之墓 has no physical union; 永恒乐园 and 烈火天罚 both involve physical union but lead to different outcomes.
 - Not every routine action must affect the main plot. Worldline changes need thresholds, transmission channels, and plausible accumulation.
 - A key event may be missed, but important facts should generally leave a costlier, less informative, or riskier alternate path unless an irreversible tragedy is explicitly intended.
 - Mite's kindness and innocence are genuine. Kindness may have complex consequences, but the system must not imply that she knowingly orchestrates everything.
@@ -113,4 +113,4 @@ Avoid using “worldline +1” as the main feedback. Internal values may be usef
 
 ## 9. Current Status
 
-This document defines a dual-perspective causal contract and non-canon examples. **The example plot, third umbilical cord, and ending bindings have not been added to gameplay code.** The NPC autonomous behavior simulator is not implemented, and Godot engine tests have not been run.
+This document defines a dual-perspective causal contract and non-canon examples. **The example plot, exact third-umbilical-cord acquisition conditions, and cross-game ending bindings have not been added to Lullaby gameplay code.** Follow the existing Hero story baseline for broad ending identities; the cross-game trigger conditions remain open. The NPC autonomous behavior simulator is not implemented, and Godot engine tests have not been run.

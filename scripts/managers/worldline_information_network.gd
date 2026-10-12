@@ -174,12 +174,29 @@ func load_save_data(data: Dictionary) -> bool:
 					break
 			if str(matched_message.get("status", "")) != "delivered" or str(matched_message.get("receiver_id", "")) != str(character_id):
 				return false
+			# The inbox is a projection of the delivered message, not an independent source of truth.
+			for field in ["fact_id", "sender_id", "channel", "source_event_id"]:
+				if not entry.has(field) or str(entry[field]) != str(matched_message.get(field, "")):
+					return false
+			if not entry.has("credibility") or not is_equal_approx(float(entry["credibility"]), float(matched_message.get("credibility", -1.0))):
+				return false
+			if not entry.has("delivery_event_id") or str(entry["delivery_event_id"]) != "lullaby.message.delivered." + inbox_message_id:
+				return false
+			if not entry.has("received_tick") or int(entry["received_tick"]) != int(matched_message.get("delivered_tick", -1)):
+				return false
 	for character_id in raw_beliefs:
 		if not (raw_beliefs[character_id] is Dictionary):
 			return false
 		for fact_id in raw_beliefs[character_id]:
 			var confidence := float(raw_beliefs[character_id][fact_id])
-			if confidence < 0.0 or confidence > 0.95:
+			if str(fact_id).strip_edges().is_empty() or not is_finite(confidence) or confidence < 0.0 or confidence > 0.95:
+				return false
+			var has_delivered_evidence := false
+			for inbox_entry in raw_inboxes.get(character_id, []):
+				if str(inbox_entry.get("fact_id", "")) == str(fact_id):
+					has_delivered_evidence = true
+					break
+			if not has_delivered_evidence:
 				return false
 	for saved_message in rebuilt_messages:
 		if str(saved_message.get("status", "")) == "delivered" and not inbox_message_ids.has(str(saved_message.get("message_id", ""))):

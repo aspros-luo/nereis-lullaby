@@ -145,6 +145,9 @@ func load_save_data(data: Dictionary) -> bool:
 			return false
 		if int(message.get("sent_tick", -1)) < 0 or int(message.get("arrival_tick", -1)) < int(message.get("sent_tick", -1)):
 			return false
+		# A message cannot originate after the network's own saved clock.
+		if int(message["sent_tick"]) > raw_current_tick:
+			return false
 		if str(message.get("status", "")) == "delivered":
 			if not message.has("delivered_tick") or int(message["delivered_tick"]) < int(message["arrival_tick"]):
 				return false

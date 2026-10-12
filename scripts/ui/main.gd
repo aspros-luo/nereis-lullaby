@@ -4,6 +4,7 @@ extends Control
 const GameStateScript = preload("res://scripts/core/game_state.gd")
 const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
+const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
 
 const LOCATION_ORDER: Array[String] = [
 	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
@@ -76,6 +77,7 @@ const LOCATION_DESCRIPTIONS: Dictionary = {
 var game_state
 var schedule_manager
 var clue_journal
+var worldline_ledger
 
 var status_label: Label
 var objective_label: Label
@@ -99,6 +101,7 @@ func _ready() -> void:
 	game_state = GameStateScript.new()
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
+	worldline_ledger = WorldlineLedgerScript.new()
 	_apply_visual_style()
 	_build_ui()
 	_refresh_ui()
@@ -501,6 +504,11 @@ func _do_daily_activity() -> void:
 		"GROVE":
 			activity_text = "我在空地上坐了一会儿，听树叶和鸟儿的声音。"
 	if game_state.take_action(action_id, activity_text):
+		var fact_ids: Array = []
+		if game_state.current_location == "FOREST":
+			fact_ids.append("forest_flower_picked")
+		var event_id := "lullaby.activity.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, action_id]
+		worldline_ledger.record_event(event_id, "lullaby", "mite", action_id, game_state.current_location, fact_ids)
 		message_label.text = activity_text
 	_refresh_ui()
 
@@ -563,6 +571,13 @@ func _talk_to_npc(npc_id: String) -> void:
 	else:
 		talked_after_anomaly[npc_id] = true
 		game_state.world_state["flags"]["post_anomaly_talked"] = talked_after_anomaly
+	var talk_event_id := "lullaby.talk.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, npc_id]
+	var known_fact_ids: Array = []
+	if fact_added:
+		for entry in clue_journal.get_entries():
+			if str(entry.get("day", -1)) == str(game_state.day_index) and str(entry.get("slot", "")) == game_state.get_slot_label():
+				known_fact_ids.append(str(entry.get("id", "")))
+	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location, known_fact_ids)
 	message_label.text = reply
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"
@@ -666,6 +681,7 @@ func _save_game() -> void:
 	config.set_value("save", "version", 1)
 	config.set_value("save", "game_state", game_state.to_save_data())
 	config.set_value("save", "clue_entries", clue_journal.get_entries())
+	config.set_value("save", "worldline_ledger", worldline_ledger.to_save_data())
 	var error: Error = config.save(SAVE_PATH)
 	if error == OK:
 		message_label.text = "进度已保存。下次启动游戏后，可以读取这份记录继续游玩。"
@@ -698,6 +714,13 @@ func _load_game() -> void:
 	game_state = restored_state
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
+	var saved_ledger: Variant = config.get_value("save", "worldline_ledger", {})
+	var restored_ledger = WorldlineLedgerScript.new()
+	if saved_ledger is Dictionary and not saved_ledger.is_empty():
+		if not restored_ledger.load_save_data(saved_ledger):
+			message_label.text = "存档中的世界线事件记录无效，当前进度没有改变。"
+			return
+	worldline_ledger = restored_ledger
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if saved_entries is Array:
 		var saved_entries_array: Array = saved_entries
@@ -715,5 +738,6 @@ func _restart_demo() -> void:
 	game_state = GameStateScript.new()
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
+	worldline_ledger = WorldlineLedgerScript.new()
 	message_label.text = "新的一天开始了。我先在村子里走走。"
 	_refresh_ui()

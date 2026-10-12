@@ -812,7 +812,10 @@ func _load_game() -> void:
 	_refresh_ui()
 
 func _finish_demo() -> void:
-	game_state.complete_demo()
+	if not game_state.complete_demo():
+		message_label.text = "还需要回访至少三个不同地点，才能结束这一段日常。"
+		_refresh_ui()
+		return
 	var clue_count: int = clue_journal.get_entries().size()
 	message_label.text = "夜色渐渐沉下来。有人问我今天过得怎么样，我说不出发生过什么大事。可当我把一路上看见的细节重新想了一遍，它们又像是没有完全对上。也许只是我太累了。\n\n这一段日常暂时结束了：我记录了 %d 条线索，回访了 %d 个地点。线索只是我见过的事情，还不能说明它们为什么发生。" % [clue_count, game_state.investigation_state["visited_after_anomaly"].size()]
 	_refresh_ui()

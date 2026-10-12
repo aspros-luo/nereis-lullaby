@@ -23,7 +23,7 @@
 ## Current code baseline
 - Implemented: 7 locations, 7 days × 3 slots, 3 key NPCs, action economy, schedules, scalar relationships, clue journal, phase anomaly, post-anomaly investigation, and a single-slot save.
 - Implemented: event ledger, explicit knowledge grants, delayed information transfer, and an initial deterministic NPC routine selector.
-- New protection: ledger loading validates required event fields, fact/first-event consistency, and all event-referenced facts; clue-journal loading now validates entries atomically and rejects duplicate IDs or missing fields.
+- New protection: ledger loading validates required event fields, fact/first-event consistency, and all event-referenced facts; clue-journal loading now validates entries atomically and rejects duplicate IDs, missing fields, or non-string text fields.
 - Core-state loading also rejects invalid locations, duplicate/unknown anomaly visits, missing anomaly flags, duplicate clue IDs, and malformed action history; completion requires visits to three distinct locations.
 - Information-network loading checks inbox/delivered-message consistency, evidence for beliefs, and credibility bounds; the main flow verifies that source and delivery events actually contain each referenced fact and rejects a network clock later than game time. Version 2 saves must contain every required section, and the version field no longer accepts implicit coercion such as strings.
 - Not yet accepted: actual execution in Godot 4.6.1, full UI playtesting, and real save-file recovery after process restart.

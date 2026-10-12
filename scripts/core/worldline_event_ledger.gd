@@ -88,40 +88,70 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	if not (raw_knowledge is Dictionary) or not (raw_opportunities is Dictionary):
 		return false
+
 	var rebuilt_events: Array[Dictionary] = []
 	var rebuilt_ids: Dictionary = {}
+	var event_facts: Dictionary = {}
 	for raw_event in raw_events:
 		if not (raw_event is Dictionary):
 			return false
 		var event: Dictionary = raw_event
 		var event_id: String = str(event.get("event_id", ""))
-		if event_id.is_empty() or rebuilt_ids.has(event_id):
+		if event_id.strip_edges().is_empty() or rebuilt_ids.has(event_id):
 			return false
-		if not (event.get("fact_ids", []) is Array):
+		for required_text in ["source_game", "actor_id", "action_id"]:
+			if str(event.get(required_text, "")).strip_edges().is_empty():
+				return false
+		var raw_event_facts: Variant = event.get("fact_ids", [])
+		if not (raw_event_facts is Array):
 			return false
-		rebuilt_events.append(event.duplicate(true))
+		var normalized_event_facts: Array[String] = []
+		for raw_fact_id in raw_event_facts:
+			if not (raw_fact_id is String) or raw_fact_id.strip_edges().is_empty():
+				return false
+			if not normalized_event_facts.has(raw_fact_id):
+				normalized_event_facts.append(raw_fact_id)
+		var normalized_event: Dictionary = event.duplicate(true)
+		normalized_event["fact_ids"] = normalized_event_facts
+		rebuilt_events.append(normalized_event)
 		rebuilt_ids[event_id] = true
-	for fact_id in raw_facts.keys():
-		if not (raw_facts[fact_id] is Dictionary):
+		event_facts[event_id] = normalized_event_facts
+
+	for fact_key in raw_facts.keys():
+		var fact_id: String = str(fact_key)
+		if fact_id.strip_edges().is_empty() or not (raw_facts[fact_key] is Dictionary):
 			return false
-		var first_event_id: String = str(raw_facts[fact_id].get("first_event_id", ""))
+		var first_event_id: String = str(raw_facts[fact_key].get("first_event_id", ""))
 		if not rebuilt_ids.has(first_event_id):
 			return false
+		if not event_facts[first_event_id].has(fact_id):
+			return false
+
+	# Every event-referenced fact must have a matching world-fact record.
+	for event_id in event_facts:
+		for fact_id in event_facts[event_id]:
+			if not raw_facts.has(fact_id):
+				return false
+
 	for character_id in raw_knowledge.keys():
 		if not (raw_knowledge[character_id] is Dictionary):
 			return false
 		for fact_id in raw_knowledge[character_id].keys():
 			if not raw_facts.has(fact_id) or not (raw_knowledge[character_id][fact_id] is Dictionary):
 				return false
-			var source_id: String = str(raw_knowledge[character_id][fact_id].get("source_event_id", ""))
-			if not rebuilt_ids.has(source_id):
+			var knowledge: Dictionary = raw_knowledge[character_id][fact_id]
+			var source_id: String = str(knowledge.get("source_event_id", ""))
+			if source_id.is_empty() or not rebuilt_ids.has(source_id) or str(knowledge.get("channel", "")).strip_edges().is_empty():
 				return false
+
 	for opportunity_id in raw_opportunities.keys():
-		if not (raw_opportunities[opportunity_id] is Dictionary):
+		if str(opportunity_id).strip_edges().is_empty() or not (raw_opportunities[opportunity_id] is Dictionary):
 			return false
 		var source_id: String = str(raw_opportunities[opportunity_id].get("source_event_id", ""))
-		if not rebuilt_ids.has(source_id):
+		if source_id.is_empty() or not rebuilt_ids.has(source_id) or not raw_opportunities[opportunity_id].has("is_open"):
 			return false
+
+	# Mutate only after all sections validate, so a failed load preserves the current ledger.
 	events = rebuilt_events
 	event_ids = rebuilt_ids
 	world_facts = raw_facts.duplicate(true)

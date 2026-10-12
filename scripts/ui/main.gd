@@ -470,21 +470,7 @@ func _advance_time() -> void:
 		game_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
-		var anomaly_fact_id := "day7_village_change"
-		var anomaly_event_id := "lullaby.anomaly.day7.evening"
-		worldline_ledger.record_event(
-			anomaly_event_id,
-			"lullaby",
-			"village",
-			"anomaly_bell",
-			game_state.current_location,
-			[anomaly_fact_id]
-		)
-		_add_fact(
-			anomaly_fact_id,
-			"一声从远处传来的鸣响",
-			"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。"
-		)
+		_record_village_anomaly()
 	elif game_state.day_index != previous_day:
 		message_label.text = str(DAY_OPENING_TEXT.get(game_state.day_index, "新的一天开始了。村里的人继续忙着各自的事。"))
 	else:
@@ -794,6 +780,22 @@ func _record_observation_event(fact_id: String) -> void:
 		"observe_" + game_state.current_location.to_lower(),
 		game_state.current_location,
 		[fact_id]
+	)
+
+func _record_village_anomaly() -> void:
+	var fact_id := "day7_village_change"
+	worldline_ledger.record_event(
+		"lullaby.anomaly.day7.evening",
+		"lullaby",
+		"village",
+		"anomaly_bell",
+		game_state.current_location,
+		[fact_id]
+	)
+	_add_fact(
+		fact_id,
+		"一声从远处传来的鸣响",
+		"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。"
 	)
 
 const SAVE_PATH: String = "user://nereis_lullaby_demo.cfg"

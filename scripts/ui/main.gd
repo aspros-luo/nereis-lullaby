@@ -476,23 +476,9 @@ func _advance_time() -> void:
 		staged_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 
 	var anomaly_started: bool = was_ordinary and staged_state.world_state["phase"] == "after_week"
-	if anomaly_started:
-		var anomaly_fact_id := "day7_village_change"
-		if not staged_ledger.record_event(
-			"lullaby.anomaly.day7.evening", "lullaby", "village",
-			"anomaly_bell", staged_state.current_location, [anomaly_fact_id]
-		):
-			message_label.text = "异变事件无法写入记录；时间没有改变。"
-			return
-		if not staged_journal.add_fact(
-			anomaly_fact_id, "一声从远处传来的鸣响",
-			"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。",
-			staged_state.day_index, staged_state.get_slot_label(),
-			schedule_manager.get_location_name(staged_state.current_location)
-		):
-			message_label.text = "异变线索无法安全保存；时间没有改变。"
-			return
-		staged_state.register_fact(anomaly_fact_id)
+	if anomaly_started and not _stage_village_anomaly(staged_state, staged_journal, staged_ledger):
+		message_label.text = "异变事件及线索无法安全提交；时间没有改变。"
+		return
 
 	# Publish the new timeline only after every required write succeeds.
 	game_state = staged_state
@@ -815,15 +801,6 @@ func _npc_is_present(npc_id: String) -> bool:
 		npc_id, game_state.day_index, game_state.slot_index
 	) == game_state.current_location
 
-func _add_fact(fact_id: String, title: String, detail: String) -> bool:
-	var added: bool = clue_journal.add_fact(
-		fact_id, title, detail, game_state.day_index, game_state.get_slot_label(),
-		schedule_manager.get_location_name(game_state.current_location)
-	)
-	if added:
-		game_state.register_fact(fact_id)
-	return added
-
 func _record_anomaly_clue_if_available(location_id: String) -> bool:
 	var fact_id := ""
 	var title := ""
@@ -861,15 +838,34 @@ func _record_anomaly_clue_if_available(location_id: String) -> bool:
 
 
 func _record_village_anomaly() -> void:
-	_commit_fact_with_event(
-		"day7_village_change",
-		"一声从远处传来的鸣响",
+	var staged_state = _copy_game_state(game_state)
+	var staged_journal = _copy_clue_journal(clue_journal)
+	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
+	if staged_state == null or staged_journal == null or staged_ledger == null:
+		return
+	if not _stage_village_anomaly(staged_state, staged_journal, staged_ledger):
+		return
+	game_state = staged_state
+	clue_journal = staged_journal
+	worldline_ledger = staged_ledger
+
+
+func _stage_village_anomaly(staged_state, staged_journal, staged_ledger) -> bool:
+	var fact_id := "day7_village_change"
+	if not staged_ledger.record_event(
+		"lullaby.anomaly.day7.evening", "lullaby", "village",
+		"anomaly_bell", staged_state.current_location, [fact_id]
+	):
+		return false
+	if not staged_journal.add_fact(
+		fact_id, "一声从远处传来的鸣响",
 		"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。",
-		"lullaby.anomaly.day7.evening",
-		"village",
-		"anomaly_bell",
-		game_state.current_location
-	)
+		staged_state.day_index, staged_state.get_slot_label(),
+		schedule_manager.get_location_name(staged_state.current_location)
+	):
+		return false
+	staged_state.register_fact(fact_id)
+	return true
 
 
 func _copy_game_state(source):

@@ -37,7 +37,7 @@
 - [x] Validate personal-moment, post-anomaly conversation, and last-NPC-action flags; require NPC action tick/day/slot values to agree and not exceed the game clock; reject completed-prologue saves without three distinct post-anomaly visits.
 - [x] Cross-check action history against time and action economy; reject future actions, duplicate ordinary-slot actions, and mismatched action-used flags; validate relationship value types, bounds, and character keys; reject implicit coercion of game clock, clue date, network clock, and message tick fields.
 - [x] Upgrade save format to version 2 and create explicit migration audit events for legacy version 1 clues lacking provenance.
-- [x] Record provenance events for observations and the Day 7 anomaly; defer dialogue-derived clues and relationship side effects until the primary action is accepted.
+- [x] Record provenance events for observations and the Day 7 anomaly; stage daily activities, NPC conversations, time advancement, autonomous NPC actions, clues, and information transfer in temporary subsystem copies before publishing the new runtime state.
 - [ ] Complete stable event IDs, trigger conditions, observable feedback, and alternate evidence for missable events.
 - [ ] Align event semantics with Nereis Hero; the two games remain independently runnable without runtime coupling.
 

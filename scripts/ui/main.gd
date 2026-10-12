@@ -589,6 +589,7 @@ func _talk_to_npc(npc_id: String) -> void:
 	var reply := _get_daily_dialogue(npc_id)
 	var fact_added := false
 	var reported_fact_ids: Array[String] = []
+	var pending_facts: Array[Dictionary] = []
 	var personal_moment: Dictionary = _get_available_personal_moment(npc_id)
 	if game_state.world_state["phase"] == "after_week":
 		match npc_id:
@@ -603,36 +604,47 @@ func _talk_to_npc(npc_id: String) -> void:
 	else:
 		if npc_id == "doctor" and game_state.day_index >= 3 and game_state.current_location == "CLINIC":
 			reported_fact_ids.append("day3_similar_sleep_reports")
-			fact_added = _add_fact(
-				"day3_similar_sleep_reports", "相似的睡眠困扰",
-				"医生提到有几位居民最近睡得不太好，也做过相似的梦。压力或普通疾病也可能造成这种情况。"
-			)
+			pending_facts.append({
+				"id": "day3_similar_sleep_reports",
+				"title": "相似的睡眠困扰",
+				"detail": "医生提到有几位居民最近睡得不太好，也做过相似的梦。压力或普通疾病也可能造成这种情况。",
+			})
 			reply = "医生提到最近有几位居民睡得不太好，但认为目前还不能确定原因。"
 		elif npc_id == "caregiver" and game_state.day_index >= 4 and game_state.current_location == "HOME":
 			reported_fact_ids.append("day4_caregiver_custom")
-			fact_added = _add_fact(
-				"day4_caregiver_custom", "关于习俗的日常解释",
-				"照料者把某项安排解释为村里沿用已久的生活习惯。她说得很自然，没有表现出自己在揭露秘密。"
-			)
+			pending_facts.append({
+				"id": "day4_caregiver_custom",
+				"title": "关于习俗的日常解释",
+				"detail": "照料者把某项安排解释为村里沿用已久的生活习惯。她说得很自然，没有表现出自己在揭露秘密。",
+			})
 			reply = "照料者说这只是村里一直沿用的习惯，还问我晚饭想吃什么。"
 		elif npc_id == "worship_leader" and game_state.day_index >= 4 and game_state.current_location == "SHRINE":
 			reported_fact_ids.append("day4_worship_custom")
-			fact_added = _add_fact(
-				"day4_worship_custom", "关于习俗的公共解释",
-				"礼拜主持者从公共传统和社区秩序的角度解释了类似安排。与另一种说法的差异值得比较，但并不能证明有人撒谎。"
-			)
+			pending_facts.append({
+				"id": "day4_worship_custom",
+				"title": "关于习俗的公共解释",
+				"detail": "礼拜主持者从公共传统和社区秩序的角度解释了类似安排。与另一种说法的差异值得比较，但并不能证明有人撒谎。",
+			})
 			reply = "礼拜主持者把类似安排解释为维护公共传统的一部分。"
 		if npc_id == "doctor" and game_state.day_index >= 6 and game_state.current_location == "CLINIC":
 			reported_fact_ids.append("day6_date_discrepancy")
-			fact_added = _add_fact(
-				"day6_date_discrepancy", "病患记得的日期并不一致",
-				"几位病患对不适开始的时间记忆不同。压力、记忆偏差或其他普通因素都可能解释差异。"
-			) or fact_added
+			pending_facts.append({
+				"id": "day6_date_discrepancy",
+				"title": "病患记得的日期并不一致",
+				"detail": "几位病患对不适开始的时间记忆不同。压力、记忆偏差或其他普通因素都可能解释差异。",
+			})
 			reply += " 医生还发现，几位病患记得的日期并不一致。"
 
 
 	if not game_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
 		return
+	# Apply dialogue-derived facts only after the action has been accepted.
+	for pending_fact in pending_facts:
+		fact_added = _add_fact(
+			str(pending_fact["id"]),
+			str(pending_fact["title"]),
+			str(pending_fact["detail"])
+		) or fact_added
 	if game_state.world_state["phase"] == "ordinary":
 		if not personal_moment.is_empty():
 			var seen_moments: Dictionary = game_state.world_state["flags"].get("personal_moments_seen", {})

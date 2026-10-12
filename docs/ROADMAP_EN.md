@@ -81,3 +81,5 @@
 - A message's source event must explicitly contain the transmitted fact, even if the sender already knows that fact from an earlier valid route.
 - Due messages are preflighted before delivery. If the ledger is missing, the source event does not support the fact, or a delivery-event ID is occupied by an incompatible event, the due batch is not applied. This prevents inbox/belief state from diverging from the event ledger.
 - Regression assertions were added; execution in local Godot 4.6.1 is still pending.
+
+- The main time-step and conversation transactions now verify that due messages were actually delivered; a provenance failure aborts the whole gameplay transaction instead of rolling back only the network subsystem.

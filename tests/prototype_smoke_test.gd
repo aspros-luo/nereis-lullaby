@@ -12,6 +12,7 @@ func _initialize() -> void:
 	_test_action_economy()
 	_test_npc_schedules_and_locations()
 	_test_location_content_coverage()
+	_test_personal_moment_coverage()
 	_test_clue_deduplication()
 	_test_relationship_bounds()
 	_test_save_roundtrip()
@@ -57,6 +58,16 @@ func _test_npc_schedules_and_locations() -> void:
 				assert(not schedules.get_location_name(location_id).is_empty())
 	assert(schedules.get_location_name("FOREST") == "林间小径")
 	assert(schedules.get_location_name("GROVE") == "林中空地")
+
+func _test_personal_moment_coverage() -> void:
+	for moment_id in MainScript.PERSONAL_MOMENTS:
+		var moment: Dictionary = MainScript.PERSONAL_MOMENTS[moment_id]
+		assert(["caregiver", "worship_leader", "doctor"].has(str(moment["npc_id"])))
+		assert(["HOME", "SHRINE", "CLINIC"].has(str(moment["location_id"])))
+		assert(int(moment["minimum_day"]) >= 1 and int(moment["minimum_day"]) <= 7)
+		assert(not str(moment["dialogue"]).is_empty())
+	assert(MainScript.PERSONAL_MOMENTS.size() >= 3)
+
 
 func _test_clue_deduplication() -> void:
 	var journal = ClueJournalScript.new()

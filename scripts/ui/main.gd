@@ -868,6 +868,9 @@ func _load_game() -> void:
 	if not _state_journal_are_consistent(restored_state, restored_journal):
 		message_label.text = "存档中的线索簿与调查记录不一致，当前进度没有改变。"
 		return
+	if not _journal_references_are_valid(restored_journal, restored_ledger):
+		message_label.text = "存档中的线索缺少对应的世界线事件来源，当前进度没有改变。"
+		return
 	# 先验证全部存档部分，再一次性替换运行状态，避免部分恢复。
 	game_state = restored_state
 	schedule_manager = ScheduleManagerScript.new()
@@ -906,6 +909,14 @@ func _network_references_are_valid(network, ledger) -> bool:
 			var delivery_event_id: String = "lullaby.message.delivered." + str(saved_message.get("message_id", ""))
 			if not ledger.event_ids.has(delivery_event_id):
 				return false
+	return true
+
+
+func _journal_references_are_valid(journal, ledger) -> bool:
+	for entry in journal.get_entries():
+		var fact_id: String = str(entry.get("id", ""))
+		if fact_id.strip_edges().is_empty() or not ledger.has_fact(fact_id):
+			return false
 	return true
 
 

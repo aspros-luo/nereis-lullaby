@@ -706,20 +706,22 @@ func _load_game() -> void:
 	if not LOCATION_ORDER.has(restored_state.current_location):
 		message_label.text = "存档中的地点无效，当前进度没有改变。"
 		return
-	game_state = restored_state
-	schedule_manager = ScheduleManagerScript.new()
-	clue_journal = ClueJournalScript.new()
 	var saved_ledger: Variant = config.get_value("save", "worldline_ledger", {})
 	var restored_ledger = WorldlineLedgerScript.new()
 	if saved_ledger is Dictionary and not saved_ledger.is_empty():
 		if not restored_ledger.load_save_data(saved_ledger):
 			message_label.text = "存档中的世界线事件记录无效，当前进度没有改变。"
 			return
-	worldline_ledger = restored_ledger
+	var restored_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if saved_entries is Array:
 		var saved_entries_array: Array = saved_entries
-		clue_journal.load_entries(saved_entries_array)
+		restored_journal.load_entries(saved_entries_array)
+	# 先验证全部存档部分，再一次性替换运行状态，避免部分恢复。
+	game_state = restored_state
+	schedule_manager = ScheduleManagerScript.new()
+	clue_journal = restored_journal
+	worldline_ledger = restored_ledger
 	message_label.text = "已读取进度。时间、关系、调查记录和线索簿都已恢复。"
 	_refresh_ui()
 

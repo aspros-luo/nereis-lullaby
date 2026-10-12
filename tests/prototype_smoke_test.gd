@@ -131,6 +131,18 @@ func _test_anomaly_observation_callbacks() -> void:
 	))
 	assert(not ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
 
+	ui_logic.clue_journal = ClueJournalScript.new()
+	assert(ui_logic.clue_journal.add_fact(
+		"day4_caregiver_custom_observed", "Home routine", "Previously observed", 5, "白天", "家附近"
+	))
+	assert(not ui_logic._get_anomaly_observation_followup("HOME").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("COMMONS").is_empty())
+	ui_logic.clue_journal = ClueJournalScript.new()
+	assert(ui_logic.clue_journal.add_fact(
+		"day4_worship_custom_observed", "Public routine", "Previously observed", 5, "白天", "礼拜场所"
+	))
+	assert(not ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
+
 
 func _test_alternate_clue_routes() -> void:
 	var ui_logic = MainScript.new()

@@ -33,6 +33,7 @@
 - [x] Validate clue-journal saves atomically; reject malformed or duplicate entries before replacing runtime state.
 - [x] Validate information-network saves: inbox entries must match delivered messages, beliefs require delivered-message evidence, and non-finite credibility is rejected.
 - [x] Validate cross-system references between restored messages and ledger facts/source/delivery events.
+- [x] Validate save consistency: discovered-fact IDs in the clue journal must exactly match investigation state.
 - [ ] Complete stable event IDs, trigger conditions, observable feedback, and alternate evidence for missable events.
 - [ ] Align event semantics with Nereis Hero; the two games remain independently runnable without runtime coupling.
 

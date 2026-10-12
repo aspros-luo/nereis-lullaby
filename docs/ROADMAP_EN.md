@@ -15,6 +15,7 @@
 ## Stage 2: Vertical slice
 - [x] Confirm Direction B (Galgame-style prologue vertical slice) and balanced delivery; work order and acceptance gates are documented in `docs/PROLOGUE_VERTICAL_SLICE_PLAN_CN.md` / `docs/PROLOGUE_VERTICAL_SLICE_PLAN_EN.md`.
 - [x] Add restrained post-anomaly narrative callbacks based on evidence the player recorded earlier; core smoke-test assertions added (pending local Godot execution).
+- [x] Add clinic-observation alternatives for the doctor's sleep-trouble and date-discrepancy clues (test code added, pending local Godot execution).
 - [x] Implement roughly one in-game week with daily activities, NPC conversations, relationships, clue journal, and phase anomaly.
 - [x] Reuse locations before and after the anomaly, with altered descriptions, NPC responses, and discoverable evidence.
 - [x] Add post-anomaly visits and an explicit prologue completion flow.

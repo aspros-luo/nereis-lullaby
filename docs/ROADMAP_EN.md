@@ -35,6 +35,7 @@
 - [x] Validate cross-system references between restored messages and ledger facts/source/delivery events.
 - [x] Validate save consistency: discovered-fact IDs in the clue journal must exactly match investigation state, and each journal fact must have a worldline-ledger source.
 - [x] Validate personal-moment, post-anomaly conversation, and last-NPC-action flags; reject completed-prologue saves without three distinct post-anomaly visits.
+- [x] Cross-check action history against time and action economy; reject future actions, duplicate ordinary-slot actions, and mismatched action-used flags.
 - [x] Upgrade save format to version 2 and create explicit migration audit events for legacy version 1 clues lacking provenance.
 - [x] Record provenance events for observations and the Day 7 anomaly; defer dialogue-derived clues and relationship side effects until the primary action is accepted.
 - [ ] Complete stable event IDs, trigger conditions, observable feedback, and alternate evidence for missable events.

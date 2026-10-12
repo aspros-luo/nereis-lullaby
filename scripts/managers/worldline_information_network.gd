@@ -26,7 +26,7 @@ func publish_message(
 		return false
 	if channel.strip_edges().is_empty() or source_event_id.strip_edges().is_empty():
 		return false
-	if travel_slots < 0 or credibility < 0.0 or credibility > 1.0 or current_tick < 0:
+	if travel_slots < 0 or not is_finite(credibility) or credibility < 0.0 or credibility > 1.0 or current_tick < 0:
 		return false
 	if current_tick < self.current_tick:
 		return false
@@ -152,7 +152,8 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 		elif int(message.get("arrival_tick", -1)) < raw_current_tick:
 			return false
-		if float(message.get("credibility", -1.0)) < 0.0 or float(message.get("credibility", 2.0)) > 1.0:
+		var saved_credibility: float = float(message.get("credibility", -1.0))
+		if not is_finite(saved_credibility) or saved_credibility < 0.0 or saved_credibility > 1.0:
 			return false
 		rebuilt_messages.append(message.duplicate(true))
 		rebuilt_ids[message_id] = true

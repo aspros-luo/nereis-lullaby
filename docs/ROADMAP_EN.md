@@ -29,6 +29,12 @@
 - [ ] Design full routes and endings after systems can be tested.
 - [ ] Keep ending names and concepts labeled as proposals until approved.
 
+## Phase 3.6: Dual-perspective worldlines and causal events
+- [x] Define a bilingual causal contract separating world facts, character knowledge, intentions, opportunities, and ending conditions.
+- [ ] Give important actions stable event IDs, preconditions, information channels, observable feedback, and alternate evidence after a missed scene.
+- [ ] Align cross-game event semantics with the Hero repository; keep both games independently runnable without runtime coupling.
+- [ ] Keep example causal paths explicitly proposed; do not canonize the Restoration Army, forest investigation, third umbilical cord, or ending bindings prematurely.
+
 ## Phase 3.5: Relationships and autonomous behavior
 - [x] Establish bilingual NPC relationship and behavior design baselines, separating known ties from open questions.
 - [ ] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses.

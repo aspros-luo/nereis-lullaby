@@ -170,10 +170,6 @@ func load_save_data(data: Dictionary) -> bool:
 			# 来源事件必须明确包含角色声称获知的事实。
 			if not event_facts[source_id].has(fact_id):
 				return false
-			# The referenced source event must list the same fact.
-			# 来源事件必须明确包含角色声称获知的事实。
-			if not event_facts[source_id].has(fact_id):
-				return false
 
 	for opportunity_id in raw_opportunities.keys():
 		if not (opportunity_id is String) or opportunity_id.strip_edges().is_empty() or not (raw_opportunities[opportunity_id] is Dictionary):

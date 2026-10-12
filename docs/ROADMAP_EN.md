@@ -74,3 +74,10 @@
 - A character's knowledge source event must explicitly contain the fact being learned; an unrelated event in the ledger is not sufficient.
 - Save loading checks the same fact-to-source relationship and rejects mismatched provenance.
 - Tests cover rejection of unrelated sources and mismatched source references in save data.
+
+
+## Atomic information delivery validation
+
+- A message's source event must explicitly contain the transmitted fact, even if the sender already knows that fact from an earlier valid route.
+- Due messages are preflighted before delivery. If the ledger is missing, the source event does not support the fact, or a delivery-event ID is occupied by an incompatible event, the due batch is not applied. This prevents inbox/belief state from diverging from the event ledger.
+- Regression assertions were added; execution in local Godot 4.6.1 is still pending.

@@ -22,6 +22,7 @@ func _initialize() -> void:
 	_test_save_roundtrip()
 	_test_save_roundtrip_after_anomaly()
 	_test_worldline_ledger()
+	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
 	_test_npc_behavior_profiles()
 	_test_npc_behavior_simulator()
@@ -222,6 +223,29 @@ func _test_worldline_ledger() -> void:
 	invalid_data["character_knowledge"] = "corrupt"
 	assert(not protected_ledger.load_save_data(invalid_data))
 	assert(protected_ledger.event_ids.has("existing"))
+
+
+func _test_worldline_ledger_rejects_inconsistent_save() -> void:
+	var source = WorldlineLedgerScript.new()
+	assert(source.record_event("observation", "lullaby", "mite", "observe", "FOREST", ["forest_oddity"]))
+	assert(source.record_event("unrelated_event", "lullaby", "doctor", "review_records", "CLINIC"))
+	var protected = WorldlineLedgerScript.new()
+	assert(protected.record_event("existing", "lullaby", "mite", "observe", "HOME"))
+
+	var invalid_data: Dictionary = source.to_save_data()
+	invalid_data["world_facts"]["forest_oddity"]["first_event_id"] = "unrelated_event"
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
+
+	invalid_data = source.to_save_data()
+	invalid_data["events"][0]["actor_id"] = ""
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
+
+	invalid_data = source.to_save_data()
+	invalid_data["events"][0]["fact_ids"] = ["missing_fact"]
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
 
 
 func _test_worldline_information_network() -> void:

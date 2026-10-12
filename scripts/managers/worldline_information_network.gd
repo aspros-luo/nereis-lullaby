@@ -6,6 +6,7 @@ var messages: Array[Dictionary] = []
 var message_ids: Dictionary = {}
 var inboxes: Dictionary = {}
 var beliefs: Dictionary = {}
+var current_tick: int = -1
 
 func publish_message(
 	message_id: String,
@@ -25,7 +26,9 @@ func publish_message(
 		return false
 	if channel.strip_edges().is_empty() or source_event_id.strip_edges().is_empty():
 		return false
-	if travel_slots < 0 or credibility < 0.0 or credibility > 1.0:
+	if travel_slots < 0 or credibility < 0.0 or credibility > 1.0 or current_tick < 0:
+		return false
+	if current_tick < self.current_tick:
 		return false
 	if ledger == null or not ledger.has_fact(fact_id) or not ledger.event_ids.has(source_event_id):
 		return false
@@ -55,6 +58,9 @@ func publish_message(
 
 ## Delivers all due messages in send order; repeated calls are safe.
 func advance_to(tick: int) -> int:
+	if tick < current_tick:
+		return 0
+	current_tick = tick
 	var delivered_count := 0
 	for index in range(messages.size()):
 		var message: Dictionary = messages[index]
@@ -103,12 +109,16 @@ func to_save_data() -> Dictionary:
 		"messages": messages.duplicate(true),
 		"inboxes": inboxes.duplicate(true),
 		"beliefs": beliefs.duplicate(true),
+		"current_tick": current_tick,
 	}
 
 func load_save_data(data: Dictionary) -> bool:
 	var raw_messages: Variant = data.get("messages", [])
 	var raw_inboxes: Variant = data.get("inboxes", {})
 	var raw_beliefs: Variant = data.get("beliefs", {})
+	var raw_current_tick: int = int(data.get("current_tick", -1))
+	if raw_current_tick < -1:
+		return false
 	if not (raw_messages is Array) or not (raw_inboxes is Dictionary) or not (raw_beliefs is Dictionary):
 		return false
 	var rebuilt_messages: Array[Dictionary] = []
@@ -122,17 +132,38 @@ func load_save_data(data: Dictionary) -> bool:
 			return false
 		if not ["pending", "delivered"].has(str(message.get("status", ""))):
 			return false
-		if str(message.get("fact_id", "")).is_empty() or str(message.get("receiver_id", "")).is_empty():
+		if str(message.get("fact_id", "")).is_empty() or str(message.get("sender_id", "")).is_empty() or str(message.get("receiver_id", "")).is_empty():
+			return false
+		if str(message.get("channel", "")).is_empty() or str(message.get("source_event_id", "")).is_empty():
+			return false
+		if int(message.get("sent_tick", -1)) < 0 or int(message.get("arrival_tick", -1)) < int(message.get("sent_tick", -1)):
+			return false
+		if str(message.get("status", "")) == "delivered":
+			if not message.has("delivered_tick") or int(message["delivered_tick"]) < int(message["arrival_tick"]):
+				return false
+		elif int(message.get("arrival_tick", -1)) < raw_current_tick:
 			return false
 		if float(message.get("credibility", -1.0)) < 0.0 or float(message.get("credibility", 2.0)) > 1.0:
 			return false
 		rebuilt_messages.append(message.duplicate(true))
 		rebuilt_ids[message_id] = true
+	var inbox_message_ids: Dictionary = {}
 	for character_id in raw_inboxes:
 		if not (raw_inboxes[character_id] is Array):
 			return false
 		for entry in raw_inboxes[character_id]:
 			if not (entry is Dictionary) or not rebuilt_ids.has(str(entry.get("message_id", ""))):
+				return false
+			var inbox_message_id: String = str(entry.get("message_id", ""))
+			if inbox_message_ids.has(inbox_message_id):
+				return false
+			inbox_message_ids[inbox_message_id] = true
+			var matched_message: Dictionary = {}
+			for saved_message in rebuilt_messages:
+				if str(saved_message.get("message_id", "")) == inbox_message_id:
+					matched_message = saved_message
+					break
+			if str(matched_message.get("status", "")) != "delivered" or str(matched_message.get("receiver_id", "")) != str(character_id):
 				return false
 	for character_id in raw_beliefs:
 		if not (raw_beliefs[character_id] is Dictionary):
@@ -141,8 +172,12 @@ func load_save_data(data: Dictionary) -> bool:
 			var confidence := float(raw_beliefs[character_id][fact_id])
 			if confidence < 0.0 or confidence > 0.95:
 				return false
+	for saved_message in rebuilt_messages:
+		if str(saved_message.get("status", "")) == "delivered" and not inbox_message_ids.has(str(saved_message.get("message_id", ""))):
+			return false
 	messages = rebuilt_messages
 	message_ids = rebuilt_ids
 	inboxes = raw_inboxes.duplicate(true)
 	beliefs = raw_beliefs.duplicate(true)
+	current_tick = raw_current_tick
 	return true

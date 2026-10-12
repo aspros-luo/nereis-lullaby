@@ -532,6 +532,15 @@ func _observe_location() -> void:
 		fact_id = "forest_flower_observation"
 		fact_title = "林间的野花"
 		fact_detail = "林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
+	if fact_id.is_empty():
+		var alternate_fact: Dictionary = _get_alternate_clue_for_observation(
+			game_state.current_location, game_state.day_index, clue_journal._seen_ids
+		)
+		if not alternate_fact.is_empty():
+			fact_id = str(alternate_fact["id"])
+			fact_title = str(alternate_fact["title"])
+			fact_detail = str(alternate_fact["detail"])
+
 	var added := false
 	if not fact_id.is_empty():
 		var event_id := "lullaby.observation.day%d.slot%d.%s.%s" % [
@@ -544,6 +553,26 @@ func _observe_location() -> void:
 	var ordinary_observation: String = str(OBSERVATION_TEXT.get(game_state.current_location, "这里暂时没有什么特别的发现。"))
 	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
+
+## Provide a quiet alternate route when a conversation-based clue was missed.
+## 玩家错过交谈线索时，允许通过查看诊疗记录补足最小证据。
+func _get_alternate_clue_for_observation(location_id: String, day_index: int, seen_ids: Dictionary) -> Dictionary:
+	if location_id != "CLINIC" or day_index < 4:
+		return {}
+	if not seen_ids.has("day3_similar_sleep_reports"):
+		return {
+			"id": "day3_similar_sleep_reports",
+			"title": "病例摘要里的相似睡眠困扰",
+			"detail": "几份整理过的病例摘要提到相似的睡眠困扰与梦境。记录没有说明共同原因，压力或普通疾病仍然可能解释这些情况。",
+		}
+	if day_index >= 6 and not seen_ids.has("day6_date_discrepancy"):
+		return {
+			"id": "day6_date_discrepancy",
+			"title": "病患记录中的日期差异",
+			"detail": "几份病例对不适开始时间的记载并不一致。差异值得复查，但不能据此认定它们有共同原因。",
+		}
+	return {}
+
 
 ## Add a restrained callback only when the player personally recorded related evidence.
 ## 仅当玩家此前亲自记录过相关证据时，才补充克制的回访呼应。

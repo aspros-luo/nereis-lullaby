@@ -25,6 +25,7 @@ func _initialize() -> void:
 	_test_observation_and_anomaly_events()
 	_test_journal_ledger_consistency()
 	_test_legacy_clue_provenance_migration()
+	_test_network_tick_consistency()
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
@@ -317,6 +318,20 @@ func _test_legacy_clue_provenance_migration() -> void:
 	assert(ledger.has_fact("legacy_clue"))
 	assert(ledger.event_ids.has("lullaby.migration.v1.clue.legacy_clue"))
 	assert(ui_logic._journal_references_are_valid(journal, ledger))
+
+
+func _test_network_tick_consistency() -> void:
+	var ui_logic = MainScript.new()
+	var state = GameStateScript.new()
+	var network = InformationNetworkScript.new()
+	state.day_index = 2
+	state.slot_index = 0
+	network.current_tick = -1
+	assert(ui_logic._network_tick_is_valid(state, network))
+	network.current_tick = 3
+	assert(ui_logic._network_tick_is_valid(state, network))
+	network.current_tick = 4
+	assert(not ui_logic._network_tick_is_valid(state, network))
 
 
 func _test_location_content_coverage() -> void:

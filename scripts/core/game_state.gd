@@ -212,18 +212,38 @@ func load_save_data(data: Dictionary) -> bool:
 	for npc_id in relationship_state.keys():
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)
 	var restored_history: Array[Dictionary] = []
+	var ordinary_action_slots: Dictionary = {}
+	var current_tick: int = (saved_day - 1) * SLOT_KEYS.size() + saved_slot
+	var actions_in_current_slot: int = 0
 	for entry in saved_history:
 		if not (entry is Dictionary):
 			return false
-		if int(entry.get("day", 0)) < 1 or int(entry.get("day", 0)) > FINAL_DAY:
+		var history_day_value: Variant = entry.get("day", null)
+		if not (history_day_value is int) or int(history_day_value) < 1 or int(history_day_value) > FINAL_DAY:
 			return false
-		if not SLOT_LABELS.has(str(entry.get("slot", ""))):
+		var history_slot: String = str(entry.get("slot", ""))
+		if not SLOT_LABELS.has(history_slot):
 			return false
 		if not POST_ANOMALY_LOCATIONS.has(str(entry.get("location", ""))):
 			return false
 		if str(entry.get("id", "")).strip_edges().is_empty() or str(entry.get("description", "")).strip_edges().is_empty():
 			return false
+		var history_slot_index: int = SLOT_LABELS.find(history_slot)
+		var history_tick: int = (int(history_day_value) - 1) * SLOT_KEYS.size() + history_slot_index
+		if history_tick > current_tick:
+			return false
+		var history_slot_key: String = "%d:%d" % [int(history_day_value), history_slot_index]
+		if saved_phase == "ordinary":
+			if ordinary_action_slots.has(history_slot_key):
+				return false
+			ordinary_action_slots[history_slot_key] = true
+			if history_tick == current_tick:
+				actions_in_current_slot += 1
 		restored_history.append(entry.duplicate(true))
+	if saved_phase == "ordinary" and saved_action_used_value != (actions_in_current_slot == 1):
+		return false
+	if saved_phase != "ordinary" and saved_action_used_value:
+		return false
 
 	day_index = saved_day
 	slot_index = saved_slot

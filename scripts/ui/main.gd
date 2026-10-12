@@ -430,7 +430,7 @@ func _advance_time() -> void:
 	var previous_day: int = game_state.day_index
 	game_state.advance_time()
 	var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
-	information_network.advance_to(world_tick)
+	information_network.advance_to(world_tick, worldline_ledger)
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
 		clue_journal.add_fact(

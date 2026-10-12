@@ -802,7 +802,7 @@ const SAVE_PATH: String = "user://nereis_lullaby_demo.cfg"
 
 func _save_game() -> void:
 	var config := ConfigFile.new()
-	config.set_value("save", "version", 1)
+	config.set_value("save", "version", 2)
 	config.set_value("save", "game_state", game_state.to_save_data())
 	config.set_value("save", "clue_entries", clue_journal.get_entries())
 	config.set_value("save", "worldline_ledger", worldline_ledger.to_save_data())
@@ -821,7 +821,7 @@ func _load_game() -> void:
 		message_label.text = "还没有可读取的存档。先游玩一段，再选择“保存进度”。"
 		return
 	var version: int = int(config.get_value("save", "version", 0))
-	if version != 1:
+	if not [1, 2].has(version):
 		message_label.text = "这份存档版本不受当前 Demo 支持。"
 		return
 	var saved_state: Variant = config.get_value("save", "game_state", {})
@@ -864,6 +864,10 @@ func _load_game() -> void:
 	var saved_entries_array: Array = saved_entries
 	if not restored_journal.load_entries(saved_entries_array):
 		message_label.text = "存档中的线索条目无效或重复，当前进度没有改变。"
+		return
+	# Version 1 saves predate clue provenance events. Preserve them with explicit migration records.
+	if version == 1 and not _migrate_legacy_clue_provenance(restored_journal, restored_ledger):
+		message_label.text = "旧版存档的线索来源无法安全迁移，当前进度没有改变。"
 		return
 	if not _state_journal_are_consistent(restored_state, restored_journal):
 		message_label.text = "存档中的线索簿与调查记录不一致，当前进度没有改变。"
@@ -909,6 +913,24 @@ func _network_references_are_valid(network, ledger) -> bool:
 			var delivery_event_id: String = "lullaby.message.delivered." + str(saved_message.get("message_id", ""))
 			if not ledger.event_ids.has(delivery_event_id):
 				return false
+	return true
+
+
+func _migrate_legacy_clue_provenance(journal, ledger) -> bool:
+	for entry in journal.get_entries():
+		var fact_id: String = str(entry.get("id", ""))
+		if ledger.has_fact(fact_id):
+			continue
+		var migration_event_id := "lullaby.migration.v1.clue." + fact_id
+		if not ledger.record_event(
+			migration_event_id,
+			"lullaby_save_migration",
+			"save_migration",
+			"preserve_legacy_clue",
+			str(entry.get("location", "")),
+			[fact_id]
+		):
+			return false
 	return true
 
 

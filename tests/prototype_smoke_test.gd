@@ -500,6 +500,13 @@ func _test_worldline_information_network() -> void:
 	assert(not protected_pending_network.load_save_data(future_send_data))
 	assert(protected_pending_network.current_tick == -1)
 
+	# A pending message due exactly at the saved clock should already have been delivered.
+	var due_data: Dictionary = pending_network.to_save_data()
+	due_data["current_tick"] = 2
+	var protected_due_network = InformationNetworkScript.new()
+	assert(not protected_due_network.load_save_data(due_data))
+	assert(protected_due_network.current_tick == -1)
+
 
 func _test_npc_behavior_profiles() -> void:
 	var profiles: Dictionary = NPCBehaviorProfilesScript.get_all_profiles()

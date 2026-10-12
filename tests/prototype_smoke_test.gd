@@ -21,6 +21,7 @@ func _initialize() -> void:
 	_test_relationship_bounds()
 	_test_save_roundtrip()
 	_test_save_roundtrip_after_anomaly()
+	_test_state_journal_consistency()
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
@@ -207,6 +208,23 @@ func _test_save_roundtrip_after_anomaly() -> void:
 	protected_visits.day_index = 4
 	assert(not protected_visits.load_save_data(invalid_visits))
 	assert(protected_visits.day_index == 4)
+
+
+func _test_state_journal_consistency() -> void:
+	var state = GameStateScript.new()
+	var journal = ClueJournalScript.new()
+	var ui_logic = MainScript.new()
+	assert(ui_logic._state_journal_are_consistent(state, journal))
+	assert(journal.add_fact("clue_a", "Clue A", "Observed detail", 1, "早晨", "家"))
+	assert(not ui_logic._state_journal_are_consistent(state, journal))
+	state.register_fact("clue_a")
+	assert(ui_logic._state_journal_are_consistent(state, journal))
+	var inconsistent_state = GameStateScript.new()
+	inconsistent_state.register_fact("orphan_fact")
+	assert(not ui_logic._state_journal_are_consistent(inconsistent_state, journal))
+	var duplicate_state = GameStateScript.new()
+	duplicate_state.investigation_state["observed_fact_ids"] = ["clue_a", "clue_a"]
+	assert(not ui_logic._state_journal_are_consistent(duplicate_state, journal))
 
 
 func _test_location_content_coverage() -> void:

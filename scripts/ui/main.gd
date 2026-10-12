@@ -464,15 +464,19 @@ func _advance_time() -> void:
 			)
 			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
 				continue
+			var action_location: String = schedule_manager.get_location(
+				npc_id, staged_state.day_index, staged_state.slot_index
+			)
 			var action_event_id := "lullaby.npc_action.tick%d.%s" % [world_tick, npc_id]
 			if not staged_ledger.record_event(
-				action_event_id, "lullaby", npc_id, str(action["id"]),
-				schedule_manager.get_location(npc_id, staged_state.day_index, staged_state.slot_index)
+				action_event_id, "lullaby", npc_id, str(action["id"]), action_location
 			):
 				message_label.text = "村民行动的因果记录无法提交；时间没有改变。"
 				return
 			last_actions[npc_id] = action.duplicate(true)
-			autonomous_lines.append(str(action["line"]))
+			# First-person play: do not narrate an NPC's off-screen action as if Mite witnessed it.
+			if action_location == staged_state.current_location:
+				autonomous_lines.append(str(action["line"]))
 		staged_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 
 	var anomaly_started: bool = was_ordinary and staged_state.world_state["phase"] == "after_week"

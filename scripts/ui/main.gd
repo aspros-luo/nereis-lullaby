@@ -641,7 +641,7 @@ func _talk_to_npc(npc_id: String) -> void:
 			received_report = true
 			information_network.advance_to(world_tick, worldline_ledger)
 	if received_report:
-		message_label.text += "\\n\\n我记下了对方的说法，但还不能仅凭这段话确定原因。"
+		message_label.text += "\n\n我记下了对方的说法，但还不能仅凭这段话确定原因。"
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"
 	_refresh_ui()

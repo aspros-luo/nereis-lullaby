@@ -57,7 +57,7 @@ func publish_message(
 	return true
 
 ## Delivers all due messages in send order; repeated calls are safe.
-func advance_to(tick: int) -> int:
+func advance_to(tick: int, ledger = null) -> int:
 	if tick < current_tick:
 		return 0
 	current_tick = tick
@@ -67,6 +67,9 @@ func advance_to(tick: int) -> int:
 		if str(message.get("status", "")) != "pending" or int(message.get("arrival_tick", -1)) > tick:
 			continue
 		var receiver_id: String = str(message["receiver_id"])
+		var delivery_event_id := "lullaby.message.delivered." + str(message["message_id"])
+		if ledger != null and not ledger.event_ids.has(delivery_event_id):
+			ledger.record_event(delivery_event_id, "lullaby", receiver_id, "receive_message", "", [str(message["fact_id"])])
 		if not inboxes.has(receiver_id):
 			inboxes[receiver_id] = []
 		var inbox: Array = inboxes[receiver_id]
@@ -77,6 +80,7 @@ func advance_to(tick: int) -> int:
 			"channel": message["channel"],
 			"credibility": message["credibility"],
 			"source_event_id": message["source_event_id"],
+			"delivery_event_id": delivery_event_id,
 			"received_tick": tick,
 		})
 		inboxes[receiver_id] = inbox

@@ -184,6 +184,18 @@ func _test_save_roundtrip() -> void:
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()
+	invalid_data["action_history"].append(invalid_data["action_history"][0].duplicate(true))
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["action_used_this_slot"] = false
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["action_history"][0]["day"] = 7
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
 	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"] = "corrupt"
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)

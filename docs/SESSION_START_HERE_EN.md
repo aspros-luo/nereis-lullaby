@@ -8,7 +8,7 @@ Before any new conversation or development task, read this file and its Chinese 
 - `docs/ROADMAP_CN.md` / `docs/ROADMAP_EN.md`
 
 ## Cross-project narrative sync (required)
-Before continuing work on plot, NPCs, clues, or world state, check the latest commit on Hero's `development` branch and follow the [Cross-Project Narrative Sync Ledger](CROSS_PROJECT_STORY_SYNC_CN_EN.md). The games have independent gameplay but compatible worldbuilding; newer explicit user decisions override older docs. Ending directions remain open, and Hero endings must not require physical union with Mite.
+Before continuing work on plot, NPCs, clues, or world state, check the latest commit on Hero's `development` branch and follow the [Cross-Project Narrative Sync Ledger](CROSS_PROJECT_STORY_SYNC_CN_EN.md). The games have independent gameplay but compatible worldbuilding; newer explicit user decisions override older docs. Follow Hero's latest story baseline: 凡人之墓 has no physical union; 永恒乐园 and 烈火天罚 both involve physical union but diverge based on the key artifact and how much agency Hero retains. Lullaby does not directly choose an ending; it affects information, character motivation, and opportunity conditions.
 
 ## Relationship and autonomous behavior baseline
 - See `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_CN.md` / `docs/NPC_RELATIONSHIP_AND_BEHAVIOR_MATRIX_EN.md` for the NPC relationship and behavior design.
@@ -20,7 +20,7 @@ Before continuing work on plot, NPCs, clues, or world state, check the latest co
 - Read `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_CN.md` / `docs/DUAL_PERSPECTIVE_WORLDLINE_CONTRACT_EN.md`.
 - Hero directly responds to opportunities; Lullaby indirectly changes information, motivation, contact, and opportunity through Mite's everyday life and relationships.
 - Keep world facts, character knowledge/beliefs, intentions, opportunity states, and ending conditions separate. Never switch an ending directly from one hidden score.
-- Restoration Army news, forest investigation, and the third umbilical cord are non-canon examples, not finalized plot conditions.
+- The transmission of Restoration Army news, forest investigation, and the exact acquisition conditions for the third umbilical cord remain open design work. Do not let outdated contradictory wording override Hero's established emotional identities for the three endings.
 - Mite does not know her true identity; her care and innocence are genuine. Important choices need observable consequences in NPC behavior, dialogue, objects, or information access.
 
 ## Project boundary

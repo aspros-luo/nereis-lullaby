@@ -251,6 +251,10 @@ func _test_save_roundtrip() -> void:
 	assert(restored_journal.get_entries().size() == 1) # Failed restore preserves existing journal.
 	assert(not restored_journal.load_entries([{"id": "broken"}]))
 	assert(restored_journal.get_entries().size() == 1)
+	var invalid_day_clue: Dictionary = journal.get_entries()[0].duplicate(true)
+	invalid_day_clue["day"] = "2"
+	assert(not restored_journal.load_entries([invalid_day_clue]))
+	assert(restored_journal.get_entries().size() == 1)
 
 
 func _test_save_roundtrip_after_anomaly() -> void:

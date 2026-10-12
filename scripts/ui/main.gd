@@ -521,14 +521,10 @@ func _observe_location() -> void:
 	var fact_title := ""
 	var fact_detail := ""
 	if game_state.day_index >= 5 and game_state.current_location == "SHRINE":
-		if not clue_journal._seen_ids.has("day4_worship_custom"):
-			fact_id = "day4_worship_custom"
-			fact_title = "关于习俗的公共解释"
-			fact_detail = "礼拜场所的公开说明把类似安排解释为维护公共传统的一部分。它与生活习惯的解释关注点不同，但不能证明任何人撒谎。"
-		else:
-			fact_id = "day5_repeated_object_shrine"
-			fact_title = "礼拜场所里的普通物件"
-			fact_detail = "我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。"
+		var shrine_fact: Dictionary = _get_shrine_observation_fact(game_state.day_index, clue_journal._seen_ids)
+		fact_id = str(shrine_fact.get("id", ""))
+		fact_title = str(shrine_fact.get("title", ""))
+		fact_detail = str(shrine_fact.get("detail", ""))
 	elif game_state.day_index >= 5 and game_state.current_location == "COMMONS":
 		fact_id = "day5_repeated_object_commons"
 		fact_title = "公共空间里的相似准备"
@@ -559,8 +555,28 @@ func _observe_location() -> void:
 	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
 
+## Prefer the missed public-custom explanation before the repeat-object clue.
+## 若错过公开习俗解释，先提供替代证据；之后再记录重复物件。
+func _get_shrine_observation_fact(day_index: int, seen_ids: Dictionary) -> Dictionary:
+	if day_index < 5:
+		return {}
+	if not seen_ids.has("day4_worship_custom"):
+		return {
+			"id": "day4_worship_custom",
+			"title": "关于习俗的公共解释",
+			"detail": "礼拜场所的公开说明把类似安排解释为维护公共传统的一部分。它与生活习惯的解释关注点不同，但不能证明任何人撒谎。",
+		}
+	if not seen_ids.has("day5_repeated_object_shrine"):
+		return {
+			"id": "day5_repeated_object_shrine",
+			"title": "礼拜场所里的普通物件",
+			"detail": "我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。",
+		}
+	return {}
+
+
 ## Provide a quiet alternate route when a conversation-based clue was missed.
-## 玩家错过交谈线索时，允许通过查看诊疗记录补足最小证据。
+## 玩家错过交谈线索时，允许通过观察地点补足最小证据。
 func _get_alternate_clue_for_observation(location_id: String, day_index: int, seen_ids: Dictionary) -> Dictionary:
 	if location_id == "HOME" and day_index >= 5 and not seen_ids.has("day4_caregiver_custom"):
 		return {

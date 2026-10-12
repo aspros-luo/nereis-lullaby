@@ -187,6 +187,12 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 			if not (saved_action.get("slot", null) is int) or int(saved_action["slot"]) < 0 or int(saved_action["slot"]) >= SLOT_KEYS.size():
 				return false
+			# The action's date, slot, and tick must describe the same in-game moment.
+			var action_tick: int = (int(saved_action["day"]) - 1) * SLOT_KEYS.size() + int(saved_action["slot"])
+			if int(saved_action["tick"]) != action_tick:
+				return false
+			if action_tick > (saved_day - 1) * SLOT_KEYS.size() + saved_slot:
+				return false
 	var anomaly_flag: Variant = saved_flags.get("village_anomaly", false)
 	if not (anomaly_flag is bool):
 		return false

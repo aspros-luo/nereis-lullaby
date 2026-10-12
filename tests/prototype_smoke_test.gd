@@ -68,6 +68,17 @@ func _test_npc_schedules_and_locations() -> void:
 	assert(schedules.get_location_name("FOREST") == "林间小径")
 	assert(schedules.get_location_name("GROVE") == "林中空地")
 
+	# UI entry points must not allow conversations with an NPC at another location.
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	ui_logic.schedule_manager = ScheduleManagerScript.new()
+	assert(ui_logic.game_state.current_location == "HOME")
+	assert(not ui_logic.schedule_manager.get_location("doctor", 1, 0) == "HOME")
+	ui_logic._talk_to_npc("doctor")
+	assert(ui_logic.game_state.action_history.is_empty())
+	ui_logic._talk_to_npc("unknown_npc")
+	assert(ui_logic.game_state.action_history.is_empty())
+
 func _test_personal_moment_coverage() -> void:
 	for moment_id in MainScript.PERSONAL_MOMENTS:
 		var moment: Dictionary = MainScript.PERSONAL_MOMENTS[moment_id]

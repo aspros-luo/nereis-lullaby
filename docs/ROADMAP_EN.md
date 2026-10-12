@@ -42,7 +42,8 @@
 - [x] Add an influence matrix and candidate causal network for five cross-regional key actors (design proposal, not yet gameplay).
 - [ ] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses.
 - [ ] Implement discrete NPC behavior simulation and authored-event schedule overrides.
-- [ ] Add regression tests for information flow, relationship changes, action consequences, and save/load.
+- [x] Add a discrete information network with travel delay, inboxes, credibility, and belief confidence kept separate; add deduplication and save/load smoke-test code (not yet executed by Godot).
+- [ ] Connect concrete character behavior cards, message-send triggers, and observable feedback to the gameplay loop.
 
 ## Phase 4: Content expansion
 - [x] Add one-time personal everyday moments for the three key villagers, with seen-state persisted in the save data (prototype content, not finalized canon).

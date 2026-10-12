@@ -16,6 +16,7 @@ func _initialize() -> void:
 	_test_action_economy()
 	_test_npc_schedules_and_locations()
 	_test_location_content_coverage()
+	_test_anomaly_observation_callbacks()
 	_test_personal_moment_coverage()
 	_test_clue_deduplication()
 	_test_relationship_bounds()
@@ -87,6 +88,30 @@ func _test_npc_schedules_and_locations() -> void:
 	assert(ui_logic.game_state.action_history.is_empty())
 	ui_logic._talk_to_npc("unknown_npc")
 	assert(ui_logic.game_state.action_history.is_empty())
+
+func _test_anomaly_observation_callbacks() -> void:
+	var ui_logic = MainScript.new()
+	ui_logic.clue_journal = ClueJournalScript.new()
+
+	# Without earlier evidence, the callback must not invent a memory.
+	assert(ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
+	assert(ui_logic._get_anomaly_observation_followup("CLINIC").is_empty())
+
+	assert(ui_logic.clue_journal.add_fact(
+		"day5_repeated_object_shrine", "Shrine object", "Previously observed", 5, "白天", "礼拜场所"
+	))
+	assert(ui_logic.clue_journal.add_fact(
+		"day3_similar_sleep_reports", "Sleep reports", "Previously heard", 3, "白天", "诊疗处"
+	))
+	assert(ui_logic.clue_journal.add_fact(
+		"forest_flower_observation", "Forest flowers", "Previously observed", 2, "早晨", "林间小径"
+	))
+	assert(not ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("CLINIC").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("FOREST").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("GROVE").is_empty())
+	assert(ui_logic._get_anomaly_observation_followup("HOME").is_empty())
+
 
 func _test_personal_moment_coverage() -> void:
 	for moment_id in MainScript.PERSONAL_MOMENTS:

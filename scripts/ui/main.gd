@@ -5,6 +5,7 @@ const GameStateScript = preload("res://scripts/core/game_state.gd")
 const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
+const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
 
 const LOCATION_ORDER: Array[String] = [
 	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
@@ -78,6 +79,7 @@ var game_state
 var schedule_manager
 var clue_journal
 var worldline_ledger
+var information_network
 
 var status_label: Label
 var objective_label: Label
@@ -102,6 +104,7 @@ func _ready() -> void:
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
 	worldline_ledger = WorldlineLedgerScript.new()
+	information_network = InformationNetworkScript.new()
 	_apply_visual_style()
 	_build_ui()
 	_refresh_ui()
@@ -426,6 +429,8 @@ func _advance_time() -> void:
 	var was_ordinary: bool = game_state.world_state["phase"] == "ordinary"
 	var previous_day: int = game_state.day_index
 	game_state.advance_time()
+	var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
+	information_network.advance_to(world_tick)
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
 		clue_journal.add_fact(
@@ -677,6 +682,7 @@ func _save_game() -> void:
 	config.set_value("save", "game_state", game_state.to_save_data())
 	config.set_value("save", "clue_entries", clue_journal.get_entries())
 	config.set_value("save", "worldline_ledger", worldline_ledger.to_save_data())
+	config.set_value("save", "information_network", information_network.to_save_data())
 	var error: Error = config.save(SAVE_PATH)
 	if error == OK:
 		message_label.text = "进度已保存。下次启动游戏后，可以读取这份记录继续游玩。"
@@ -714,6 +720,14 @@ func _load_game() -> void:
 	if not saved_ledger.is_empty() and not restored_ledger.load_save_data(saved_ledger):
 		message_label.text = "存档中的世界线事件记录无效，当前进度没有改变。"
 		return
+	var saved_network: Variant = config.get_value("save", "information_network", {})
+	if not (saved_network is Dictionary):
+		message_label.text = "存档中的信息传播记录格式无效，当前进度没有改变。"
+		return
+	var restored_network = InformationNetworkScript.new()
+	if not saved_network.is_empty() and not restored_network.load_save_data(saved_network):
+		message_label.text = "存档中的信息传播记录无效，当前进度没有改变。"
+		return
 	var restored_journal = ClueJournalScript.new()
 	var saved_entries: Variant = config.get_value("save", "clue_entries", [])
 	if saved_entries is Array:
@@ -724,7 +738,8 @@ func _load_game() -> void:
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = restored_journal
 	worldline_ledger = restored_ledger
-	message_label.text = "已读取进度。时间、关系、调查记录和线索簿都已恢复。"
+	information_network = restored_network
+	message_label.text = "已读取进度。时间、关系、调查记录、线索簿和已传播的信息都已恢复。"
 	_refresh_ui()
 
 func _finish_demo() -> void:
@@ -738,5 +753,6 @@ func _restart_demo() -> void:
 	schedule_manager = ScheduleManagerScript.new()
 	clue_journal = ClueJournalScript.new()
 	worldline_ledger = WorldlineLedgerScript.new()
+	information_network = InformationNetworkScript.new()
 	message_label.text = "新的一天开始了。我先在村子里走走。"
 	_refresh_ui()

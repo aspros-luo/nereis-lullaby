@@ -212,6 +212,16 @@ func _test_save_roundtrip() -> void:
 	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["npc_id"] = "doctor"
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["tick"] = 2
+	assert(not protected_state.load_save_data(invalid_data)) # Tick must match day and slot.
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["day"] = 2
+	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["slot"] = 0
+	invalid_data["world_state"]["flags"]["npc_last_autonomous_actions"]["caregiver"]["tick"] = 3
+	assert(not protected_state.load_save_data(invalid_data)) # Future autonomous actions are invalid.
+	assert(protected_state.day_index == 4)
 
 	var journal = ClueJournalScript.new()
 	assert(journal.add_fact("save_clue", "Saved clue", "Clue details", 2, "白天", "林间小径"))

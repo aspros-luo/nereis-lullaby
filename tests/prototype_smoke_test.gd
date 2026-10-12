@@ -31,6 +31,7 @@ func _initialize() -> void:
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
+	_test_information_delivery_aborts_time_step()
 	_test_npc_behavior_profiles()
 	_test_npc_behavior_simulator()
 	_test_npc_observable_action_traces()
@@ -726,6 +727,31 @@ func _test_worldline_information_network() -> void:
 	assert(collision_network.current_tick == 0)
 	assert(collision_network.get_inbox("doctor").is_empty())
 	assert(str(collision_network.messages[0]["status"]) == "pending")
+
+
+func _test_information_delivery_aborts_time_step() -> void:
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	ui_logic.clue_journal = ClueJournalScript.new()
+	ui_logic.schedule_manager = ScheduleManagerScript.new()
+	ui_logic.worldline_ledger = WorldlineLedgerScript.new()
+	ui_logic.information_network = InformationNetworkScript.new()
+	ui_logic.message_label = Label.new()
+	assert(ui_logic.worldline_ledger.record_event(
+		"source_observation", "lullaby", "mite", "observe_forest", "FOREST", ["forest_oddity"]
+	))
+	assert(ui_logic.information_network.publish_message(
+		"blocked_time_step", "forest_oddity", "mite", "doctor", "conversation",
+		0, 0.5, 0, "source_observation", ui_logic.worldline_ledger
+	))
+	assert(ui_logic.worldline_ledger.record_event(
+		"lullaby.message.delivered.blocked_time_step", "lullaby", "doctor", "receive_message", "", []
+	))
+	ui_logic._advance_time()
+	assert(ui_logic.game_state.day_index == 1)
+	assert(ui_logic.game_state.slot_index == 0)
+	assert(str(ui_logic.information_network.messages[0]["status"]) == "pending")
+	assert(ui_logic.message_label.text.contains("当前时段没有改变"))
 
 
 func _test_npc_behavior_profiles() -> void:

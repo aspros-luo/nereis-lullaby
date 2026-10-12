@@ -123,7 +123,10 @@ func load_save_data(data: Dictionary) -> bool:
 	var raw_messages: Variant = data.get("messages", [])
 	var raw_inboxes: Variant = data.get("inboxes", {})
 	var raw_beliefs: Variant = data.get("beliefs", {})
-	var raw_current_tick: int = int(data.get("current_tick", -1))
+	var raw_current_tick_value: Variant = data.get("current_tick", null)
+	if not (raw_current_tick_value is int):
+		return false
+	var raw_current_tick: int = int(raw_current_tick_value)
 	if raw_current_tick < -1:
 		return false
 	if not (raw_messages is Array) or not (raw_inboxes is Dictionary) or not (raw_beliefs is Dictionary):
@@ -143,17 +146,25 @@ func load_save_data(data: Dictionary) -> bool:
 			return false
 		if str(message.get("channel", "")).is_empty() or str(message.get("source_event_id", "")).is_empty():
 			return false
-		if int(message.get("sent_tick", -1)) < 0 or int(message.get("arrival_tick", -1)) < int(message.get("sent_tick", -1)):
+		var sent_tick_value: Variant = message.get("sent_tick", null)
+		var arrival_tick_value: Variant = message.get("arrival_tick", null)
+		if not (sent_tick_value is int) or not (arrival_tick_value is int):
+			return false
+		var sent_tick: int = int(sent_tick_value)
+		var arrival_tick: int = int(arrival_tick_value)
+		if sent_tick < 0 or arrival_tick < sent_tick:
 			return false
 		# A message cannot originate after the network's own saved clock.
-		if int(message["sent_tick"]) > raw_current_tick:
+		if sent_tick > raw_current_tick:
 			return false
 		if str(message.get("status", "")) == "delivered":
-			if not message.has("delivered_tick") or int(message["delivered_tick"]) < int(message["arrival_tick"]):
+			var delivered_tick_value: Variant = message.get("delivered_tick", null)
+			if not (delivered_tick_value is int):
 				return false
-			if int(message["delivered_tick"]) > raw_current_tick:
+			var delivered_tick: int = int(delivered_tick_value)
+			if delivered_tick < arrival_tick or delivered_tick > raw_current_tick:
 				return false
-		elif int(message.get("arrival_tick", -1)) <= raw_current_tick:
+		elif arrival_tick <= raw_current_tick:
 			# advance_to() delivers every message due at the saved tick, including this boundary.
 			return false
 		var saved_credibility: float = float(message.get("credibility", -1.0))

@@ -23,6 +23,7 @@ func _initialize() -> void:
 	_test_save_roundtrip_after_anomaly()
 	_test_state_journal_consistency()
 	_test_observation_and_anomaly_events()
+	_test_journal_ledger_consistency()
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
@@ -247,6 +248,18 @@ func _test_observation_and_anomaly_events() -> void:
 	assert(ui_logic.worldline_ledger.has_fact("day7_village_change"))
 	assert(ui_logic.worldline_ledger.event_ids.has("lullaby.anomaly.day7.evening"))
 	assert(ui_logic._state_journal_are_consistent(ui_logic.game_state, ui_logic.clue_journal))
+
+
+func _test_journal_ledger_consistency() -> void:
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	ui_logic.schedule_manager = ScheduleManagerScript.new()
+	ui_logic.clue_journal = ClueJournalScript.new()
+	ui_logic.worldline_ledger = WorldlineLedgerScript.new()
+	assert(ui_logic.clue_journal.add_fact("orphan_clue", "Orphan", "No event source", 1, "早晨", "家"))
+	assert(not ui_logic._journal_references_are_valid(ui_logic.clue_journal, ui_logic.worldline_ledger))
+	ui_logic.worldline_ledger.record_event("source_for_clue", "lullaby", "mite", "observe", "HOME", ["orphan_clue"])
+	assert(ui_logic._journal_references_are_valid(ui_logic.clue_journal, ui_logic.worldline_ledger))
 
 
 func _test_location_content_coverage() -> void:

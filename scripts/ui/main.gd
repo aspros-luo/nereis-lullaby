@@ -525,6 +525,7 @@ func _talk_to_npc(npc_id: String) -> void:
 		return
 	var reply := _get_daily_dialogue(npc_id)
 	var fact_added := false
+	var reported_fact_id := ""
 	if game_state.world_state["phase"] == "after_week":
 		match npc_id:
 			"caregiver":
@@ -535,24 +536,28 @@ func _talk_to_npc(npc_id: String) -> void:
 				reply = "医生说大家可能只是累了。他把几页记录压在手下，没有继续说下去。"
 	else:
 		if npc_id == "doctor" and game_state.day_index >= 3 and game_state.current_location == "CLINIC":
+			reported_fact_id = "day3_similar_sleep_reports"
 			fact_added = _add_fact(
 				"day3_similar_sleep_reports", "相似的睡眠困扰",
 				"医生提到有几位居民最近睡得不太好，也做过相似的梦。压力或普通疾病也可能造成这种情况。"
 			)
 			reply = "医生提到最近有几位居民睡得不太好，但认为目前还不能确定原因。"
 		elif npc_id == "caregiver" and game_state.day_index >= 4 and game_state.current_location == "HOME":
+			reported_fact_id = "day4_caregiver_custom"
 			fact_added = _add_fact(
 				"day4_caregiver_custom", "关于习俗的日常解释",
 				"照料者把某项安排解释为村里沿用已久的生活习惯。她说得很自然，没有表现出自己在揭露秘密。"
 			)
 			reply = "照料者说这只是村里一直沿用的习惯，还问我晚饭想吃什么。"
 		elif npc_id == "worship_leader" and game_state.day_index >= 4 and game_state.current_location == "SHRINE":
+			reported_fact_id = "day4_worship_custom"
 			fact_added = _add_fact(
 				"day4_worship_custom", "关于习俗的公共解释",
 				"礼拜主持者从公共传统和社区秩序的角度解释了类似安排。与另一种说法的差异值得比较，但并不能证明有人撒谎。"
 			)
 			reply = "礼拜主持者把类似安排解释为维护公共传统的一部分。"
 		if npc_id == "doctor" and game_state.day_index >= 6 and game_state.current_location == "CLINIC":
+			reported_fact_id = "day6_date_discrepancy"
 			fact_added = _add_fact(
 				"day6_date_discrepancy", "病患记得的日期并不一致",
 				"几位病患对不适开始的时间记忆不同。压力、记忆偏差或其他普通因素都可能解释差异。"
@@ -579,6 +584,24 @@ func _talk_to_npc(npc_id: String) -> void:
 	var talk_event_id := "lullaby.talk.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, npc_id]
 	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location)
 	message_label.text = reply
+	if not reported_fact_id.is_empty():
+		var report_event_id := "lullaby.report.day%d.slot%d.%s.%s" % [
+			game_state.day_index, game_state.slot_index, npc_id, reported_fact_id
+		]
+		worldline_ledger.record_event(
+			report_event_id, "lullaby", npc_id, "report_" + reported_fact_id,
+			game_state.current_location, [reported_fact_id]
+		)
+		var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
+		var message_id := "lullaby.message.day%d.slot%d.%s.%s" % [
+			game_state.day_index, game_state.slot_index, npc_id, reported_fact_id
+		]
+		if information_network.publish_message(
+			message_id, reported_fact_id, npc_id, "mite", "direct_conversation",
+			0, 0.8, world_tick, report_event_id, worldline_ledger
+		):
+			information_network.advance_to(world_tick, worldline_ledger)
+			message_label.text += "\\n\\n我记下了对方的说法，但还不能仅凭这段话确定原因。"
 	if fact_added:
 		message_label.text += "（线索簿已更新。）"
 	_refresh_ui()

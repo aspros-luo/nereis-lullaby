@@ -29,6 +29,7 @@
 - [x] Add smoke-test code for the ledger, information network, and NPC behavior (not yet executed by Godot).
 - [x] Add message delay, inboxes, credibility, and belief confidence as separate concepts.
 - [x] Connect an initial deterministic NPC routine selector, with authored story beats taking priority; only narrate NPC actions directly observable from the player's current location.
+- [x] Harden NPC schedule lookup boundaries: unknown actors, out-of-range days/slots, invalid locations, and invalid schedule overrides fail safely; add `tests/schedule_boundary_test.gd` (pending execution in Godot).
 - [x] Harden ledger save loading: required event fields, fact/first-event consistency, and existence of every event-referenced fact.
 - [x] Validate clue-journal saves atomically; reject malformed or duplicate entries and non-string text fields before replacing runtime state.
 - [x] Validate information-network saves: inbox entries must match delivered messages, beliefs require delivered-message evidence, and non-finite credibility, string-coerced clock/confidence values, non-string message identifiers, message send times later than the network clock, and pending messages already due at the saved tick are rejected.

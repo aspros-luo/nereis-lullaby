@@ -67,3 +67,10 @@
 - Do not treat prototype narrative as finalized canon.
 - Do not trigger GitHub Actions proactively.
 - Reports must distinguish static review, automated tests, engine execution, and human playtesting.
+
+
+## Causal provenance validation
+
+- A character's knowledge source event must explicitly contain the fact being learned; an unrelated event in the ledger is not sufficient.
+- Save loading checks the same fact-to-source relationship and rejects mismatched provenance.
+- Tests cover rejection of unrelated sources and mismatched source references in save data.

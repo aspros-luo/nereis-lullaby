@@ -526,6 +526,7 @@ func _talk_to_npc(npc_id: String) -> void:
 	var reply := _get_daily_dialogue(npc_id)
 	var fact_added := false
 	var reported_fact_ids: Array[String] = []
+	var personal_moment: Dictionary = _get_available_personal_moment(npc_id)
 	if game_state.world_state["phase"] == "after_week":
 		match npc_id:
 			"caregiver":
@@ -534,6 +535,8 @@ func _talk_to_npc(npc_id: String) -> void:
 				reply = "礼拜主持者说村里一切都好，但他把原本放在桌上的木盒收了起来。"
 			"doctor":
 				reply = "医生说大家可能只是累了。他把几页记录压在手下，没有继续说下去。"
+	elif not personal_moment.is_empty():
+		reply = str(personal_moment["dialogue"])
 	else:
 		if npc_id == "doctor" and game_state.day_index >= 3 and game_state.current_location == "CLINIC":
 			reported_fact_ids.append("day3_similar_sleep_reports")
@@ -564,9 +567,6 @@ func _talk_to_npc(npc_id: String) -> void:
 			) or fact_added
 			reply += " 医生还发现，几位病患记得的日期并不一致。"
 
-	var personal_moment: Dictionary = _get_available_personal_moment(npc_id)
-	if not personal_moment.is_empty():
-		reply = str(personal_moment["dialogue"])
 
 	if not game_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
 		return

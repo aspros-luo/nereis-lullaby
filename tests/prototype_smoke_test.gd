@@ -17,6 +17,7 @@ func _initialize() -> void:
 	_test_npc_schedules_and_locations()
 	_test_location_content_coverage()
 	_test_anomaly_observation_callbacks()
+	_test_alternate_clue_routes()
 	_test_personal_moment_coverage()
 	_test_clue_deduplication()
 	_test_relationship_bounds()
@@ -116,6 +117,26 @@ func _test_anomaly_observation_callbacks() -> void:
 	assert(not ui_logic._get_anomaly_observation_followup("GROVE").is_empty())
 	assert(not ui_logic._get_anomaly_observation_followup("PATH").is_empty())
 	assert(ui_logic._get_anomaly_observation_followup("HOME").is_empty())
+
+
+func _test_alternate_clue_routes() -> void:
+	var ui_logic = MainScript.new()
+	var no_clues: Dictionary = {}
+	var sleep_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("CLINIC", 4, no_clues)
+	assert(sleep_clue.get("id", "") == "day3_similar_sleep_reports")
+	assert(ui_logic._get_alternate_clue_for_observation("HOME", 4, no_clues).is_empty())
+	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 3, no_clues).is_empty())
+
+	var seen_sleep: Dictionary = {"day3_similar_sleep_reports": true}
+	var date_clue: Dictionary = ui_logic._get_alternate_clue_for_observation("CLINIC", 6, seen_sleep)
+	assert(date_clue.get("id", "") == "day6_date_discrepancy")
+	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 5, seen_sleep).is_empty())
+
+	var seen_both: Dictionary = {
+		"day3_similar_sleep_reports": true,
+		"day6_date_discrepancy": true,
+	}
+	assert(ui_logic._get_alternate_clue_for_observation("CLINIC", 7, seen_both).is_empty())
 
 
 func _test_personal_moment_coverage() -> void:

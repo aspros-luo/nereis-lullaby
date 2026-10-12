@@ -512,6 +512,7 @@ func _observe_location() -> void:
 		game_state = staged_state
 		var added_after := _record_anomaly_clue_if_available(game_state.current_location)
 		var anomaly_observation: String = str(ANOMALY_OBSERVATION_TEXT.get(game_state.current_location, "我仔细看了看周围，暂时没有发现能解释变化的东西。"))
+		anomaly_observation += _get_anomaly_observation_followup(game_state.current_location)
 		message_label.text = anomaly_observation + ("（线索簿已更新。）" if added_after else " 我暂时没有发现新的记录。")
 		_refresh_ui()
 		return
@@ -543,6 +544,26 @@ func _observe_location() -> void:
 	var ordinary_observation: String = str(OBSERVATION_TEXT.get(game_state.current_location, "这里暂时没有什么特别的发现。"))
 	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
+
+## Add a restrained callback only when the player personally recorded related evidence.
+## 仅当玩家此前亲自记录过相关证据时，才补充克制的回访呼应。
+func _get_anomaly_observation_followup(location_id: String) -> String:
+	var seen_ids: Dictionary = clue_journal._seen_ids
+	match location_id:
+		"SHRINE":
+			if seen_ids.has("day5_repeated_object_shrine"):
+				return "\n\n我想起此前在这里见过的相似物件。它们和这圈潮痕是否有关，我还不知道。"
+		"COMMONS":
+			if seen_ids.has("day5_repeated_object_commons"):
+				return "\n\n之前见到的相似准备还留在记忆里；眼前的人们却像什么也没发生。"
+		"FOREST", "GROVE", "PATH":
+			if seen_ids.has("forest_flower_observation") or seen_ids.has("forest_flower_picked"):
+				return "\n\n我想起之前见过的整齐断口。现在这些变化似乎没有留下能对应的脚印。"
+		"CLINIC":
+			if seen_ids.has("day3_similar_sleep_reports") or seen_ids.has("day6_date_discrepancy"):
+				return "\n\n医生之前提到过相似的睡眠困扰和不一致的日期。我无法判断它们是否有关。"
+	return ""
+
 
 func _do_daily_activity() -> void:
 	if game_state.world_state["phase"] != "ordinary" or not game_state.can_take_action():

@@ -4,6 +4,9 @@ extends RefCounted
 const SLOT_KEYS: Array[String] = ["morning", "daytime", "evening"]
 const SLOT_LABELS: Array[String] = ["早晨", "白天", "傍晚"]
 const FINAL_DAY: int = 7
+const POST_ANOMALY_LOCATIONS: Array[String] = [
+	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
+]
 
 var day_index: int = 1
 var slot_index: int = 0
@@ -62,7 +65,7 @@ func register_fact(fact_id: String) -> void:
 		investigation_state["observed_fact_ids"] = facts
 
 func mark_post_anomaly_visit(location_id: String) -> void:
-	if world_state["phase"] != "after_week":
+	if world_state["phase"] != "after_week" or not POST_ANOMALY_LOCATIONS.has(location_id):
 		return
 	var visited: Array = investigation_state["visited_after_anomaly"]
 	if not visited.has(location_id):
@@ -84,9 +87,16 @@ func advance_time() -> void:
 		slot_index = 0
 		day_index += 1
 
-func complete_demo() -> void:
-	if world_state["phase"] == "after_week":
-		world_state["phase"] = "demo_complete"
+func can_complete_demo() -> bool:
+	if world_state["phase"] != "after_week":
+		return false
+	return investigation_state["visited_after_anomaly"].size() >= 3
+
+func complete_demo() -> bool:
+	if not can_complete_demo():
+		return false
+	world_state["phase"] = "demo_complete"
+	return true
 
 
 func to_save_data() -> Dictionary:
@@ -146,9 +156,13 @@ func load_save_data(data: Dictionary) -> bool:
 		return false
 	if saved_flags.has("personal_moments_seen") and not (saved_flags["personal_moments_seen"] is Dictionary):
 		return false
+	var validated_visits: Array[String] = []
 	for visited_location in saved_visits_value:
-		if not (visited_location is String):
+		if not (visited_location is String) or not POST_ANOMALY_LOCATIONS.has(visited_location):
 			return false
+		if validated_visits.has(visited_location):
+			return false
+		validated_visits.append(visited_location)
 	var restored_relationships: Dictionary = {}
 	for npc_id in relationship_state.keys():
 		restored_relationships[npc_id] = clampi(int(saved_relationships.get(npc_id, 0)), -5, 10)

@@ -31,6 +31,8 @@
 
 ## Phase 3.6: Dual-perspective worldlines and causal events
 - [x] Define a bilingual causal contract separating world facts, character knowledge, intentions, opportunities, and ending conditions.
+- [x] Add the first traceable event ledger: event-ID deduplication, world-fact provenance, explicit knowledge grants, opportunity state, and save serialization; routine actions and conversations now record events.
+- [x] Add automated smoke-test code for the ledger (not yet executed by Godot).
 - [ ] Give important actions stable event IDs, preconditions, information channels, observable feedback, and alternate evidence after a missed scene.
 - [ ] Align cross-game event semantics with the Hero repository; keep both games independently runnable without runtime coupling.
 - [ ] Keep example causal paths explicitly proposed; do not canonize the Restoration Army, forest investigation, third umbilical cord, or ending bindings prematurely.

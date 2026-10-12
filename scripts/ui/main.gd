@@ -559,7 +559,7 @@ func _do_daily_activity() -> void:
 func _talk_to_npc(npc_id: String) -> void:
 	if not game_state.can_take_action():
 		return
-	if not schedule_manager.NPC_DATA.has(npc_id) or not _npc_is_present(npc_id):
+	if not ScheduleManagerScript.NPC_DATA.has(npc_id) or not _npc_is_present(npc_id):
 		return
 	var talked_after_anomaly: Dictionary = game_state.world_state["flags"].get("post_anomaly_talked", {})
 	if game_state.world_state["phase"] == "after_week" and talked_after_anomaly.has(npc_id):

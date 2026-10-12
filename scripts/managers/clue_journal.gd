@@ -48,7 +48,10 @@ func load_entries(saved_entries: Array) -> bool:
 		var fact_id: String = str(entry.get("id", ""))
 		var title: String = str(entry.get("title", ""))
 		var detail: String = str(entry.get("detail", ""))
-		var day: int = int(entry.get("day", 0))
+		var day_value: Variant = entry.get("day", null)
+		if not (day_value is int):
+			return false
+		var day: int = int(day_value)
 		var slot: String = str(entry.get("slot", ""))
 		var location: String = str(entry.get("location", ""))
 		if fact_id.strip_edges().is_empty() or restored_ids.has(fact_id):

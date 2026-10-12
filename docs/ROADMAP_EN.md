@@ -39,6 +39,7 @@
 
 ## Phase 3.5: Relationships and autonomous behavior
 - [x] Establish bilingual NPC relationship and behavior design baselines, separating known ties from open questions.
+- [x] Add an influence matrix and candidate causal network for five cross-regional key actors (design proposal, not yet gameplay).
 - [ ] Create data-driven behavior cards for the three key NPCs: goals, motives, knowledge boundaries, memory, relationship dimensions, and stress responses.
 - [ ] Implement discrete NPC behavior simulation and authored-event schedule overrides.
 - [ ] Add regression tests for information flow, relationship changes, action consequences, and save/load.

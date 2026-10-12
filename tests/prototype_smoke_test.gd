@@ -9,6 +9,7 @@ const MainScript = preload("res://scripts/ui/main.gd")
 const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
 const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
 const NPCBehaviorProfilesScript = preload("res://scripts/data/npc_behavior_profiles.gd")
+const NPCBehaviorSimulatorScript = preload("res://scripts/managers/npc_behavior_simulator.gd")
 
 func _initialize() -> void:
 	_test_time_progression_and_anomaly()
@@ -23,6 +24,7 @@ func _initialize() -> void:
 	_test_worldline_ledger()
 	_test_worldline_information_network()
 	_test_npc_behavior_profiles()
+	_test_npc_behavior_simulator()
 	print("Nereis Lullaby core smoke tests passed.")
 	quit()
 
@@ -273,3 +275,19 @@ func _test_npc_behavior_profiles() -> void:
 	var copy: Dictionary = NPCBehaviorProfilesScript.get_profile("doctor")
 	copy["goals"].clear()
 	assert(not NPCBehaviorProfilesScript.get_profile("doctor")["goals"].is_empty())
+
+
+func _test_npc_behavior_simulator() -> void:
+	var profile: Dictionary = NPCBehaviorProfilesScript.get_profile("caregiver")
+	var action_a: Dictionary = NPCBehaviorSimulatorScript.choose_action("caregiver", profile, 3, 2, 0, 0, false)
+	var action_b: Dictionary = NPCBehaviorSimulatorScript.choose_action("caregiver", profile, 3, 2, 0, 0, false)
+	assert(NPCBehaviorSimulatorScript.validate_action(action_a))
+	assert(action_a == action_b) # Same inputs must yield the same choice.
+	assert(action_a["npc_id"] == "caregiver")
+	assert(action_a["tick"] == 3)
+	var close_relationship: Dictionary = NPCBehaviorSimulatorScript.choose_action("caregiver", profile, 3, 2, 0, 4, false)
+	assert(close_relationship["id"] == "check_on_mite")
+	assert(NPCBehaviorSimulatorScript.choose_action("doctor", NPCBehaviorProfilesScript.get_profile("doctor"), 3, 2, 0, 0, false, 1)["id"] == "review_records")
+	assert(NPCBehaviorSimulatorScript.choose_action("doctor", NPCBehaviorProfilesScript.get_profile("doctor"), 3, 2, 0, 0, true).is_empty())
+	assert(NPCBehaviorSimulatorScript.choose_action("unknown_npc", {}, 3, 2, 0, 0, false).is_empty())
+	assert(not NPCBehaviorSimulatorScript.validate_action({"id": "incomplete"}))

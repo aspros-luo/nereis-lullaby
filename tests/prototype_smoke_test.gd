@@ -440,6 +440,8 @@ func _test_worldline_ledger_rejects_inconsistent_save() -> void:
 	var source = WorldlineLedgerScript.new()
 	assert(source.record_event("observation", "lullaby", "mite", "observe", "FOREST", ["forest_oddity"]))
 	assert(source.record_event("unrelated_event", "lullaby", "doctor", "review_records", "CLINIC"))
+	assert(source.grant_knowledge("doctor", "forest_oddity", "observation", "direct_observation"))
+	assert(source.set_opportunity("forest_followup", true, "observation"))
 	var protected = WorldlineLedgerScript.new()
 	assert(protected.record_event("existing", "lullaby", "mite", "observe", "HOME"))
 
@@ -459,6 +461,14 @@ func _test_worldline_ledger_rejects_inconsistent_save() -> void:
 	assert(protected.event_ids.has("existing"))
 	invalid_data = source.to_save_data()
 	invalid_data["events"][0]["event_id"] = 123
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
+	invalid_data = source.to_save_data()
+	invalid_data["character_knowledge"]["doctor"]["forest_oddity"]["channel"] = 7
+	assert(not protected.load_save_data(invalid_data))
+	assert(protected.event_ids.has("existing"))
+	invalid_data = source.to_save_data()
+	invalid_data["opportunities"]["forest_followup"]["is_open"] = "true"
 	assert(not protected.load_save_data(invalid_data))
 	assert(protected.event_ids.has("existing"))
 

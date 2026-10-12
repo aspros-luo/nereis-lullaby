@@ -239,6 +239,7 @@ func _test_worldline_information_network() -> void:
 	# Receipt creates a report and tentative belief, not objective knowledge.
 	assert(not ledger.character_knows("merchant", "forest_oddity"))
 	assert(network.advance_to(5) == 0)
+	assert(network.advance_to(4) == 0) # Time cannot move backwards.
 	var restored = InformationNetworkScript.new()
 	assert(restored.load_save_data(network.to_save_data()))
 	assert(restored.get_inbox("merchant").size() == 1)
@@ -247,6 +248,10 @@ func _test_worldline_information_network() -> void:
 	assert(protected_network.load_save_data(network.to_save_data()))
 	var invalid_data: Dictionary = network.to_save_data()
 	invalid_data["messages"] = "corrupt"
+	assert(not protected_network.load_save_data(invalid_data))
+	assert(protected_network.get_inbox("merchant").size() == 1)
+	invalid_data = network.to_save_data()
+	invalid_data["current_tick"] = -2
 	assert(not protected_network.load_save_data(invalid_data))
 	assert(protected_network.get_inbox("merchant").size() == 1)
 

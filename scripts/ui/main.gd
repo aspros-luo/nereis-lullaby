@@ -656,48 +656,76 @@ func _talk_to_npc(npc_id: String) -> void:
 			reply += " 医生还发现，几位病患记得的日期并不一致。"
 
 
-	if not game_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
+	# Stage action, relationships, clues, event provenance and information delivery together.
+	var staged_state = _copy_game_state(game_state)
+	var staged_journal = _copy_clue_journal(clue_journal)
+	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
+	var staged_network = _copy_information_network(information_network)
+	if staged_state == null or staged_journal == null or staged_ledger == null or staged_network == null:
+		message_label.text = "这次交谈暂时无法安全记录，当前时段没有消耗。"
 		return
-	# Apply dialogue-derived facts only after the action has been accepted.
-	for pending_fact in pending_facts:
-		fact_added = _add_fact(
-			str(pending_fact["id"]),
-			str(pending_fact["title"]),
-			str(pending_fact["detail"])
-		) or fact_added
-	if game_state.world_state["phase"] == "ordinary":
+	if not staged_state.take_action("talk_" + npc_id, "与" + schedule_manager.get_npc_name(npc_id) + "交谈"):
+		return
+	if staged_state.world_state["phase"] == "ordinary":
 		if not personal_moment.is_empty():
-			var seen_moments: Dictionary = game_state.world_state["flags"].get("personal_moments_seen", {})
+			var seen_moments: Dictionary = staged_state.world_state["flags"].get("personal_moments_seen", {})
 			seen_moments[str(personal_moment["id"])] = true
-			game_state.world_state["flags"]["personal_moments_seen"] = seen_moments
-			game_state.increase_relationship(npc_id, 2)
+			staged_state.world_state["flags"]["personal_moments_seen"] = seen_moments
+			staged_state.increase_relationship(npc_id, 2)
 		else:
-			game_state.increase_relationship(npc_id)
+			staged_state.increase_relationship(npc_id)
 	else:
-		talked_after_anomaly[npc_id] = true
-		game_state.world_state["flags"]["post_anomaly_talked"] = talked_after_anomaly
-	var talk_event_id := "lullaby.talk.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, npc_id]
-	worldline_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, game_state.current_location)
-	message_label.text = reply
+		var staged_talked: Dictionary = staged_state.world_state["flags"].get("post_anomaly_talked", {})
+		staged_talked[npc_id] = true
+		staged_state.world_state["flags"]["post_anomaly_talked"] = staged_talked
+
+	var talk_event_id := "lullaby.talk.day%d.slot%d.%s" % [staged_state.day_index, staged_state.slot_index, npc_id]
+	if not staged_ledger.record_event(talk_event_id, "lullaby", "mite", "talk_" + npc_id, staged_state.current_location):
+		message_label.text = "交谈事件无法写入记录；当前时段没有消耗。"
+		return
+	var world_tick: int = (staged_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + staged_state.slot_index
 	var received_report := false
-	var world_tick: int = (game_state.day_index - 1) * GameStateScript.SLOT_KEYS.size() + game_state.slot_index
 	for reported_fact_id in reported_fact_ids:
+		var pending_fact: Dictionary = {}
+		for candidate in pending_facts:
+			if str(candidate.get("id", "")) == reported_fact_id:
+				pending_fact = candidate
+				break
 		var report_event_id := "lullaby.report.day%d.slot%d.%s.%s" % [
-			game_state.day_index, game_state.slot_index, npc_id, reported_fact_id
+			staged_state.day_index, staged_state.slot_index, npc_id, reported_fact_id
 		]
-		worldline_ledger.record_event(
+		if not staged_ledger.record_event(
 			report_event_id, "lullaby", npc_id, "report_" + reported_fact_id,
-			game_state.current_location, [reported_fact_id]
-		)
-		var message_id := "lullaby.message.day%d.slot%d.%s.%s" % [
-			game_state.day_index, game_state.slot_index, npc_id, reported_fact_id
-		]
-		if information_network.publish_message(
-			message_id, reported_fact_id, npc_id, "mite", "direct_conversation",
-			0, 0.8, world_tick, report_event_id, worldline_ledger
+			staged_state.current_location, [reported_fact_id]
 		):
-			received_report = true
-			information_network.advance_to(world_tick, worldline_ledger)
+			message_label.text = "交谈事实的来源无法写入记录；当前时段没有消耗。"
+			return
+		if not pending_fact.is_empty():
+			var added_pending: bool = staged_journal.add_fact(
+				reported_fact_id, str(pending_fact["title"]), str(pending_fact["detail"]),
+				staged_state.day_index, staged_state.get_slot_label(),
+				schedule_manager.get_location_name(staged_state.current_location)
+			)
+			if added_pending:
+				staged_state.register_fact(reported_fact_id)
+				fact_added = true
+		var message_id := "lullaby.message.day%d.slot%d.%s.%s" % [
+			staged_state.day_index, staged_state.slot_index, npc_id, reported_fact_id
+		]
+		if not staged_network.publish_message(
+			message_id, reported_fact_id, npc_id, "mite", "direct_conversation",
+			0, 0.8, world_tick, report_event_id, staged_ledger
+		):
+			message_label.text = "交谈内容已准备，但信息传播记录无法提交；当前时段没有消耗。"
+			return
+		received_report = true
+		staged_network.advance_to(world_tick, staged_ledger)
+
+	game_state = staged_state
+	clue_journal = staged_journal
+	worldline_ledger = staged_ledger
+	information_network = staged_network
+	message_label.text = reply
 	if received_report:
 		message_label.text += "\n\n我记下了对方的说法，但还不能仅凭这段话确定原因。"
 	if fact_added:

@@ -28,7 +28,8 @@ static func choose_action(
 	slot: int,
 	relationship: int,
 	authored_override: bool,
-	received_message_count: int = 0
+	received_message_count: int = 0,
+	previous_action_id: String = ""
 ) -> Dictionary:
 	if authored_override or not ACTIONS.has(npc_id) or profile.is_empty() or tick < 0:
 		return {}
@@ -42,15 +43,22 @@ static func choose_action(
 			options.append(candidate)
 	if options.is_empty():
 		return {}
+	if options.size() > 1 and not previous_action_id.is_empty():
+		var filtered_options: Array = []
+		for candidate in options:
+			if str(candidate.get("id", "")) != previous_action_id:
+				filtered_options.append(candidate)
+		if not filtered_options.is_empty():
+			options = filtered_options
 	var index: int = posmod(tick + day + maxi(0, relationship + 5) + received_message_count, options.size())
 	if npc_id == "doctor" and received_message_count > 0:
 		for candidate_index in range(options.size()):
-			if str(options[candidate_index]["id"]) == "review_records":
+			if str(options[candidate_index]["id"]) == "review_records" and str(options[candidate_index]["id"]) != previous_action_id:
 				index = candidate_index
 				break
 	if npc_id == "caregiver" and relationship >= 4:
 		for candidate_index in range(options.size()):
-			if str(options[candidate_index]["id"]) == "check_on_mite":
+			if str(options[candidate_index]["id"]) == "check_on_mite" and str(options[candidate_index]["id"]) != previous_action_id:
 				index = candidate_index
 				break
 	var selected: Dictionary = options[index].duplicate(true)

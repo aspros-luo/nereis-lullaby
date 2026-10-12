@@ -118,6 +118,19 @@ func _test_anomaly_observation_callbacks() -> void:
 	assert(not ui_logic._get_anomaly_observation_followup("PATH").is_empty())
 	assert(ui_logic._get_anomaly_observation_followup("HOME").is_empty())
 
+	# A missed conversation may leave only the custom explanation, not the repeat-object clue.
+	ui_logic.clue_journal = ClueJournalScript.new()
+	assert(ui_logic.clue_journal.add_fact(
+		"day4_caregiver_custom", "Everyday custom", "Previously heard", 4, "白天", "家附近"
+	))
+	assert(not ui_logic._get_anomaly_observation_followup("HOME").is_empty())
+	assert(not ui_logic._get_anomaly_observation_followup("COMMONS").is_empty())
+	ui_logic.clue_journal = ClueJournalScript.new()
+	assert(ui_logic.clue_journal.add_fact(
+		"day4_worship_custom", "Public custom", "Previously heard", 4, "白天", "礼拜场所"
+	))
+	assert(not ui_logic._get_anomaly_observation_followup("SHRINE").is_empty())
+
 
 func _test_alternate_clue_routes() -> void:
 	var ui_logic = MainScript.new()

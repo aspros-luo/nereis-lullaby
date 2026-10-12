@@ -606,12 +606,19 @@ func _get_alternate_clue_for_observation(location_id: String, day_index: int, se
 func _get_anomaly_observation_followup(location_id: String) -> String:
 	var seen_ids: Dictionary = clue_journal._seen_ids
 	match location_id:
+		"HOME":
+			if seen_ids.has("day4_caregiver_custom"):
+				return "\n\n我想起照料者曾把某项安排解释为生活习惯。现在的变化让我重新想起那句话，但我还无法判断二者是否有关。"
 		"SHRINE":
 			if seen_ids.has("day5_repeated_object_shrine"):
 				return "\n\n我想起此前在这里见过的相似物件。它们和这圈潮痕是否有关，我还不知道。"
+			if seen_ids.has("day4_worship_custom"):
+				return "\n\n我想起这里曾把某项安排解释为公共传统。眼前的变化让我重新想起那种说法，但它还不能解释发生了什么。"
 		"COMMONS":
 			if seen_ids.has("day5_repeated_object_commons"):
 				return "\n\n之前见到的相似准备还留在记忆里；眼前的人们却像什么也没发生。"
+			if seen_ids.has("day4_caregiver_custom"):
+				return "\n\n照料者曾把类似安排说成生活习惯。公共空间眼下的变化让我想起这句话，但我还不能把两件事联系起来。"
 		"FOREST", "GROVE", "PATH":
 			if seen_ids.has("forest_flower_observation") or seen_ids.has("forest_flower_picked"):
 				return "\n\n我想起之前见过的整齐断口。现在这些变化似乎没有留下能对应的脚印。"

@@ -6,6 +6,8 @@ const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manag
 const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
 const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
 const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
+const NPCBehaviorProfilesScript = preload("res://scripts/data/npc_behavior_profiles.gd")
+const NPCBehaviorSimulatorScript = preload("res://scripts/managers/npc_behavior_simulator.gd")
 
 const LOCATION_ORDER: Array[String] = [
 	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
@@ -431,6 +433,42 @@ func _advance_time() -> void:
 	game_state.advance_time()
 	var world_tick: int = (game_state.day_index - 1) * 3 + game_state.slot_index
 	information_network.advance_to(world_tick, worldline_ledger)
+	var authored_beat_active: bool = (
+		game_state.world_state["phase"] != "ordinary"
+		or game_state.day_index != previous_day
+	)
+	var autonomous_lines: Array[String] = []
+	if not authored_beat_active:
+		var last_actions: Dictionary = game_state.world_state["flags"].get("npc_last_autonomous_actions", {})
+		for npc_id in ["caregiver", "worship_leader", "doctor"]:
+			var profile: Dictionary = NPCBehaviorProfilesScript.get_profile(npc_id)
+			var inbox: Array = information_network.get_inbox(npc_id)
+			var action: Dictionary = NPCBehaviorSimulatorScript.choose_action(
+				npc_id,
+				profile,
+				world_tick,
+				game_state.day_index,
+				game_state.slot_index,
+				int(game_state.relationship_state.get(npc_id, 0)),
+				false,
+				inbox.size()
+			)
+			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
+				continue
+			var previous_action: Dictionary = last_actions.get(npc_id, {})
+			if str(previous_action.get("id", "")) == str(action["id"]):
+				continue
+			last_actions[npc_id] = action.duplicate(true)
+			var action_event_id := "lullaby.npc_action.tick%d.%s" % [world_tick, npc_id]
+			worldline_ledger.record_event(
+				action_event_id,
+				"lullaby",
+				npc_id,
+				str(action["id"]),
+				schedule_manager.get_location(npc_id, game_state.day_index, game_state.slot_index)
+			)
+			autonomous_lines.append(str(action["line"]))
+		game_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
 	if was_ordinary and game_state.world_state["phase"] == "after_week":
 		message_label.text = "远处忽然传来一声沉闷的鸣响。它很快消失，村庄却安静得有些不寻常。"
 		clue_journal.add_fact(
@@ -446,6 +484,8 @@ func _advance_time() -> void:
 		message_label.text = str(DAY_OPENING_TEXT.get(game_state.day_index, "新的一天开始了。村里的人继续忙着各自的事。"))
 	else:
 		message_label.text = "时段过去了。村里的人也继续忙着各自的事。"
+	if not autonomous_lines.is_empty():
+		message_label.text += "\n\n村民动向：\n" + "\n".join(autonomous_lines)
 	_refresh_ui()
 
 func _observe_location() -> void:

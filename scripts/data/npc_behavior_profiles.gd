@@ -7,6 +7,7 @@ const PROFILES: Dictionary = {
 		"role": "household_caregiver",
 		"goals": ["keep Mite safe", "maintain ordinary daily routines"],
 		"motives": ["care", "stability", "familiarity"],
+		"action_preferences": ["care", "stability"],
 		"knowledge_boundaries": [
 			"knows household routines and Mite's childhood habits",
 			"does not automatically know the cause of villagers' sleep problems",
@@ -21,6 +22,7 @@ const PROFILES: Dictionary = {
 		"role": "local_community_ritual_coordinator",
 		"goals": ["keep public routines orderly", "help villagers cooperate"],
 		"motives": ["community cohesion", "tradition", "responsibility"],
+		"action_preferences": ["community", "coordination", "tradition"],
 		"knowledge_boundaries": [
 			"knows public customs and the preparations he personally coordinates",
 			"does not automatically know private medical records",
@@ -35,6 +37,7 @@ const PROFILES: Dictionary = {
 		"role": "village_practitioner",
 		"goals": ["care for patients", "keep records usable and consistent"],
 		"motives": ["duty of care", "evidence", "professional caution"],
+		"action_preferences": ["evidence", "care", "caution"],
 		"knowledge_boundaries": [
 			"knows only patients and records he has personally encountered",
 			"date discrepancies do not establish a supernatural cause",
@@ -57,12 +60,12 @@ static func get_all_profiles() -> Dictionary:
 	return PROFILES.duplicate(true)
 
 static func has_required_fields(profile: Dictionary) -> bool:
-	for key in ["role", "goals", "motives", "knowledge_boundaries", "memory_dimensions", "relationship_dimensions", "stress_response", "fallback_action"]:
+	for key in ["role", "goals", "motives", "action_preferences", "knowledge_boundaries", "memory_dimensions", "relationship_dimensions", "stress_response", "fallback_action"]:
 		if not profile.has(key):
 			return false
 	if str(profile["role"]).is_empty() or str(profile["stress_response"]).is_empty():
 		return false
-	for key in ["goals", "motives", "knowledge_boundaries", "memory_dimensions", "relationship_dimensions"]:
+	for key in ["goals", "motives", "action_preferences", "knowledge_boundaries", "memory_dimensions", "relationship_dimensions"]:
 		if not (profile[key] is Array) or profile[key].is_empty():
 			return false
 	return true

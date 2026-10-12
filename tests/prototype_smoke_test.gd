@@ -119,6 +119,15 @@ func _test_clue_deduplication() -> void:
 	var entries: Array[Dictionary] = journal.get_entries()
 	assert(entries.size() == 1)
 	assert(entries[0]["detail"] == "Observed fact")
+	var malformed_entries: Array = journal.get_entries()
+	malformed_entries[0]["title"] = 123
+	assert(not journal.load_entries(malformed_entries))
+	assert(journal.get_entries().size() == 1)
+	assert(journal.get_entries()[0]["title"] == "Test")
+	malformed_entries = journal.get_entries()
+	malformed_entries[0]["day"] = "1"
+	assert(not journal.load_entries(malformed_entries))
+	assert(journal.get_entries()[0]["detail"] == "Observed fact")
 
 func _test_relationship_bounds() -> void:
 	var state = GameStateScript.new()

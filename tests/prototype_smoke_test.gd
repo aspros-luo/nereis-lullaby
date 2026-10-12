@@ -482,6 +482,16 @@ func _test_worldline_information_network() -> void:
 	assert(not protected_network.load_save_data(invalid_data))
 	assert(protected_network.get_inbox("merchant").size() == 2)
 
+	# A pending message may arrive in the future, but cannot be sent after the saved clock.
+	var pending_network = InformationNetworkScript.new()
+	assert(pending_network.publish_message("future_send_test", "forest_oddity", "mite", "doctor", "conversation", 4, 0.5, 2, "source_observation", ledger))
+	var future_send_data: Dictionary = pending_network.to_save_data()
+	future_send_data["messages"][0]["sent_tick"] = 3
+	future_send_data["messages"][0]["arrival_tick"] = 7
+	var protected_pending_network = InformationNetworkScript.new()
+	assert(not protected_pending_network.load_save_data(future_send_data))
+	assert(protected_pending_network.current_tick == -1)
+
 
 func _test_npc_behavior_profiles() -> void:
 	var profiles: Dictionary = NPCBehaviorProfilesScript.get_all_profiles()

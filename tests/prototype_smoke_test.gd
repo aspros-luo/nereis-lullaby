@@ -705,6 +705,25 @@ func _test_worldline_information_network() -> void:
 	assert(not protected_due_network.load_save_data(due_data))
 	assert(protected_due_network.current_tick == -1)
 
+	# Due messages cannot be delivered without a ledger to record provenance.
+	var no_ledger_network = InformationNetworkScript.new()
+	assert(no_ledger_network.publish_message("needs_ledger", "forest_oddity", "mite", "doctor", "conversation", 1, 0.5, 2, "source_observation", ledger))
+	assert(no_ledger_network.advance_to(3) == 0)
+	assert(no_ledger_network.current_tick == 2)
+	assert(no_ledger_network.get_inbox("doctor").is_empty())
+	assert(str(no_ledger_network.messages[0]["status"]) == "pending")
+
+	# A colliding delivery event with the wrong fact must block delivery atomically.
+	var collision_ledger = WorldlineLedgerScript.new()
+	assert(collision_ledger.record_event("source_observation", "lullaby", "mite", "observe_forest", "FOREST", ["forest_oddity"]))
+	assert(collision_ledger.record_event("lullaby.message.delivered.collision_message", "lullaby", "doctor", "receive_message", "", []))
+	var collision_network = InformationNetworkScript.new()
+	assert(collision_network.publish_message("collision_message", "forest_oddity", "mite", "doctor", "conversation", 1, 0.5, 0, "source_observation", collision_ledger))
+	assert(collision_network.advance_to(1, collision_ledger) == 0)
+	assert(collision_network.current_tick == 0)
+	assert(collision_network.get_inbox("doctor").is_empty())
+	assert(str(collision_network.messages[0]["status"]) == "pending")
+
 
 func _test_npc_behavior_profiles() -> void:
 	var profiles: Dictionary = NPCBehaviorProfilesScript.get_all_profiles()

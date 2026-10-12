@@ -12,7 +12,11 @@ func add_fact(
 	slot_label: String,
 	location_name: String
 ) -> bool:
-	if _seen_ids.has(fact_id):
+	if fact_id.strip_edges().is_empty() or _seen_ids.has(fact_id):
+		return false
+	if title.strip_edges().is_empty() or detail.strip_edges().is_empty():
+		return false
+	if day_index < 1 or day_index > 7 or slot_label.strip_edges().is_empty() or location_name.strip_edges().is_empty():
 		return false
 
 	_seen_ids[fact_id] = true
@@ -33,18 +37,35 @@ func get_entries() -> Array[Dictionary]:
 	return copied_entries
 
 
-func load_entries(saved_entries: Array) -> void:
-	entries.clear()
-	_seen_ids.clear()
+## Validate into temporary collections first; invalid saves must not partially replace the journal.
+func load_entries(saved_entries: Array) -> bool:
+	var restored_entries: Array[Dictionary] = []
+	var restored_ids: Dictionary = {}
 	for entry_variant in saved_entries:
 		if not (entry_variant is Dictionary):
-			continue
+			return false
 		var entry: Dictionary = entry_variant
-		add_fact(
-			str(entry.get("id", "")),
-			str(entry.get("title", "")),
-			str(entry.get("detail", "")),
-			int(entry.get("day", 1)),
-			str(entry.get("slot", "早晨")),
-			str(entry.get("location", "未知地点"))
-		)
+		var fact_id: String = str(entry.get("id", ""))
+		var title: String = str(entry.get("title", ""))
+		var detail: String = str(entry.get("detail", ""))
+		var day: int = int(entry.get("day", 0))
+		var slot: String = str(entry.get("slot", ""))
+		var location: String = str(entry.get("location", ""))
+		if fact_id.strip_edges().is_empty() or restored_ids.has(fact_id):
+			return false
+		if title.strip_edges().is_empty() or detail.strip_edges().is_empty():
+			return false
+		if day < 1 or day > 7 or slot.strip_edges().is_empty() or location.strip_edges().is_empty():
+			return false
+		restored_ids[fact_id] = true
+		restored_entries.append({
+			"id": fact_id,
+			"title": title,
+			"detail": detail,
+			"day": day,
+			"slot": slot,
+			"location": location,
+		})
+	entries = restored_entries
+	_seen_ids = restored_ids
+	return true

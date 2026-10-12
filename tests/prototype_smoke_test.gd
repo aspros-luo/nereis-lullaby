@@ -161,15 +161,27 @@ func _test_save_roundtrip_after_anomaly() -> void:
 	assert(state.world_state["phase"] == "after_week")
 	state.mark_post_anomaly_visit("HOME")
 	state.mark_post_anomaly_visit("SHRINE")
+	assert(not state.can_complete_demo())
+	assert(not state.complete_demo())
+	state.mark_post_anomaly_visit("HOME") # Revisiting does not count as a third location.
+	assert(not state.can_complete_demo())
+	state.mark_post_anomaly_visit("FOREST")
+	assert(state.can_complete_demo())
 	var restored = GameStateScript.new()
 	assert(restored.load_save_data(state.to_save_data()))
 	assert(restored.world_state["phase"] == "after_week")
 	assert(restored.world_state["flags"]["village_anomaly"])
-	assert(restored.investigation_state["visited_after_anomaly"].size() == 2)
-	restored.complete_demo()
+	assert(restored.investigation_state["visited_after_anomaly"].size() == 3)
+	assert(restored.complete_demo())
 	var completed = GameStateScript.new()
 	assert(completed.load_save_data(restored.to_save_data()))
 	assert(completed.world_state["phase"] == "demo_complete")
+	var invalid_visits: Dictionary = state.to_save_data()
+	invalid_visits["investigation_state"]["visited_after_anomaly"] = ["HOME", "HOME", "UNKNOWN"]
+	var protected_visits = GameStateScript.new()
+	protected_visits.day_index = 4
+	assert(not protected_visits.load_save_data(invalid_visits))
+	assert(protected_visits.day_index == 4)
 
 
 func _test_location_content_coverage() -> void:

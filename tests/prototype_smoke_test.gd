@@ -239,6 +239,15 @@ func _test_save_roundtrip() -> void:
 	original.increase_relationship("caregiver", 3)
 	original.register_fact("save_test_fact")
 	original.world_state["flags"]["personal_moments_seen"] = {"caregiver_memory": true}
+	original.world_state["flags"]["npc_observed_traces"] = {
+		"CLINIC": {
+			"npc_id": "doctor",
+			"action_id": "review_records",
+			"tick": 1,
+			"day": 1,
+			"slot": 1,
+		}
+	}
 	original.world_state["flags"]["npc_last_autonomous_actions"] = {
 		"caregiver": {
 			"npc_id": "caregiver",
@@ -262,6 +271,7 @@ func _test_save_roundtrip() -> void:
 	assert(restored.investigation_state["observed_fact_ids"].has("save_test_fact"))
 	assert(restored.action_history.size() == 1)
 	assert(restored.world_state["flags"]["personal_moments_seen"]["caregiver_memory"])
+	assert(restored.world_state["flags"]["npc_observed_traces"]["CLINIC"]["action_id"] == "review_records")
 	assert(restored.world_state["flags"]["npc_last_autonomous_actions"]["caregiver"]["id"] == "tend_home")
 	var protected_state = GameStateScript.new()
 	protected_state.day_index = 4
@@ -275,6 +285,10 @@ func _test_save_roundtrip() -> void:
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()
 	invalid_data["world_state"]["flags"]["personal_moments_seen"] = "corrupt"
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["world_state"]["flags"]["npc_observed_traces"]["CLINIC"]["tick"] = 99
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()

@@ -35,4 +35,5 @@ The main scene now advances delivery with the game timeline and includes network
 
 - The system is committed to the main loop and smoke-test code, but **has not been run by Godot**.
 - Cross-region characters such as merchants, junior Church clerks, and Restoration Army quartermasters are not yet integrated, and no unapproved story messages have been hardcoded for demonstration.
-- Next, explicit conversations/actions should create messages, and the UI should show who told whom, when the information arrived, and whether the recipient believes it—without violating character permissions or knowledge boundaries.
+- The doctor’s reports about sleep/date discrepancies and the caregiver/worship leader’s explanations of customs are now routed through zero-delay conversation messages. Delivery is recorded in the worldline ledger without automatically granting objective knowledge.
+- Next, explicit actions between cross-region characters should create delayed messages, and the UI should show who told whom, when the information arrived, and whether the recipient believes it—without violating character permissions or knowledge boundaries.

@@ -61,6 +61,8 @@ Seven destinations are currently available: Mite's home area, village commons, p
 
 The anomaly's specific presentation, timing, and evidence are **prototype story proposals**, not finalized world canon. This slice is intended to test the loop of everyday life, contradictory clues, world change, and revisiting familiar locations.
 
+Three one-time personal moments have been added: the caregiver shares a small childhood memory through an old herb pouch, the worship leader and Mite retie a ribbon, and the doctor asks Mite to sort blank labels. These scenes strengthen the villagers' everyday identities and provide extra relationship feedback; their first-seen flags persist in save data. They are prototype character content only and neither reveal the ritual's truth nor finalize world canon.
+
 ## Validation questions
 
 1. Does the player choose activities rather than only advance dialogue?

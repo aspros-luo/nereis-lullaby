@@ -443,6 +443,7 @@ func _advance_time() -> void:
 		for npc_id in ["caregiver", "worship_leader", "doctor"]:
 			var profile: Dictionary = NPCBehaviorProfilesScript.get_profile(npc_id)
 			var inbox: Array = information_network.get_inbox(npc_id)
+			var previous_action: Dictionary = last_actions.get(npc_id, {})
 			var action: Dictionary = NPCBehaviorSimulatorScript.choose_action(
 				npc_id,
 				profile,
@@ -452,7 +453,7 @@ func _advance_time() -> void:
 				int(game_state.relationship_state.get(npc_id, 0)),
 				false,
 				inbox.size(),
-				str(last_actions.get(npc_id, {}).get("id", ""))
+				str(previous_action.get("id", ""))
 			)
 			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
 				continue

@@ -142,21 +142,29 @@ func load_save_data(data: Dictionary) -> bool:
 				return false
 
 	for character_id in raw_knowledge.keys():
-		if not (raw_knowledge[character_id] is Dictionary):
+		if not (character_id is String) or not (raw_knowledge[character_id] is Dictionary):
 			return false
 		for fact_id in raw_knowledge[character_id].keys():
-			if not raw_facts.has(fact_id) or not (raw_knowledge[character_id][fact_id] is Dictionary):
+			if not (fact_id is String) or not raw_facts.has(fact_id) or not (raw_knowledge[character_id][fact_id] is Dictionary):
 				return false
 			var knowledge: Dictionary = raw_knowledge[character_id][fact_id]
-			var source_id: String = str(knowledge.get("source_event_id", ""))
-			if source_id.is_empty() or not rebuilt_ids.has(source_id) or str(knowledge.get("channel", "")).strip_edges().is_empty():
+			var source_value: Variant = knowledge.get("source_event_id", null)
+			var channel_value: Variant = knowledge.get("channel", null)
+			if not (source_value is String) or not (channel_value is String):
+				return false
+			var source_id: String = source_value
+			if source_id.is_empty() or not rebuilt_ids.has(source_id) or channel_value.strip_edges().is_empty():
 				return false
 
 	for opportunity_id in raw_opportunities.keys():
-		if str(opportunity_id).strip_edges().is_empty() or not (raw_opportunities[opportunity_id] is Dictionary):
+		if not (opportunity_id is String) or opportunity_id.strip_edges().is_empty() or not (raw_opportunities[opportunity_id] is Dictionary):
 			return false
-		var source_id: String = str(raw_opportunities[opportunity_id].get("source_event_id", ""))
-		if source_id.is_empty() or not rebuilt_ids.has(source_id) or not raw_opportunities[opportunity_id].has("is_open"):
+		var source_value: Variant = raw_opportunities[opportunity_id].get("source_event_id", null)
+		var open_value: Variant = raw_opportunities[opportunity_id].get("is_open", null)
+		if not (source_value is String) or not (open_value is bool):
+			return false
+		var source_id: String = source_value
+		if source_id.is_empty() or not rebuilt_ids.has(source_id):
 			return false
 
 	# Mutate only after all sections validate, so a failed load preserves the current ledger.

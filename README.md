@@ -11,10 +11,10 @@
 5. [Core Gameplay (CN)](docs/CORE_GAMEPLAY_CN.md) / [EN](docs/CORE_GAMEPLAY_EN.md)
 6. [Roadmap (CN)](docs/ROADMAP_CN.md) / [EN](docs/ROADMAP_EN.md)
 7. [Prologue Vertical Slice Plan (CN)](docs/PROLOGUE_VERTICAL_SLICE_PLAN_CN.md) / [EN](docs/PROLOGUE_VERTICAL_SLICE_PLAN_EN.md)
-7. [Village Character and Secret Matrix (CN)](docs/VILLAGE_CHARACTER_SECRET_MATRIX_CN.md) / [EN](docs/VILLAGE_CHARACTER_SECRET_MATRIX_EN.md)
-8. [Week One Schedule and Event Chain (CN)](docs/WEEK_ONE_SCHEDULE_EVENT_CHAIN_CN.md) / [EN](docs/WEEK_ONE_SCHEDULE_EVENT_CHAIN_EN.md)
-9. [Playable Prototype Guide (CN)](docs/PLAYTEST_GUIDE_CN.md) / [EN](docs/PLAYTEST_GUIDE_EN.md)
-10. [Cross-Project Narrative Sync Ledger (CN/EN)](docs/CROSS_PROJECT_STORY_SYNC_CN_EN.md)
+8. [Village Character and Secret Matrix (CN)](docs/VILLAGE_CHARACTER_SECRET_MATRIX_CN.md) / [EN](docs/VILLAGE_CHARACTER_SECRET_MATRIX_EN.md)
+9. [Week One Schedule and Event Chain (CN)](docs/WEEK_ONE_SCHEDULE_EVENT_CHAIN_CN.md) / [EN](docs/WEEK_ONE_SCHEDULE_EVENT_CHAIN_EN.md)
+10. [Playable Prototype Guide (CN)](docs/PLAYTEST_GUIDE_CN.md) / [EN](docs/PLAYTEST_GUIDE_EN.md)
+11. [Cross-Project Narrative Sync Ledger (CN/EN)](docs/CROSS_PROJECT_STORY_SYNC_CN_EN.md)
 
 ## Confirmed identity
 

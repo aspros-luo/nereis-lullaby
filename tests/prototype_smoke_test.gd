@@ -24,6 +24,7 @@ func _initialize() -> void:
 	_test_state_journal_consistency()
 	_test_observation_and_anomaly_events()
 	_test_journal_ledger_consistency()
+	_test_legacy_clue_provenance_migration()
 	_test_worldline_ledger()
 	_test_worldline_ledger_rejects_inconsistent_save()
 	_test_worldline_information_network()
@@ -274,6 +275,17 @@ func _test_journal_ledger_consistency() -> void:
 	assert(not ui_logic._journal_references_are_valid(ui_logic.clue_journal, ui_logic.worldline_ledger))
 	ui_logic.worldline_ledger.record_event("source_for_clue", "lullaby", "mite", "observe", "HOME", ["orphan_clue"])
 	assert(ui_logic._journal_references_are_valid(ui_logic.clue_journal, ui_logic.worldline_ledger))
+
+
+func _test_legacy_clue_provenance_migration() -> void:
+	var ui_logic = MainScript.new()
+	var journal = ClueJournalScript.new()
+	var ledger = WorldlineLedgerScript.new()
+	assert(journal.add_fact("legacy_clue", "Legacy clue", "Preserved from an older save", 7, "傍晚", "家"))
+	assert(ui_logic._migrate_legacy_clue_provenance(journal, ledger))
+	assert(ledger.has_fact("legacy_clue"))
+	assert(ledger.event_ids.has("lullaby.migration.v1.clue.legacy_clue"))
+	assert(ui_logic._journal_references_are_valid(journal, ledger))
 
 
 func _test_location_content_coverage() -> void:

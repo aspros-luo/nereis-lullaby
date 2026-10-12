@@ -328,6 +328,14 @@ func _test_worldline_information_network() -> void:
 	invalid_data["current_tick"] = -2
 	assert(not protected_network.load_save_data(invalid_data))
 	assert(protected_network.get_inbox("merchant").size() == 2)
+	invalid_data = network.to_save_data()
+	invalid_data["inboxes"]["merchant"][0]["fact_id"] = "forged_fact"
+	assert(not protected_network.load_save_data(invalid_data))
+	assert(protected_network.get_inbox("merchant").size() == 2)
+	invalid_data = network.to_save_data()
+	invalid_data["beliefs"]["merchant"]["unsupported_fact"] = 0.4
+	assert(not protected_network.load_save_data(invalid_data))
+	assert(protected_network.get_inbox("merchant").size() == 2)
 
 
 func _test_npc_behavior_profiles() -> void:

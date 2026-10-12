@@ -483,39 +483,42 @@ func _observe_location() -> void:
 	if game_state.world_state["phase"] == "demo_complete":
 		return
 	if game_state.world_state["phase"] == "after_week":
-		game_state.mark_post_anomaly_visit(game_state.current_location)
+		var staged_state = _copy_game_state(game_state)
+		if staged_state == null:
+			return
+		staged_state.mark_post_anomaly_visit(staged_state.current_location)
+		game_state = staged_state
 		var added_after := _record_anomaly_clue_if_available(game_state.current_location)
 		var anomaly_observation: String = str(ANOMALY_OBSERVATION_TEXT.get(game_state.current_location, "我仔细看了看周围，暂时没有发现能解释变化的东西。"))
 		message_label.text = anomaly_observation + ("（线索簿已更新。）" if added_after else " 我暂时没有发现新的记录。")
 		_refresh_ui()
 		return
 
-	var added := false
+	var fact_id := ""
+	var fact_title := ""
+	var fact_detail := ""
 	if game_state.day_index >= 5 and game_state.current_location == "SHRINE":
-		added = _add_fact(
-			"day5_repeated_object_shrine", "礼拜场所里的普通物件",
-			"我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。"
-		)
+		fact_id = "day5_repeated_object_shrine"
+		fact_title = "礼拜场所里的普通物件"
+		fact_detail = "我注意到一种普通物件被仔细摆放。它的用途目前并不明确，也可能只是日常用品。"
 	elif game_state.day_index >= 5 and game_state.current_location == "COMMONS":
-		added = _add_fact(
-			"day5_repeated_object_commons", "公共空间里的相似准备",
-			"这里也出现了与其他场景相似的准备方式。重复本身值得记下，但还不能说明原因。"
-		)
+		fact_id = "day5_repeated_object_commons"
+		fact_title = "公共空间里的相似准备"
+		fact_detail = "这里也出现了与其他场景相似的准备方式。重复本身值得记下，但还不能说明原因。"
 	elif game_state.current_location == "FOREST" or game_state.current_location == "GROVE":
-		added = _add_fact(
-			"forest_flower_observation", "林间的野花",
-			"林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
+		fact_id = "forest_flower_observation"
+		fact_title = "林间的野花"
+		fact_detail = "林边长着几簇野花，花茎被折下的地方很整齐。也许只是有人采花时留下的痕迹。"
+	var added := false
+	if not fact_id.is_empty():
+		var event_id := "lullaby.observation.day%d.slot%d.%s.%s" % [
+			game_state.day_index, game_state.slot_index, game_state.current_location.to_lower(), fact_id
+		]
+		added = _commit_fact_with_event(
+			fact_id, fact_title, fact_detail, event_id, "mite",
+			"observe_" + game_state.current_location.to_lower(), game_state.current_location
 		)
 	var ordinary_observation: String = str(OBSERVATION_TEXT.get(game_state.current_location, "这里暂时没有什么特别的发现。"))
-	if added:
-		var observed_fact_id := ""
-		if game_state.day_index >= 5 and game_state.current_location == "SHRINE":
-			observed_fact_id = "day5_repeated_object_shrine"
-		elif game_state.day_index >= 5 and game_state.current_location == "COMMONS":
-			observed_fact_id = "day5_repeated_object_commons"
-		else:
-			observed_fact_id = "forest_flower_observation"
-		_record_observation_event(observed_fact_id)
 	message_label.text = ordinary_observation + ("\n\n我把注意到的细节记了下来。（线索簿已更新。）" if added else "\n\n我没发现新的明确线索，但这里还有值得慢慢看的地方。")
 	_refresh_ui()
 
@@ -790,44 +793,84 @@ func _record_anomaly_clue_if_available(location_id: String) -> bool:
 			detail = "医生把几份记录收进抽屉。也许是病人的隐私，不方便让人看见。"
 	if fact_id.is_empty():
 		return false
-	var added: bool = _add_fact(fact_id, title, detail)
-	if added:
-		_record_observation_event(fact_id)
-	return added
-
-func _record_observation_event(fact_id: String) -> void:
-	if fact_id.strip_edges().is_empty():
-		return
 	var event_id := "lullaby.observation.day%d.slot%d.%s.%s" % [
-		game_state.day_index,
-		game_state.slot_index,
-		game_state.current_location.to_lower(),
-		fact_id,
+		game_state.day_index, game_state.slot_index, location_id.to_lower(), fact_id
 	]
-	worldline_ledger.record_event(
-		event_id,
-		"lullaby",
-		"mite",
-		"observe_" + game_state.current_location.to_lower(),
-		game_state.current_location,
-		[fact_id]
+	return _commit_fact_with_event(
+		fact_id, title, detail, event_id, "mite",
+		"observe_" + location_id.to_lower(), location_id
 	)
+
 
 func _record_village_anomaly() -> void:
-	var fact_id := "day7_village_change"
-	worldline_ledger.record_event(
+	_commit_fact_with_event(
+		"day7_village_change",
+		"一声从远处传来的鸣响",
+		"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。",
 		"lullaby.anomaly.day7.evening",
-		"lullaby",
 		"village",
 		"anomaly_bell",
-		game_state.current_location,
-		[fact_id]
+		game_state.current_location
 	)
-	_add_fact(
-		fact_id,
-		"一声从远处传来的鸣响",
-		"傍晚时，远处传来一声沉闷的鸣响。没有人解释它从哪里来；村庄很快恢复安静，但安静得让人有些在意。"
-	)
+
+
+func _copy_game_state(source):
+	var copy = GameStateScript.new()
+	if not copy.load_save_data(source.to_save_data()):
+		return null
+	return copy
+
+
+func _copy_clue_journal(source):
+	var copy = ClueJournalScript.new()
+	if not copy.load_entries(source.get_entries()):
+		return null
+	return copy
+
+
+func _copy_worldline_ledger(source):
+	var copy = WorldlineLedgerScript.new()
+	if not copy.load_save_data(source.to_save_data()):
+		return null
+	return copy
+
+
+func _copy_information_network(source):
+	var copy = InformationNetworkScript.new()
+	if not copy.load_save_data(source.to_save_data()):
+		return null
+	return copy
+
+
+func _commit_fact_with_event(
+	fact_id: String,
+	title: String,
+	detail: String,
+	event_id: String,
+	actor_id: String,
+	action_id: String,
+	location_id: String
+) -> bool:
+	var staged_state = _copy_game_state(game_state)
+	var staged_journal = _copy_clue_journal(clue_journal)
+	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
+	if staged_state == null or staged_journal == null or staged_ledger == null:
+		return false
+	if staged_journal._seen_ids.has(fact_id):
+		return false
+	# The event establishes provenance first, but only inside the temporary ledger.
+	if not staged_ledger.record_event(event_id, "lullaby", actor_id, action_id, location_id, [fact_id]):
+		return false
+	if not staged_journal.add_fact(
+		fact_id, title, detail, staged_state.day_index, staged_state.get_slot_label(),
+		schedule_manager.get_location_name(location_id)
+	):
+		return false
+	staged_state.register_fact(fact_id)
+	game_state = staged_state
+	clue_journal = staged_journal
+	worldline_ledger = staged_ledger
+	return true
 
 const SAVE_PATH: String = "user://nereis_lullaby_demo.cfg"
 

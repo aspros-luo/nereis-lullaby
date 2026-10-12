@@ -32,7 +32,7 @@
 - [x] Harden ledger save loading: required event fields, fact/first-event consistency, and existence of every event-referenced fact.
 - [x] Validate clue-journal saves atomically; reject malformed or duplicate entries before replacing runtime state.
 - [x] Validate information-network saves: inbox entries must match delivered messages, beliefs require delivered-message evidence, and non-finite credibility, string-coerced clock/confidence values, message send times later than the network clock, and pending messages already due at the saved tick are rejected.
-- [x] Validate cross-system references between restored messages and ledger facts/source/delivery events.
+- [x] Validate cross-system references: source and delivery events must actually contain each message's referenced fact; version 2 saves require every section, and the version field rejects implicit coercion.
 - [x] Validate save consistency: discovered-fact IDs in the clue journal must exactly match investigation state, and each journal fact must have a worldline-ledger source.
 - [x] Validate personal-moment, post-anomaly conversation, and last-NPC-action flags; require NPC action tick/day/slot values to agree and not exceed the game clock; reject completed-prologue saves without three distinct post-anomaly visits.
 - [x] Cross-check action history against time and action economy; reject future actions, duplicate ordinary-slot actions, and mismatched action-used flags; validate relationship value types, bounds, and character keys; reject implicit coercion of game clock, clue date, network clock, and message tick fields.

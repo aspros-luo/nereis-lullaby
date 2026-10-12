@@ -68,6 +68,20 @@ func _test_personal_moment_coverage() -> void:
 		assert(not str(moment["dialogue"]).is_empty())
 	assert(MainScript.PERSONAL_MOMENTS.size() >= 3)
 
+	var ui_logic = MainScript.new()
+	ui_logic.game_state = GameStateScript.new()
+	ui_logic.game_state.day_index = 2
+	ui_logic.game_state.current_location = "HOME"
+	var available: Dictionary = ui_logic._get_available_personal_moment("caregiver")
+	assert(available.get("id", "") == "caregiver_memory")
+	ui_logic.game_state.world_state["flags"]["personal_moments_seen"] = {"caregiver_memory": true}
+	assert(ui_logic._get_available_personal_moment("caregiver").is_empty())
+	ui_logic.game_state.current_location = "CLINIC"
+	ui_logic.game_state.day_index = 5
+	assert(ui_logic._get_available_personal_moment("doctor").is_empty())
+	ui_logic.game_state.day_index = 6
+	assert(ui_logic._get_available_personal_moment("doctor").get("id", "") == "doctor_labels")
+
 
 func _test_clue_deduplication() -> void:
 	var journal = ClueJournalScript.new()
@@ -92,6 +106,7 @@ func _test_save_roundtrip() -> void:
 	assert(original.take_action("save_test", "save test activity"))
 	original.increase_relationship("caregiver", 3)
 	original.register_fact("save_test_fact")
+	original.world_state["flags"]["personal_moments_seen"] = {"caregiver_memory": true}
 	var restored = GameStateScript.new()
 	assert(restored.load_save_data(original.to_save_data()))
 	assert(restored.day_index == original.day_index)
@@ -100,6 +115,7 @@ func _test_save_roundtrip() -> void:
 	assert(restored.relationship_state["caregiver"] == 3)
 	assert(restored.investigation_state["observed_fact_ids"].has("save_test_fact"))
 	assert(restored.action_history.size() == 1)
+	assert(restored.world_state["flags"]["personal_moments_seen"]["caregiver_memory"])
 	var protected_state = GameStateScript.new()
 	protected_state.day_index = 4
 	var invalid_data: Dictionary = original.to_save_data()
@@ -108,6 +124,10 @@ func _test_save_roundtrip() -> void:
 	assert(protected_state.day_index == 4)
 	invalid_data = original.to_save_data()
 	invalid_data["world_state"] = {"phase": "after_week", "flags": {}}
+	assert(not protected_state.load_save_data(invalid_data))
+	assert(protected_state.day_index == 4)
+	invalid_data = original.to_save_data()
+	invalid_data["world_state"]["flags"]["personal_moments_seen"] = "corrupt"
 	assert(not protected_state.load_save_data(invalid_data))
 	assert(protected_state.day_index == 4)
 

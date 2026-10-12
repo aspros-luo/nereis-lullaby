@@ -451,7 +451,8 @@ func _advance_time() -> void:
 				game_state.slot_index,
 				int(game_state.relationship_state.get(npc_id, 0)),
 				false,
-				inbox.size()
+				inbox.size(),
+				str(last_actions.get(npc_id, {}).get("id", ""))
 			)
 			if action.is_empty() or not NPCBehaviorSimulatorScript.validate_action(action):
 				continue

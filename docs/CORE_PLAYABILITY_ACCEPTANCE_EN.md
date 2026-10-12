@@ -14,7 +14,7 @@
 - [ ] Activities, conversations, and personal moments consume actions and produce expected relationship/clue changes.
 - [ ] Repeated observations do not create duplicate journal entries.
 - [ ] After the Day 7 anomaly, time remains stopped; exploration, visits, conversations, and completion conditions work. Completion requires at least three distinct valid locations; revisits do not count, and absent or unknown NPCs cannot be addressed.
-- [ ] After saving, quitting, restarting, and loading, time, location, relationships, phase, action history, personal-moment flags, journal, ledger, and information network remain consistent.
+- [ ] After saving, quitting, restarting, and loading, time, location, relationships, phase, action history, personal-moment flags, journal, ledger, and information network remain consistent; verify the version 1 save migration.
 - [ ] Invalid save data does not partially overwrite the current runtime state; clue-journal IDs match investigation state, every journal fact has ledger provenance, malformed NPC flags are rejected, and completed saves require three distinct visits.
 - [ ] Event IDs are deduplicated; facts have supporting events; character knowledge has an explicit source; receiving a message does not automatically become objective knowledge.
 - [ ] Clues from ordinary observations and the Day 7 anomaly have provenance events; failed conversations do not mutate clues or relationships.

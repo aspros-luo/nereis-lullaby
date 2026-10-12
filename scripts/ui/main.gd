@@ -523,37 +523,44 @@ func _do_daily_activity() -> void:
 		return
 	var action_id := "activity_" + game_state.current_location.to_lower()
 	var activity_text := ""
+	var relationship_target := ""
+	var picked_flower := false
 	match game_state.current_location:
 		"HOME":
 			activity_text = "我整理了家里的东西，又把门前的花瓶换了水。"
-			if _npc_is_present("caregiver") and game_state.world_state["phase"] == "ordinary":
-				game_state.increase_relationship("caregiver")
+			if _npc_is_present("caregiver"):
+				relationship_target = "caregiver"
 		"COMMONS":
 			activity_text = "我帮忙收拾公共空间，和路过的村民说了几句话。"
-			if _npc_is_present("caregiver") and game_state.world_state["phase"] == "ordinary":
-				game_state.increase_relationship("caregiver")
+			if _npc_is_present("caregiver"):
+				relationship_target = "caregiver"
 		"SHRINE":
 			activity_text = "我帮忙把布料和花束摆整齐。大家看起来都很满意。"
-			if _npc_is_present("worship_leader") and game_state.world_state["phase"] == "ordinary":
-				game_state.increase_relationship("worship_leader")
+			if _npc_is_present("worship_leader"):
+				relationship_target = "worship_leader"
 		"CLINIC":
 			activity_text = "我帮忙分拣干燥的草药，屋里都是淡淡的苦香。"
-			if _npc_is_present("doctor") and game_state.world_state["phase"] == "ordinary":
-				game_state.increase_relationship("doctor")
+			if _npc_is_present("doctor"):
+				relationship_target = "doctor"
 		"PATH":
 			activity_text = "我沿着小路采了些常见的草叶，准备带回家。"
 		"FOREST":
 			activity_text = "我采了几朵颜色好看的野花。树影很安静，我忍不住多待了一会儿。"
-			_add_fact("forest_flower_picked", "带回家的野花", "我在林子里采了几朵野花。花茎上有细小的水珠，闻起来带着雨后的气味。")
+			picked_flower = true
 		"GROVE":
 			activity_text = "我在空地上坐了一会儿，听树叶和鸟儿的声音。"
-	if game_state.take_action(action_id, activity_text):
-		var fact_ids: Array = []
-		if game_state.current_location == "FOREST":
-			fact_ids.append("forest_flower_picked")
-		var event_id := "lullaby.activity.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, action_id]
-		worldline_ledger.record_event(event_id, "lullaby", "mite", action_id, game_state.current_location, fact_ids)
-		message_label.text = activity_text
+	if not game_state.take_action(action_id, activity_text):
+		return
+	# Commit side effects only after the primary action has been accepted.
+	if not relationship_target.is_empty():
+		game_state.increase_relationship(relationship_target)
+	var fact_ids: Array = []
+	if picked_flower:
+		_add_fact("forest_flower_picked", "带回家的野花", "我在林子里采了几朵野花。花茎上有细小的水珠，闻起来带着雨后的气味。")
+		fact_ids.append("forest_flower_picked")
+	var event_id := "lullaby.activity.day%d.slot%d.%s" % [game_state.day_index, game_state.slot_index, action_id]
+	worldline_ledger.record_event(event_id, "lullaby", "mite", action_id, game_state.current_location, fact_ids)
+	message_label.text = activity_text
 	_refresh_ui()
 
 func _talk_to_npc(npc_id: String) -> void:

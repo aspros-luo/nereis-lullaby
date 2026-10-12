@@ -475,6 +475,7 @@ func _advance_time() -> void:
 				return
 			last_actions[npc_id] = action.duplicate(true)
 			# First-person play: do not narrate an NPC's off-screen action as if Mite witnessed it.
+			# 第一人称视角：蜜忒不在场时，不得把 NPC 的行动当成她亲眼所见。
 			if action_location == staged_state.current_location:
 				autonomous_lines.append(str(action["line"]))
 		staged_state.world_state["flags"]["npc_last_autonomous_actions"] = last_actions
@@ -485,6 +486,7 @@ func _advance_time() -> void:
 		return
 
 	# Publish the new timeline only after every required write succeeds.
+	# 只有所有必要写入都成功后，才正式替换当前世界线状态。
 	game_state = staged_state
 	worldline_ledger = staged_ledger
 	information_network = staged_network
@@ -575,6 +577,7 @@ func _do_daily_activity() -> void:
 			activity_text = "我在空地上坐了一会儿，听树叶和鸟儿的声音。"
 
 	# Stage the action and all causal side effects in temporary subsystem copies.
+	# 先在各子系统的临时副本中准备行动及其全部因果副作用。
 	var staged_state = _copy_game_state(game_state)
 	var staged_journal = _copy_clue_journal(clue_journal)
 	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
@@ -677,6 +680,7 @@ func _talk_to_npc(npc_id: String) -> void:
 
 
 	# Stage action, relationships, clues, event provenance and information delivery together.
+	# 将行动消耗、关系、线索、事件来源与信息送达放在同一事务中准备。
 	var staged_state = _copy_game_state(game_state)
 	var staged_journal = _copy_clue_journal(clue_journal)
 	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
@@ -917,6 +921,7 @@ func _commit_fact_with_event(
 	if staged_journal._seen_ids.has(fact_id):
 		return false
 	# The event establishes provenance first, but only inside the temporary ledger.
+	# 先在临时台账中建立事实来源；失败时整份临时状态会被丢弃。
 	if not staged_ledger.record_event(event_id, "lullaby", actor_id, action_id, location_id, [fact_id]):
 		return false
 	if not staged_journal.add_fact(

@@ -1,0 +1,6 @@
+[gd_resource]
+
+[resource]
+id = "egg"
+display_name = "Egg"
+description = "A fresh ingredient used in simple recipes."

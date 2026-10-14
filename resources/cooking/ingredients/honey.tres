@@ -1,0 +1,6 @@
+[gd_resource]
+
+[resource]
+id = "honey"
+display_name = "Honey"
+description = "Sweet ingredient collected from village sources."

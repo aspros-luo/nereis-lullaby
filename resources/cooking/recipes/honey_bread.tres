@@ -1,0 +1,7 @@
+[gd_resource]
+
+[resource]
+id = "honey_bread"
+display_name = "Honey Bread"
+ingredients = ["flour", "honey", "egg"]
+result = "honey_bread"

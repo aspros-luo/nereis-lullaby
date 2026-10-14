@@ -1,0 +1,6 @@
+[gd_resource]
+
+[resource]
+id = "flour"
+display_name = "Flour"
+description = "Basic cooking ingredient used for baking."

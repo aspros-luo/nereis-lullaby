@@ -9,13 +9,6 @@ Completed:
 - Resource loader foundation
 - Database loader bridge
 
-Pipeline:
-
-Resource (.tres)
-→ CookingResourceLoader
-→ CookingDatabaseLoader / CookingDatabase
-→ CookingManager
-
 ## Cooking-0.3 Kitchen Flow (current)
 
 Completed:
@@ -24,20 +17,19 @@ Completed:
 - KitchenController + `scenes/cooking/kitchen.tscn`
 - CookingSession 状态机完善
 - Inventory 接入（消耗材料、获得料理）
-- `.tres` 资源修正（script 引用、ingredients 字典、result_item_id）
+- `.tres` 资源修正
 - `tests/cooking_flow_test.gd` headless 烟测
-- **CookingMenuUI** 文本配方菜单与结果反馈（深色风格对齐主界面）
+- **CookingMenuUI** 文本配方菜单与结果反馈
 
-Still open:
+In progress / blocked:
 
-- 主游戏地点行动接入（「我家附近」打开厨房）
+- 主游戏 `main.gd` HOME 接入：补丁已写在 `docs/patches/main_kitchen_home.patch`
+  - 注意：一次错误提交曾截断 `scripts/ui/main.gd`，需先恢复到 `631045fb` 再打补丁
 - 多步骤制作过程演出
 - NPC 赠送与隐藏世界影响
 
 ## Next
 
-Cooking-0.3 收尾 / 0.4：
-
-1. ~~文本/简 UI 配方菜单~~ ✅
-2. 在「我家附近」行动中打开厨房
-3. 蜂蜜面包多步骤过程（准备 → 揉面 → 烘烤 → 完成）
+1. 恢复并打上 HOME 接入补丁
+2. 蜂蜜面包多步骤过程（准备 → 揉面 → 烘烤 → 完成）
+3. 本机 Godot 运行 `cooking_flow_test.gd` 与主界面手测

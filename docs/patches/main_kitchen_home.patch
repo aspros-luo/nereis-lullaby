@@ -1,0 +1,123 @@
+--- a/scripts/ui/main.gd
++++ b/scripts/ui/main.gd
+@@ -100,6 +100,10 @@
+ var save_button: Button
+ var load_button: Button
+ var location_buttons: Array[Button] = []
++var cook_button: Button
++var player_inventory: Inventory
++var kitchen_controller: KitchenController
++
+ 
+ func _ready() -> void:
+ 	game_state = GameStateScript.new()
+@@ -107,6 +111,7 @@
+ 	clue_journal = ClueJournalScript.new()
+ 	worldline_ledger = WorldlineLedgerScript.new()
+ 	information_network = InformationNetworkScript.new()
++	_setup_kitchen()
+ 	_apply_visual_style()
+ 	_build_ui()
+ 	_refresh_ui()
+@@ -231,6 +236,12 @@
+ 	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
+ 	action_button.pressed.connect(_do_daily_activity)
+ 	action_row.add_child(action_button)
++
++	cook_button = Button.new()
++	cook_button.text = "去做点吃的"
++	cook_button.visible = false
++	cook_button.pressed.connect(_open_kitchen)
++	action_row.add_child(cook_button)
+ 
+ 	advance_button = Button.new()
+ 	advance_button.text = "等到下一个时段"
+@@ -315,6 +326,15 @@
+ 		action_button.text = "时间停在这里了"
+ 	elif game_state.world_state["phase"] == "demo_complete":
+ 		action_button.text = "序章已结束"
++
++	if cook_button != null:
++		var can_cook_here := (
++			game_state.current_location == "HOME"
++			and game_state.world_state["phase"] == "ordinary"
++			and game_state.can_take_action()
++		)
++		cook_button.visible = can_cook_here
++		cook_button.disabled = not can_cook_here
+ 
+ 	for button_index in range(location_buttons.size()):
+ 		var location_id: String = LOCATION_ORDER[button_index]
+@@ -1280,3 +1300,80 @@
+ 		return false
+ 	return True
+ 
++
++func _setup_kitchen() -> void:
++	player_inventory = Inventory.new()
++	player_inventory.add_item("flour", 3)
++	player_inventory.add_item("honey", 3)
++	player_inventory.add_item("egg", 3)
++
++	kitchen_controller = KitchenController.new()
++	add_child(kitchen_controller)
++	kitchen_controller.bootstrap_with(player_inventory)
++	if not kitchen_controller.cooking_completed.is_connected(_on_kitchen_cooking_completed):
++		kitchen_controller.cooking_completed.connect(_on_kitchen_cooking_completed)
++	if not kitchen_controller.kitchen_closed.is_connected(_on_kitchen_closed):
++		kitchen_controller.kitchen_closed.connect(_on_kitchen_closed)
++
++
++func _open_kitchen() -> void:
++	if kitchen_controller == null:
++		return
++	if game_state.world_state["phase"] != "ordinary":
++		message_label.text = "现在不适合进厨房。"
++		return
++	if game_state.current_location != "HOME":
++		message_label.text = "只有回到家里才能进厨房。"
++		return
++	if not game_state.can_take_action():
++		message_label.text = "这个时段我已经忙完了，还是等到下一个时段再做吧。"
++		return
++	kitchen_controller.open()
++	message_label.text = "我走进厨房，准备做一点简单的食物。"
++
++
++func _on_kitchen_cooking_completed(result: CookingResult) -> void:
++	if result == null:
++		return
++	if not result.success:
++		message_label.text = "厨房：%s" % result.message
++		return
++
++	var action_id := "activity_home_cooking"
++	var activity_text := "我在厨房做了%s，屋里渐渐有了食物的香气。" % result.output_item_id
++	var staged_state = _copy_game_state(game_state)
++	var staged_journal = _copy_clue_journal(clue_journal)
++	var staged_ledger = _copy_worldline_ledger(worldline_ledger)
++	if staged_state == null or staged_journal == null or staged_ledger == null:
++		message_label.text = "料理做好了，但这项活动暂时无法安全记录。"
++		return
++	if not staged_state.take_action(action_id, activity_text):
++		message_label.text = "料理做好了，可这个时段已经没有行动机会了。"
++		_refresh_ui()
++		return
++
++	var cook_event_id := "lullaby.activity.day%d.slot%d.home_cooking" % [staged_state.day_index, staged_state.slot_index]
++	if not staged_ledger.record_event(cook_event_id, "lullaby", "mite", action_id, "HOME"):
++		message_label.text = "料理做好了，但活动记录无法提交；本时段行动没有消耗。"
++		return
++
++	game_state = staged_state
++	clue_journal = staged_journal
++	worldline_ledger = staged_ledger
++	message_label.text = activity_text + "（获得 %s）" % result.output_item_id
++	_refresh_ui()
++
++
++func _on_kitchen_closed() -> void:
++	if message_label != null and game_state != null:
++		if game_state.current_location == "HOME":
++			message_label.text = "我离开厨房，回到家里熟悉的光线里。"
++	_refresh_ui()

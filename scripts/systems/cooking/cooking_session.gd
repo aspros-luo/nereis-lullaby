@@ -5,11 +5,11 @@ extends RefCounted
 ## Keeps gameplay flow separated from UI and data resources.
 
 enum State {
-    IDLE,
-    SELECT_RECIPE,
-    CHECK_INGREDIENT,
-    COOKING,
-    COMPLETE
+	IDLE,
+	SELECT_RECIPE,
+	CHECK_INGREDIENT,
+	COOKING,
+	COMPLETE
 }
 
 var state: State = State.IDLE
@@ -17,17 +17,23 @@ var current_recipe_id: String = ""
 var result_item_id: String = ""
 
 func begin(recipe_id: String) -> void:
-    current_recipe_id = recipe_id
-    state = State.SELECT_RECIPE
+	current_recipe_id = recipe_id
+	state = State.SELECT_RECIPE
+
+func mark_ingredients_checked() -> void:
+	state = State.CHECK_INGREDIENT
 
 func start_cooking() -> void:
-    state = State.COOKING
+	state = State.COOKING
 
 func complete(result_id: String) -> void:
-    result_item_id = result_id
-    state = State.COMPLETE
+	result_item_id = result_id
+	state = State.COMPLETE
 
 func reset() -> void:
-    state = State.IDLE
-    current_recipe_id = ""
-    result_item_id = ""
+	state = State.IDLE
+	current_recipe_id = ""
+	result_item_id = ""
+
+func is_busy() -> bool:
+	return state == State.COOKING or state == State.SELECT_RECIPE or state == State.CHECK_INGREDIENT

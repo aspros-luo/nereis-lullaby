@@ -9,10 +9,18 @@ var recipes: Dictionary = {}
 func register_recipe(recipe: CookingRecipe) -> void:
 	if recipe == null:
 		return
+	if recipe.id == "":
+		return
 	recipes[recipe.id] = recipe
 
 func get_recipe(recipe_id: String) -> CookingRecipe:
 	return recipes.get(recipe_id)
+
+func list_recipe_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for key in recipes.keys():
+		ids.append(str(key))
+	return ids
 
 func cook(recipe_id: String, inventory: Dictionary) -> String:
 	var recipe := get_recipe(recipe_id)

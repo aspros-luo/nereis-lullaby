@@ -1,6 +1,9 @@
-[gd_resource]
+[gd_resource type="Resource" script_class="CookingIngredient" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/cooking/cooking_ingredient.gd" id="1"]
 
 [resource]
+script = ExtResource("1")
 id = "honey"
 display_name = "Honey"
-description = "Sweet ingredient collected from village sources."
+description = "Sweet honey collected near the village edge."

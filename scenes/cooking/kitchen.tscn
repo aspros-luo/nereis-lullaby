@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://kitchen_scene_cooking_03"]
+
+[ext_resource type="Script" path="res://scripts/systems/cooking/kitchen_controller.gd" id="1_kitchen"]
+[ext_resource type="Script" path="res://scripts/systems/cooking/cooking_station.gd" id="2_station"]
+
+[node name="Kitchen" type="Node2D"]
+script = ExtResource("1_kitchen")
+
+[node name="Background" type="Sprite2D" parent="."]
+# Placeholder only. Replace texture via editor; do not draw in code.
+centered = true
+position = Vector2(640, 360)
+
+[node name="CookingStation" type="Node2D" parent="."]
+position = Vector2(640, 420)
+script = ExtResource("2_station")
+station_id = "kitchen_main"
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+position = Vector2(640, 520)

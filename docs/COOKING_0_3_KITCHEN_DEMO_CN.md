@@ -15,10 +15,12 @@
 Player
 → CookingStation.interact()
 → KitchenController.open()
+→ CookingMenuUI（配方列表 / 材料状态）
 → CookingFlowController.request_cook(recipe_id)
 → CookingManager.cook()
 → Inventory 更新
 → CookingResult 信号回传
+→ CookingMenuUI 显示结果
 
 ## Scene
 
@@ -27,8 +29,9 @@ Player
 - Background (Sprite2D placeholder)
 - CookingStation (Node2D)
 - PlayerSpawn (Marker2D)
+- CanvasLayer + CookingMenuUI（运行时创建）
 
-## 当前阶段（已完成基础层）
+## 当前阶段
 
 - [x] CookingFlowController
 - [x] KitchenController
@@ -36,6 +39,6 @@ Player
 - [x] 资源加载与默认蜂蜜面包配方
 - [x] Inventory 接入制作结果
 - [x] Headless flow 测试脚本
-- [ ] 正式 UI 面板（配方列表 / 反馈文本）
+- [x] 正式 UI 面板（配方列表 / 反馈文本）
 - [ ] 与主界面地点行动打通（在「我家附近」触发厨房）
 - [ ] 多步骤操作表现（揉面 / 烘烤等过程演出）

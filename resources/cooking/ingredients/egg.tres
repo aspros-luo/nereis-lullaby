@@ -6,4 +6,4 @@
 script = ExtResource("1")
 id = "egg"
 display_name = "Egg"
-d = "Fresh egg from the village coop."
+description = "Fresh egg from the village coop."

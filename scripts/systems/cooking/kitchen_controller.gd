@@ -30,15 +30,16 @@ func _ready() -> void:
 	if cooking_station != null and cooking_station.has_signal("cooking_requested"):
 		if not cooking_station.cooking_requested.is_connected(_on_station_interact):
 			cooking_station.cooking_requested.connect(_on_station_interact)
-	# When this scene is run directly (F6 / as main), open the kitchen UI immediately.
 	if get_parent() == get_tree().root:
 		call_deferred("open")
 
-func bootstrap_with(inv = null) -> void:
+func bootstrap_with(inv = null, game_state = null, ledger = null) -> void:
 	_ensure_runtime()
 	if inv != null:
 		inventory = inv
 		flow_controller.setup(cooking_manager, menu_controller, inventory)
+	if flow_controller != null:
+		flow_controller.bind_world(game_state, ledger)
 
 func open() -> void:
 	_ensure_runtime()
@@ -78,9 +79,10 @@ func _ensure_runtime() -> void:
 
 	if inventory == null:
 		inventory = InventoryScript.new()
-		inventory.add_item("flour", 2)
+		inventory.add_item("flour", 3)
 		inventory.add_item("honey", 2)
 		inventory.add_item("egg", 2)
+		inventory.add_item("herb", 2)
 
 	if flow_controller == null:
 		flow_controller = CookingFlowControllerScript.new()

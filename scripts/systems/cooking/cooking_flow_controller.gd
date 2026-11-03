@@ -6,6 +6,7 @@ extends Node
 
 const CookingSessionScript = preload("res://scripts/systems/cooking/cooking_session.gd")
 const CookingResultScript = preload("res://scripts/systems/cooking/cooking_result.gd")
+const CookingWorldInfluenceScript = preload("res://scripts/systems/cooking/cooking_world_influence.gd")
 
 signal flow_started
 signal recipe_list_ready(recipe_ids: Array)
@@ -18,6 +19,9 @@ var cooking_manager
 var menu_controller
 var session
 var inventory
+## Optional: set by host to receive hidden world writes.
+var game_state = null
+var worldline_ledger = null
 
 func setup(manager, menu, inv) -> void:
 	cooking_manager = manager
@@ -28,6 +32,10 @@ func setup(manager, menu, inv) -> void:
 	if menu_controller != null and menu_controller.has_signal("cooking_requested"):
 		if not menu_controller.cooking_requested.is_connected(_on_cooking_requested):
 			menu_controller.cooking_requested.connect(_on_cooking_requested)
+
+func bind_world(state = null, ledger = null) -> void:
+	game_state = state
+	worldline_ledger = ledger
 
 func open_kitchen() -> void:
 	if cooking_manager == null:
@@ -138,6 +146,7 @@ func _finish_current_recipe() -> void:
 
 	session.complete(output_id)
 	var result = CookingResultScript.completed(recipe_id, output_id, image_path)
-	result.message = "热气和甜味一起散开来。"
+	result.message = "热气和甜味一起散开来。" if recipe_id == "honey_bread" else "碗沿还烫手，气味却很安静。"
+	CookingWorldInfluenceScript.apply_cook_to_world(result, game_state, worldline_ledger)
 	cooking_finished.emit(result)
 	session.reset()

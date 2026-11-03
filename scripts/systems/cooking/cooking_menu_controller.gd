@@ -4,10 +4,12 @@ extends Node
 signal recipe_selected(recipe_id)
 signal cooking_requested(recipe_id)
 
-var available_recipes: Array[String] = []
+var available_recipes: Array = []
 
-func set_recipes(recipes: Array[String]) -> void:
-	available_recipes = recipes
+func set_recipes(recipes: Array) -> void:
+	available_recipes.clear()
+	for recipe_id in recipes:
+		available_recipes.append(str(recipe_id))
 
 func select_recipe(recipe_id: String) -> void:
 	if recipe_id in available_recipes:

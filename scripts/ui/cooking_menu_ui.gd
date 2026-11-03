@@ -20,13 +20,21 @@ var close_button: Button
 var _recipe_meta: Dictionary = {}
 var _inventory_snapshot: Dictionary = {}
 var _in_process: bool = false
+var _ui_built: bool = false
 
 func _ready() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	_ensure_ui()
+
+func _ensure_ui() -> void:
+	if _ui_built:
+		return
 	_build_ui()
+	_ui_built = true
 
 func open_menu(recipe_ids: Array, manager, inventory) -> void:
+	_ensure_ui()
 	_recipe_meta.clear()
 	_inventory_snapshot = {}
 	_in_process = false
@@ -59,24 +67,35 @@ func open_menu(recipe_ids: Array, manager, inventory) -> void:
 	_refresh_recipe_list()
 	_refresh_inventory_label()
 	_set_process_mode(false)
-	status_label.text = "厨房里很安静。桌上放着面粉、蜂蜜和鸡蛋。"
-	message_label.text = "选一份想做的料理吧。"
-	step_label.text = ""
+	if status_label != null:
+		status_label.text = "厨房里很安静。桌上放着面粉、蜂蜜和鸡蛋。"
+	if message_label != null:
+		message_label.text = "选一份想做的料理吧。"
+	if step_label != null:
+		step_label.text = ""
 	visible = true
 
 func show_step(progress_label: String, step_text: String, is_last: bool) -> void:
+	_ensure_ui()
 	_in_process = true
 	_set_process_mode(true)
-	status_label.text = "正在制作……"
-	step_label.text = "%s\n%s" % [progress_label, step_text]
-	if is_last:
-		continue_button.text = "完成出炉"
-		message_label.text = "最后一步了。"
-	else:
-		continue_button.text = "继续"
-		message_label.text = "按自己的节奏做就好。"
+	if status_label != null:
+		status_label.text = "正在制作……"
+	if step_label != null:
+		step_label.text = "%s\n%s" % [progress_label, step_text]
+	if continue_button != null:
+		if is_last:
+			continue_button.text = "完成出炉"
+		else:
+			continue_button.text = "继续"
+	if message_label != null:
+		if is_last:
+			message_label.text = "最后一步了。"
+		else:
+			message_label.text = "按自己的节奏做就好。"
 
 func show_result(result, inventory = null) -> void:
+	_ensure_ui()
 	_in_process = false
 	_set_process_mode(false)
 	if inventory != null:
@@ -84,17 +103,24 @@ func show_result(result, inventory = null) -> void:
 		_refresh_inventory_label()
 
 	if result == null:
-		message_label.text = "没有得到结果。"
+		if message_label != null:
+			message_label.text = "没有得到结果。"
 		return
 
 	if result.success:
-		status_label.text = "料理完成了。"
-		step_label.text = ""
-		message_label.text = "做好了：%s\n%s" % [result.output_item_id, result.message]
+		if status_label != null:
+			status_label.text = "料理完成了。"
+		if step_label != null:
+			step_label.text = ""
+		if message_label != null:
+			message_label.text = "做好了：%s\n%s" % [result.output_item_id, result.message]
 	else:
-		status_label.text = "这次没能完成。"
-		step_label.text = ""
-		message_label.text = str(result.message)
+		if status_label != null:
+			status_label.text = "这次没能完成。"
+		if step_label != null:
+			step_label.text = ""
+		if message_label != null:
+			message_label.text = str(result.message)
 
 func close_menu() -> void:
 	_in_process = false
@@ -107,6 +133,10 @@ func _set_process_mode(active: bool) -> void:
 		recipe_container.visible = not active
 
 func _build_ui() -> void:
+	# Avoid duplicating widgets if called twice.
+	if recipe_container != null:
+		return
+
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	var backdrop := ColorRect.new()
@@ -193,6 +223,8 @@ func _build_ui() -> void:
 	root.add_child(close_button)
 
 func _refresh_recipe_list() -> void:
+	if recipe_container == null:
+		return
 	for child in recipe_container.get_children():
 		recipe_container.remove_child(child)
 		child.queue_free()
@@ -234,6 +266,8 @@ func _refresh_recipe_list() -> void:
 		recipe_container.add_child(row)
 
 func _refresh_inventory_label() -> void:
+	if inventory_label == null:
+		return
 	if _inventory_snapshot.is_empty():
 		inventory_label.text = "（空）"
 		return

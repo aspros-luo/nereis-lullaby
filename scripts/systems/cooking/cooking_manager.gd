@@ -6,24 +6,26 @@ extends Node
 
 var recipes: Dictionary = {}
 
-func register_recipe(recipe: CookingRecipe) -> void:
+func register_recipe(recipe) -> void:
 	if recipe == null:
 		return
-	if recipe.id == "":
+	if not ("id" in recipe):
 		return
-	recipes[recipe.id] = recipe
+	if str(recipe.id) == "":
+		return
+	recipes[str(recipe.id)] = recipe
 
-func get_recipe(recipe_id: String) -> CookingRecipe:
+func get_recipe(recipe_id: String):
 	return recipes.get(recipe_id)
 
-func list_recipe_ids() -> Array[String]:
-	var ids: Array[String] = []
+func list_recipe_ids() -> Array:
+	var ids: Array = []
 	for key in recipes.keys():
 		ids.append(str(key))
 	return ids
 
 func cook(recipe_id: String, inventory: Dictionary) -> String:
-	var recipe := get_recipe(recipe_id)
+	var recipe = get_recipe(recipe_id)
 	if recipe == null:
 		return ""
 
@@ -31,4 +33,4 @@ func cook(recipe_id: String, inventory: Dictionary) -> String:
 		return ""
 
 	recipe.consume_ingredients(inventory)
-	return recipe.result_item_id
+	return str(recipe.result_item_id)

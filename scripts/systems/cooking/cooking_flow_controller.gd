@@ -4,36 +4,40 @@ extends Node
 ## Orchestrates the full kitchen cooking flow.
 ## Multi-step recipes advance one player action at a time.
 
+const CookingSessionScript = preload("res://scripts/systems/cooking/cooking_session.gd")
+const CookingResultScript = preload("res://scripts/systems/cooking/cooking_result.gd")
+
 signal flow_started
 signal recipe_list_ready(recipe_ids: Array)
 signal cooking_started(recipe_id: String)
 signal step_changed(recipe_id: String, step_index: int, step_text: String, progress_label: String, is_last: bool)
-signal cooking_finished(result: CookingResult)
+signal cooking_finished(result)
 signal flow_cancelled
 
-var cooking_manager: CookingManager
-var menu_controller: CookingMenuController
-var session: CookingSession
-var inventory: Inventory
+var cooking_manager
+var menu_controller
+var session
+var inventory
 
-func setup(manager: CookingManager, menu: CookingMenuController, inv: Inventory) -> void:
+func setup(manager, menu, inv) -> void:
 	cooking_manager = manager
 	menu_controller = menu
 	inventory = inv
-	session = CookingSession.new()
+	session = CookingSessionScript.new()
 
-	if menu_controller != null and not menu_controller.cooking_requested.is_connected(_on_cooking_requested):
-		menu_controller.cooking_requested.connect(_on_cooking_requested)
+	if menu_controller != null and menu_controller.has_signal("cooking_requested"):
+		if not menu_controller.cooking_requested.is_connected(_on_cooking_requested):
+			menu_controller.cooking_requested.connect(_on_cooking_requested)
 
 func open_kitchen() -> void:
 	if cooking_manager == null:
 		return
 
-	var recipe_ids: Array[String] = []
+	var recipe_ids: Array = []
 	for recipe_id in cooking_manager.recipes.keys():
 		recipe_ids.append(str(recipe_id))
 
-	if menu_controller != null:
+	if menu_controller != null and menu_controller.has_method("set_recipes"):
 		menu_controller.set_recipes(recipe_ids)
 
 	session.reset()
@@ -44,7 +48,7 @@ func request_cook(recipe_id: String) -> void:
 	_on_cooking_requested(recipe_id)
 
 func advance_current_step() -> void:
-	if session == null or session.state != CookingSession.State.COOKING:
+	if session == null or session.state != CookingSessionScript.State.COOKING:
 		return
 
 	if session.is_on_last_step():
@@ -63,30 +67,31 @@ func _on_cooking_requested(recipe_id: String) -> void:
 	if cooking_manager == null or session == null:
 		return
 
-	if session.state == CookingSession.State.COOKING:
-		# Ignore new recipe requests while a process is active.
+	if session.state == CookingSessionScript.State.COOKING:
 		return
 
 	if inventory == null:
-		var failed := CookingResult.failed("No inventory available")
-		cooking_finished.emit(failed)
+		cooking_finished.emit(CookingResultScript.failed("No inventory available"))
 		return
 
-	var recipe := cooking_manager.get_recipe(recipe_id)
+	var recipe = cooking_manager.get_recipe(recipe_id)
 	if recipe == null:
-		var failed := CookingResult.failed("Unknown recipe: %s" % recipe_id)
-		cooking_finished.emit(failed)
+		cooking_finished.emit(CookingResultScript.failed("Unknown recipe: %s" % recipe_id))
 		return
 
-	var recipe_steps: Array[String] = recipe.get_steps()
+	var recipe_steps: Array = []
+	if recipe.has_method("get_steps"):
+		recipe_steps = recipe.get_steps()
+	elif "steps" in recipe:
+		recipe_steps = recipe.steps
+
 	session.begin(recipe_id, recipe_steps)
 	session.mark_ingredients_checked()
 
 	var inv_snapshot: Dictionary = inventory.items.duplicate()
 	if not recipe.can_cook(inv_snapshot):
 		session.reset()
-		var failed := CookingResult.failed("Missing ingredients for %s" % recipe_id)
-		cooking_finished.emit(failed)
+		cooking_finished.emit(CookingResultScript.failed("Missing ingredients for %s" % recipe_id))
 		return
 
 	session.start_cooking()
@@ -103,30 +108,30 @@ func _emit_step() -> void:
 	)
 
 func _finish_current_recipe() -> void:
-	var recipe_id := session.current_recipe_id
-	var recipe := cooking_manager.get_recipe(recipe_id)
+	var recipe_id: String = session.current_recipe_id
+	var recipe = cooking_manager.get_recipe(recipe_id)
 	if recipe == null:
 		session.reset()
-		cooking_finished.emit(CookingResult.failed("Unknown recipe: %s" % recipe_id))
+		cooking_finished.emit(CookingResultScript.failed("Unknown recipe: %s" % recipe_id))
 		return
 
 	var inv_snapshot: Dictionary = inventory.items.duplicate()
 	if not recipe.can_cook(inv_snapshot):
 		session.reset()
-		cooking_finished.emit(CookingResult.failed("Missing ingredients for %s" % recipe_id))
+		cooking_finished.emit(CookingResultScript.failed("Missing ingredients for %s" % recipe_id))
 		return
 
-	var output_id := cooking_manager.cook(recipe_id, inv_snapshot)
+	var output_id: String = cooking_manager.cook(recipe_id, inv_snapshot)
 	if output_id == "":
 		session.reset()
-		cooking_finished.emit(CookingResult.failed("Cooking failed for %s" % recipe_id))
+		cooking_finished.emit(CookingResultScript.failed("Cooking failed for %s" % recipe_id))
 		return
 
 	inventory.items = inv_snapshot
 	inventory.add_item(output_id, 1)
 
 	session.complete(output_id)
-	var result := CookingResult.completed(recipe_id, output_id)
+	var result = CookingResultScript.completed(recipe_id, output_id)
 	result.message = "热气和甜味一起散开来。"
 	cooking_finished.emit(result)
 	session.reset()

@@ -17,7 +17,7 @@ var message_label: Label
 var continue_button: Button
 var close_button: Button
 
-var _recipe_meta: Dictionary = {} # recipe_id -> {display_name, can_cook, missing}
+var _recipe_meta: Dictionary = {}
 var _inventory_snapshot: Dictionary = {}
 var _in_process: bool = false
 
@@ -26,7 +26,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build_ui()
 
-func open_menu(recipe_ids: Array, manager: CookingManager, inventory: Inventory) -> void:
+func open_menu(recipe_ids: Array, manager, inventory) -> void:
 	_recipe_meta.clear()
 	_inventory_snapshot = {}
 	_in_process = false
@@ -37,12 +37,12 @@ func open_menu(recipe_ids: Array, manager: CookingManager, inventory: Inventory)
 		var id_str := str(recipe_id)
 		var display_name := id_str
 		var can_cook := false
-		var missing: Array[String] = []
+		var missing: Array = []
 
 		if manager != null:
-			var recipe := manager.get_recipe(id_str)
+			var recipe = manager.get_recipe(id_str)
 			if recipe != null:
-				display_name = recipe.display_name if recipe.display_name != "" else id_str
+				display_name = str(recipe.display_name) if str(recipe.display_name) != "" else id_str
 				can_cook = recipe.can_cook(_inventory_snapshot)
 				for ingredient_id in recipe.ingredients.keys():
 					var need := int(recipe.ingredients[ingredient_id])
@@ -76,7 +76,7 @@ func show_step(progress_label: String, step_text: String, is_last: bool) -> void
 		continue_button.text = "继续"
 		message_label.text = "按自己的节奏做就好。"
 
-func show_result(result: CookingResult, inventory: Inventory = null) -> void:
+func show_result(result, inventory = null) -> void:
 	_in_process = false
 	_set_process_mode(false)
 	if inventory != null:
@@ -94,7 +94,7 @@ func show_result(result: CookingResult, inventory: Inventory = null) -> void:
 	else:
 		status_label.text = "这次没能完成。"
 		step_label.text = ""
-		message_label.text = result.message
+		message_label.text = str(result.message)
 
 func close_menu() -> void:
 	_in_process = false
@@ -238,7 +238,7 @@ func _refresh_inventory_label() -> void:
 		inventory_label.text = "（空）"
 		return
 
-	var parts: Array[String] = []
+	var parts: Array = []
 	for item_id in _inventory_snapshot.keys():
 		var count := int(_inventory_snapshot[item_id])
 		if count > 0:

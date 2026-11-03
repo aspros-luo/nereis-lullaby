@@ -3,9 +3,6 @@ extends SceneTree
 ## Headless smoke test for Cooking-0.3 multi-step kitchen flow.
 ## Run with:
 ##   godot --headless --path . -s res://tests/cooking_flow_test.gd
-##
-## Use preload() instead of global class_name: headless -s does not
-## always register project class_name symbols before this script parses.
 
 const CookingManagerScript = preload("res://scripts/systems/cooking/cooking_manager.gd")
 const CookingRecipeScript = preload("res://scripts/systems/cooking/cooking_recipe.gd")
@@ -63,7 +60,7 @@ func _test_manager_cook() -> void:
 
 func _test_session_states() -> void:
 	var session = CookingSessionScript.new()
-	var steps: Array[String] = ["准备", "揉面", "烘烤", "完成"]
+	var steps := ["准备", "揉面", "烘烤", "完成"]
 	session.begin("honey_bread", steps)
 	_assert(session.state == CookingSessionScript.State.SELECT_RECIPE, "begin -> SELECT_RECIPE")
 	session.start_cooking()
@@ -99,9 +96,9 @@ func _test_multi_step_success() -> void:
 	_assert(steps_seen.size() == 1, "first step emitted")
 	_assert(inv.get_count("flour") == 1, "ingredients not consumed before finish")
 
-	flow.advance_current_step() # 揉面
-	flow.advance_current_step() # 烘烤
-	flow.advance_current_step() # 完成 (last)
+	flow.advance_current_step()
+	flow.advance_current_step()
+	flow.advance_current_step()
 	_assert(steps_seen.size() == 4, "four steps emitted")
 	_assert(bool(steps_seen[3]["last"]), "fourth step marked last")
 

@@ -3,8 +3,10 @@ extends Node
 
 ## Initial cooking content registry.
 
-func create_default_recipes() -> Array[CookingRecipe]:
-	var honey_bread := CookingRecipe.new()
+const CookingRecipeScript = preload("res://scripts/systems/cooking/cooking_recipe.gd")
+
+func create_default_recipes() -> Array:
+	var honey_bread = CookingRecipeScript.new()
 	honey_bread.id = "honey_bread"
 	honey_bread.display_name = "蜂蜜面包"
 	honey_bread.ingredients = {

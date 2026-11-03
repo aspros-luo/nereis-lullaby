@@ -9,7 +9,8 @@ extends Resource
 @export var ingredients: Dictionary = {}
 @export var result_item_id: String
 ## Ordered step texts shown during cooking (Mite-facing narration).
-@export var steps: Array[String] = []
+## Plain Array avoids typed-array assignment friction from untyped literals.
+@export var steps: Array = []
 
 func can_cook(inventory: Dictionary) -> bool:
 	for ingredient_id in ingredients.keys():
@@ -22,10 +23,9 @@ func consume_ingredients(inventory: Dictionary) -> void:
 	for ingredient_id in ingredients.keys():
 		inventory[ingredient_id] = int(inventory.get(ingredient_id, 0)) - int(ingredients[ingredient_id])
 
-func get_steps() -> Array[String]:
+func get_steps() -> Array:
 	if steps.is_empty():
-		var fallback: Array[String] = ["开始制作。", "完成。"]
-		return fallback
+		return ["开始制作。", "完成。"]
 	return steps
 
 func step_count() -> int:

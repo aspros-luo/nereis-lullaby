@@ -12,13 +12,13 @@ enum State {
 	COMPLETE
 }
 
-var state: State = State.IDLE
+var state: int = State.IDLE
 var current_recipe_id: String = ""
 var result_item_id: String = ""
 var step_index: int = 0
-var steps: Array[String] = []
+var steps: Array = []
 
-func begin(recipe_id: String, recipe_steps: Array[String] = []) -> void:
+func begin(recipe_id: String, recipe_steps: Array = []) -> void:
 	current_recipe_id = recipe_id
 	steps = recipe_steps.duplicate()
 	step_index = 0
@@ -37,7 +37,7 @@ func start_cooking() -> void:
 func current_step_text() -> String:
 	if step_index < 0 or step_index >= steps.size():
 		return ""
-	return steps[step_index]
+	return str(steps[step_index])
 
 func step_progress_label() -> String:
 	if steps.is_empty():

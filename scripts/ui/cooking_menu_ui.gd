@@ -5,17 +5,21 @@ extends Control
 ## Matches the prototype dark UI style used by the main village screen.
 
 signal recipe_cook_requested(recipe_id: String)
+signal step_continue_requested
 signal close_requested
 
 var title_label: Label
 var status_label: Label
 var inventory_label: Label
 var recipe_container: VBoxContainer
+var step_label: Label
 var message_label: Label
+var continue_button: Button
 var close_button: Button
 
 var _recipe_meta: Dictionary = {} # recipe_id -> {display_name, can_cook, missing}
 var _inventory_snapshot: Dictionary = {}
+var _in_process: bool = false
 
 func _ready() -> void:
 	visible = false
@@ -25,6 +29,7 @@ func _ready() -> void:
 func open_menu(recipe_ids: Array, manager: CookingManager, inventory: Inventory) -> void:
 	_recipe_meta.clear()
 	_inventory_snapshot = {}
+	_in_process = false
 	if inventory != null:
 		_inventory_snapshot = inventory.items.duplicate()
 
@@ -53,11 +58,27 @@ func open_menu(recipe_ids: Array, manager: CookingManager, inventory: Inventory)
 
 	_refresh_recipe_list()
 	_refresh_inventory_label()
+	_set_process_mode(false)
 	status_label.text = "厨房里很安静。桌上放着面粉、蜂蜜和鸡蛋。"
 	message_label.text = "选一份想做的料理吧。"
+	step_label.text = ""
 	visible = true
 
+func show_step(progress_label: String, step_text: String, is_last: bool) -> void:
+	_in_process = true
+	_set_process_mode(true)
+	status_label.text = "正在制作……"
+	step_label.text = "%s\n%s" % [progress_label, step_text]
+	if is_last:
+		continue_button.text = "完成出炉"
+		message_label.text = "最后一步了。"
+	else:
+		continue_button.text = "继续"
+		message_label.text = "按自己的节奏做就好。"
+
 func show_result(result: CookingResult, inventory: Inventory = null) -> void:
+	_in_process = false
+	_set_process_mode(false)
 	if inventory != null:
 		_inventory_snapshot = inventory.items.duplicate()
 		_refresh_inventory_label()
@@ -68,13 +89,22 @@ func show_result(result: CookingResult, inventory: Inventory = null) -> void:
 
 	if result.success:
 		status_label.text = "料理完成了。"
+		step_label.text = ""
 		message_label.text = "做好了：%s\n%s" % [result.output_item_id, result.message]
 	else:
 		status_label.text = "这次没能完成。"
+		step_label.text = ""
 		message_label.text = result.message
 
 func close_menu() -> void:
+	_in_process = false
 	visible = false
+
+func _set_process_mode(active: bool) -> void:
+	if continue_button != null:
+		continue_button.visible = active
+	if recipe_container != null:
+		recipe_container.visible = not active
 
 func _build_ui() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -136,11 +166,25 @@ func _build_ui() -> void:
 	recipe_container.add_theme_constant_override("separation", 8)
 	root.add_child(recipe_container)
 
+	step_label = Label.new()
+	step_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	step_label.add_theme_font_size_override("font_size", 16)
+	step_label.add_theme_color_override("font_color", Color("#c8bfa8"))
+	step_label.text = ""
+	root.add_child(step_label)
+
 	message_label = Label.new()
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	message_label.add_theme_color_override("font_color", Color("#e8dfd2"))
 	message_label.text = ""
 	root.add_child(message_label)
+
+	continue_button = Button.new()
+	continue_button.text = "继续"
+	continue_button.visible = false
+	continue_button.pressed.connect(func(): step_continue_requested.emit())
+	_style_button(continue_button)
+	root.add_child(continue_button)
 
 	close_button = Button.new()
 	close_button.text = "离开厨房"
@@ -205,6 +249,8 @@ func _refresh_inventory_label() -> void:
 		inventory_label.text = "、".join(parts)
 
 func _on_recipe_pressed(recipe_id: String) -> void:
+	if _in_process:
+		return
 	recipe_cook_requested.emit(recipe_id)
 
 func _style_button(button: Button) -> void:

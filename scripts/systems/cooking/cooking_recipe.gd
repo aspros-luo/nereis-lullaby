@@ -9,8 +9,9 @@ extends Resource
 @export var ingredients: Dictionary = {}
 @export var result_item_id: String
 ## Ordered step texts shown during cooking (Mite-facing narration).
-## Plain Array avoids typed-array assignment friction from untyped literals.
 @export var steps: Array = []
+## Optional finish portrait, e.g. res://assets/cooking/results/honey_bread.png
+@export var result_image_path: String = ""
 
 func can_cook(inventory: Dictionary) -> bool:
 	for ingredient_id in ingredients.keys():
@@ -30,3 +31,10 @@ func get_steps() -> Array:
 
 func step_count() -> int:
 	return get_steps().size()
+
+func get_result_image_path() -> String:
+	if result_image_path != "":
+		return result_image_path
+	if id != "":
+		return "res://assets/cooking/results/%s.png" % id
+	return ""

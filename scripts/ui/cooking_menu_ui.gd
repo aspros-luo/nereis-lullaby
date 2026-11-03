@@ -1,8 +1,8 @@
 class_name CookingMenuUI
 extends Control
 
-## Text-first kitchen menu.
-## Matches the prototype dark UI style used by the main village screen.
+## Text-first kitchen menu with optional finish portrait.
+## Portrait is shown only on successful cook completion.
 
 signal recipe_cook_requested(recipe_id: String)
 signal step_continue_requested
@@ -14,6 +14,7 @@ var inventory_label: Label
 var recipe_container: VBoxContainer
 var step_label: Label
 var message_label: Label
+var result_portrait: TextureRect
 var continue_button: Button
 var close_button: Button
 
@@ -38,6 +39,7 @@ func open_menu(recipe_ids: Array, manager, inventory) -> void:
 	_recipe_meta.clear()
 	_inventory_snapshot = {}
 	_in_process = false
+	_hide_portrait()
 	if inventory != null:
 		_inventory_snapshot = inventory.items.duplicate()
 
@@ -78,6 +80,7 @@ func open_menu(recipe_ids: Array, manager, inventory) -> void:
 func show_step(progress_label: String, step_text: String, is_last: bool) -> void:
 	_ensure_ui()
 	_in_process = true
+	_hide_portrait()
 	_set_process_mode(true)
 	if status_label != null:
 		status_label.text = "正在制作……"
@@ -103,6 +106,7 @@ func show_result(result, inventory = null) -> void:
 		_refresh_inventory_label()
 
 	if result == null:
+		_hide_portrait()
 		if message_label != null:
 			message_label.text = "没有得到结果。"
 		return
@@ -114,7 +118,9 @@ func show_result(result, inventory = null) -> void:
 			step_label.text = ""
 		if message_label != null:
 			message_label.text = "做好了：%s\n%s" % [result.output_item_id, result.message]
+		_show_portrait(str(result.result_image_path))
 	else:
+		_hide_portrait()
 		if status_label != null:
 			status_label.text = "这次没能完成。"
 		if step_label != null:
@@ -124,7 +130,26 @@ func show_result(result, inventory = null) -> void:
 
 func close_menu() -> void:
 	_in_process = false
+	_hide_portrait()
 	visible = false
+
+func _show_portrait(path: String) -> void:
+	if result_portrait == null:
+		return
+	if path.strip_edges().is_empty() or not ResourceLoader.exists(path):
+		_hide_portrait()
+		return
+	var tex = load(path)
+	if tex == null:
+		_hide_portrait()
+		return
+	result_portrait.texture = tex
+	result_portrait.visible = true
+
+func _hide_portrait() -> void:
+	if result_portrait != null:
+		result_portrait.texture = null
+		result_portrait.visible = false
 
 func _set_process_mode(active: bool) -> void:
 	if continue_button != null:
@@ -133,7 +158,6 @@ func _set_process_mode(active: bool) -> void:
 		recipe_container.visible = not active
 
 func _build_ui() -> void:
-	# Avoid duplicating widgets if called twice.
 	if recipe_container != null:
 		return
 
@@ -195,6 +219,15 @@ func _build_ui() -> void:
 	recipe_container = VBoxContainer.new()
 	recipe_container.add_theme_constant_override("separation", 8)
 	root.add_child(recipe_container)
+
+	# Finish portrait: Vanillaware-like food plate showcase.
+	result_portrait = TextureRect.new()
+	result_portrait.visible = false
+	result_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	result_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	result_portrait.custom_minimum_size = Vector2(420, 280)
+	result_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	root.add_child(result_portrait)
 
 	step_label = Label.new()
 	step_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

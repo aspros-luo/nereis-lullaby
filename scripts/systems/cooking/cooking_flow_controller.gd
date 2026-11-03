@@ -130,8 +130,14 @@ func _finish_current_recipe() -> void:
 	inventory.items = inv_snapshot
 	inventory.add_item(output_id, 1)
 
+	var image_path: String = ""
+	if recipe.has_method("get_result_image_path"):
+		image_path = str(recipe.get_result_image_path())
+	elif "result_image_path" in recipe:
+		image_path = str(recipe.result_image_path)
+
 	session.complete(output_id)
-	var result = CookingResultScript.completed(recipe_id, output_id)
+	var result = CookingResultScript.completed(recipe_id, output_id, image_path)
 	result.message = "热气和甜味一起散开来。"
 	cooking_finished.emit(result)
 	session.reset()

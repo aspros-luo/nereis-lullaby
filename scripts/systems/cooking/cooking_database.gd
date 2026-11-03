@@ -15,6 +15,7 @@ func create_default_recipes() -> Array:
 		"egg": 1
 	}
 	honey_bread.result_item_id = "honey_bread"
+	honey_bread.result_image_path = "res://assets/cooking/results/honey_bread.png"
 	honey_bread.steps = [
 		"我把面粉倒进碗里，再加入蜂蜜和鸡蛋。甜味先一步钻进鼻子里。",
 		"用手把面团揉到光滑。有一点黏，但并不讨厌。",

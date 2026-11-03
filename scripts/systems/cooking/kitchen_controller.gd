@@ -30,6 +30,9 @@ func _ready() -> void:
 	if cooking_station != null and cooking_station.has_signal("cooking_requested"):
 		if not cooking_station.cooking_requested.is_connected(_on_station_interact):
 			cooking_station.cooking_requested.connect(_on_station_interact)
+	# When this scene is run directly (F6 / as main), open the kitchen UI immediately.
+	if get_parent() == get_tree().root:
+		call_deferred("open")
 
 func bootstrap_with(inv = null) -> void:
 	_ensure_runtime()

@@ -1,9 +1,8 @@
 extends Control
-## Daily-loop sample (plan C): freedom + heavy-action cap + knowledge gather.
-## Festival event_focus is stubbed; kitchen retained.
+## Daily sample with professional-ish shell:
+## HUD · Stage (art placeholder) · Action rail · Dialogue box · Map/Bag drawers.
 
 const GameStateScript = preload("res://scripts/core/game_state.gd")
-const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
 const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
 const KitchenControllerScript = preload("res://scripts/systems/cooking/kitchen_controller.gd")
 const CookingGiftServiceScript = preload("res://scripts/systems/cooking/cooking_gift_service.gd")
@@ -14,25 +13,26 @@ const GatherSystemScript = preload("res://scripts/systems/daily/gather_system.gd
 const NpcIntentSchedulerScript = preload("res://scripts/systems/daily/npc_intent_scheduler.gd")
 
 const LOCATION_ORDER: Array[String] = [
-	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
+	"HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"
 ]
 const LOCATION_NAMES: Dictionary = {
-	"HOME": "家附近",
-	"COMMONS": "公共场",
-	"SHRINE": "礼拜场所",
-	"CLINIC": "诊疗处",
-	"PATH": "村庄通路",
-	"FOREST": "林间",
-	"GROVE": "林中空地",
+	"HOME": "家附近", "COMMONS": "公共场", "SHRINE": "礼拜场所", "CLINIC": "诊疗处",
+	"PATH": "村庄通路", "FOREST": "林间", "GROVE": "林中空地",
 }
 const LOCATION_DESCRIPTIONS: Dictionary = {
-	"HOME": "熟悉的屋子和门前小路。老婆婆总把日子安排得妥妥当当。铁匠的锤声有时从棚后传来。",
-	"COMMONS": "村民交换食物、闲聊和帮忙的地方。也有外地来的商贩偶尔停脚。",
-	"SHRINE": "公开举行节庆与祈祷准备的地方。木头和花束都收拾得很整齐。",
+	"HOME": "熟悉的屋子和门前小路。老婆婆总把日子安排得妥妥当当。",
+	"COMMONS": "村民交换食物与闲聊的地方。外地商贩偶尔停脚。",
+	"SHRINE": "节庆与祈祷准备的地方。木头和花束很整齐。",
 	"CLINIC": "草药与药瓶摆在架子上。空气里有干净的苦味。",
-	"PATH": "连接村庄各处的小路。有人把篮子放在路边。",
-	"FOREST": "林子比村庄安静。风穿过叶子时，像有人在远处说话。",
+	"PATH": "连接各处的小路。有人把篮子放在路边。",
+	"FOREST": "林子比村庄安静。风穿过叶子，像有人在远处说话。",
 	"GROVE": "树木围出的空地。适合坐一会儿。",
+}
+## Placeholder stage tints until location art exists.
+const STAGE_COLORS: Dictionary = {
+	"HOME": Color("#2a2430"), "COMMONS": Color("#2c2832"), "SHRINE": Color("#24262e"),
+	"CLINIC": Color("#1f2a2c"), "PATH": Color("#2a2824"), "FOREST": Color("#1a2420"),
+	"GROVE": Color("#22281e"),
 }
 
 var game_state
@@ -45,15 +45,18 @@ var player_inventory
 var kitchen_controller
 var gift_service
 
-var status_label: Label
-var location_label: Label
-var description_label: Label
-var action_state_label: Label
-var message_label: Label
-var inventory_label: Label
-var knowledge_label: Label
-var dynamic_actions: VBoxContainer
-var location_buttons: Array[Button] = []
+# Shell nodes
+var hud_status: Label
+var stage_bg: ColorRect
+var stage_title: Label
+var stage_hint: Label
+var portrait_slot: Panel
+var portrait_label: Label
+var action_list: VBoxContainer
+var dialogue_text: Label
+var map_overlay: Control
+var bag_overlay: Control
+var bag_body: Label
 
 func _ready() -> void:
 	game_state = GameStateScript.new()
@@ -64,9 +67,8 @@ func _ready() -> void:
 	gather_system.setup_sample_spots()
 	intent_scheduler = NpcIntentSchedulerScript.new()
 	_setup_kitchen()
-	_apply_visual_style()
-	_build_ui()
-	message_label.text = "我在村子里住了很久。今天想做点平常的事。"
+	_build_shell()
+	_set_dialogue("我在村子里住了很久。今天想做点平常的事。")
 	_refresh_ui()
 
 func _setup_kitchen() -> void:
@@ -83,155 +85,365 @@ func _setup_kitchen() -> void:
 	if not kitchen_controller.kitchen_closed.is_connected(_on_kitchen_closed):
 		kitchen_controller.kitchen_closed.connect(_on_kitchen_closed)
 
-func _apply_visual_style() -> void:
-	var backdrop := ColorRect.new()
-	backdrop.color = Color("#15141b")
-	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(backdrop)
-	move_child(backdrop, 0)
-
-func _build_ui() -> void:
+func _build_shell() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var root_bg := ColorRect.new()
+	root_bg.color = Color("#121018")
+	root_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(root_bg)
+
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_right", 24)
-	margin.add_theme_constant_override("margin_top", 20)
-	margin.add_theme_constant_override("margin_bottom", 20)
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_top", 12)
+	margin.add_theme_constant_override("margin_bottom", 12)
 	add_child(margin)
 
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	margin.add_child(scroll)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	margin.add_child(vbox)
 
-	var root := VBoxContainer.new()
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("separation", 10)
-	scroll.add_child(root)
+	# --- HUD ---
+	var hud := HBoxContainer.new()
+	hud.add_theme_constant_override("separation", 10)
+	vbox.add_child(hud)
 
-	var title := Label.new()
-	title.text = "蜜忒之歌｜日常样板"
-	title.add_theme_font_size_override("font_size", 28)
-	title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(title)
+	hud_status = Label.new()
+	hud_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hud_status.add_theme_font_size_override("font_size", 16)
+	hud_status.add_theme_color_override("font_color", Color("#e8dfd2"))
+	hud.add_child(hud_status)
 
-	status_label = Label.new()
-	status_label.add_theme_font_size_override("font_size", 18)
-	status_label.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(status_label)
+	var map_btn := Button.new()
+	map_btn.text = "地图"
+	map_btn.pressed.connect(_toggle_map)
+	_style_button(map_btn)
+	hud.add_child(map_btn)
 
-	var map_title := Label.new()
-	map_title.text = "地点"
-	map_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(map_title)
+	var bag_btn := Button.new()
+	bag_btn.text = "背包/线索"
+	bag_btn.pressed.connect(_toggle_bag)
+	_style_button(bag_btn)
+	hud.add_child(bag_btn)
 
-	var map_grid := GridContainer.new()
-	map_grid.columns = 3
-	map_grid.add_theme_constant_override("h_separation", 8)
-	map_grid.add_theme_constant_override("v_separation", 8)
-	root.add_child(map_grid)
+	# --- Middle: Stage + Action rail ---
+	var mid := HBoxContainer.new()
+	mid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	mid.add_theme_constant_override("separation", 12)
+	vbox.add_child(mid)
+
+	var stage_wrap := Control.new()
+	stage_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stage_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	stage_wrap.custom_minimum_size = Vector2(0, 280)
+	mid.add_child(stage_wrap)
+
+	stage_bg = ColorRect.new()
+	stage_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	stage_bg.color = Color("#2a2430")
+	stage_wrap.add_child(stage_bg)
+
+	var stage_frame := Panel.new()
+	stage_frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var frame_style := StyleBoxFlat.new()
+	frame_style.bg_color = Color(0, 0, 0, 0)
+	frame_style.border_color = Color("#665344")
+	frame_style.set_border_width_all(1)
+	stage_frame.add_theme_stylebox_override("panel", frame_style)
+	stage_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_wrap.add_child(stage_frame)
+
+	var stage_margin := MarginContainer.new()
+	stage_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	stage_margin.add_theme_constant_override("margin_left", 16)
+	stage_margin.add_theme_constant_override("margin_right", 16)
+	stage_margin.add_theme_constant_override("margin_top", 14)
+	stage_margin.add_theme_constant_override("margin_bottom", 14)
+	stage_wrap.add_child(stage_margin)
+
+	var stage_col := VBoxContainer.new()
+	stage_col.add_theme_constant_override("separation", 8)
+	stage_margin.add_child(stage_col)
+
+	stage_title = Label.new()
+	stage_title.add_theme_font_size_override("font_size", 26)
+	stage_title.add_theme_color_override("font_color", Color("#f0e6d8"))
+	stage_col.add_child(stage_title)
+
+	stage_hint = Label.new()
+	stage_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	stage_hint.add_theme_color_override("font_color", Color("#c8bfa8"))
+	stage_col.add_child(stage_hint)
+
+	var portrait_row := HBoxContainer.new()
+	portrait_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	portrait_row.alignment = BoxContainer.ALIGNMENT_END
+	stage_col.add_child(portrait_row)
+
+	portrait_slot = Panel.new()
+	portrait_slot.custom_minimum_size = Vector2(120, 160)
+	var pstyle := StyleBoxFlat.new()
+	pstyle.bg_color = Color("#1a1820")
+	pstyle.border_color = Color("#4a4050")
+	pstyle.set_border_width_all(1)
+	pstyle.set_corner_radius_all(4)
+	portrait_slot.add_theme_stylebox_override("panel", pstyle)
+	portrait_row.add_child(portrait_slot)
+
+	var pcenter := CenterContainer.new()
+	pcenter.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	portrait_slot.add_child(pcenter)
+	portrait_label = Label.new()
+	portrait_label.text = "立绘\n占位"
+	portrait_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	portrait_label.add_theme_color_override("font_color", Color("#77717b"))
+	pcenter.add_child(portrait_label)
+
+	var art_note := Label.new()
+	art_note.text = "场景图占位 · 后续接 locations/{id}.png"
+	art_note.add_theme_font_size_override("font_size", 11)
+	art_note.add_theme_color_override("font_color", Color("#665f6a"))
+	stage_col.add_child(art_note)
+
+	# Action rail
+	var rail := PanelContainer.new()
+	rail.custom_minimum_size = Vector2(220, 0)
+	rail.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var rail_style := StyleBoxFlat.new()
+	rail_style.bg_color = Color("#1a1820")
+	rail_style.border_color = Color("#3a3544")
+	rail_style.set_border_width_all(1)
+	rail_style.set_corner_radius_all(6)
+	rail_style.content_margin_left = 10
+	rail_style.content_margin_right = 10
+	rail_style.content_margin_top = 10
+	rail_style.content_margin_bottom = 10
+	rail.add_theme_stylebox_override("panel", rail_style)
+	mid.add_child(rail)
+
+	var rail_v := VBoxContainer.new()
+	rail_v.add_theme_constant_override("separation", 8)
+	rail.add_child(rail_v)
+
+	var rail_title := Label.new()
+	rail_title.text = "此刻可做"
+	rail_title.add_theme_color_override("font_color", Color("#e8dfd2"))
+	rail_v.add_child(rail_title)
+
+	var action_scroll := ScrollContainer.new()
+	action_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	action_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rail_v.add_child(action_scroll)
+
+	action_list = VBoxContainer.new()
+	action_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	action_list.add_theme_constant_override("separation", 6)
+	action_scroll.add_child(action_list)
+
+	# --- Dialogue box ---
+	var dialogue_panel := PanelContainer.new()
+	dialogue_panel.custom_minimum_size = Vector2(0, 110)
+	var dstyle := StyleBoxFlat.new()
+	dstyle.bg_color = Color("#1c1822")
+	dstyle.border_color = Color("#c09a6a")
+	dstyle.set_border_width_all(1)
+	dstyle.set_corner_radius_all(6)
+	dstyle.content_margin_left = 16
+	dstyle.content_margin_right = 16
+	dstyle.content_margin_top = 12
+	dstyle.content_margin_bottom = 12
+	dialogue_panel.add_theme_stylebox_override("panel", dstyle)
+	vbox.add_child(dialogue_panel)
+
+	dialogue_text = Label.new()
+	dialogue_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dialogue_text.add_theme_font_size_override("font_size", 17)
+	dialogue_text.add_theme_color_override("font_color", Color("#f0e6d8"))
+	dialogue_panel.add_child(dialogue_text)
+
+	_build_map_overlay()
+	_build_bag_overlay()
+
+func _build_map_overlay() -> void:
+	map_overlay = Control.new()
+	map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	map_overlay.visible = false
+	add_child(map_overlay)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.72)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed:
+			map_overlay.visible = false
+	)
+	map_overlay.add_child(dim)
+
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -200
+	panel.offset_right = 200
+	panel.offset_top = -160
+	panel.offset_bottom = 160
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = Color("#1a1820")
+	ps.border_color = Color("#c09a6a")
+	ps.set_border_width_all(1)
+	ps.set_corner_radius_all(8)
+	ps.content_margin_left = 16
+	ps.content_margin_right = 16
+	ps.content_margin_top = 14
+	ps.content_margin_bottom = 14
+	panel.add_theme_stylebox_override("panel", ps)
+	map_overlay.add_child(panel)
+
+	var mv := VBoxContainer.new()
+	mv.add_theme_constant_override("separation", 8)
+	panel.add_child(mv)
+	var mt := Label.new()
+	mt.text = "前往哪里？"
+	mt.add_theme_font_size_override("font_size", 18)
+	mt.add_theme_color_override("font_color", Color("#e8dfd2"))
+	mv.add_child(mt)
+
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	mv.add_child(grid)
 	for location_id in LOCATION_ORDER:
-		var button := Button.new()
-		button.text = str(LOCATION_NAMES.get(location_id, location_id))
-		button.custom_minimum_size = Vector2(150, 38)
-		button.pressed.connect(_on_location_selected.bind(location_id))
-		_style_button(button)
-		map_grid.add_child(button)
-		location_buttons.append(button)
+		var b := Button.new()
+		b.text = str(LOCATION_NAMES.get(location_id, location_id))
+		b.custom_minimum_size = Vector2(150, 36)
+		b.pressed.connect(_on_location_selected.bind(location_id))
+		_style_button(b)
+		grid.add_child(b)
 
-	location_label = Label.new()
-	location_label.add_theme_font_size_override("font_size", 20)
-	location_label.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(location_label)
+	var close_b := Button.new()
+	close_b.text = "关闭"
+	close_b.pressed.connect(func(): map_overlay.visible = false)
+	_style_button(close_b)
+	mv.add_child(close_b)
 
-	description_label = Label.new()
-	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description_label.add_theme_color_override("font_color", Color("#c8bfa8"))
-	root.add_child(description_label)
+func _build_bag_overlay() -> void:
+	bag_overlay = Control.new()
+	bag_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bag_overlay.visible = false
+	add_child(bag_overlay)
 
-	action_state_label = Label.new()
-	action_state_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	action_state_label.add_theme_color_override("font_color", Color("#c8bfa8"))
-	root.add_child(action_state_label)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.72)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed:
+			bag_overlay.visible = false
+	)
+	bag_overlay.add_child(dim)
 
-	var act_title := Label.new()
-	act_title.text = "可以做的事"
-	act_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(act_title)
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -220
+	panel.offset_right = 220
+	panel.offset_top = -150
+	panel.offset_bottom = 150
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = Color("#1a1820")
+	ps.border_color = Color("#c09a6a")
+	ps.set_border_width_all(1)
+	ps.set_corner_radius_all(8)
+	ps.content_margin_left = 16
+	ps.content_margin_right = 16
+	ps.content_margin_top = 14
+	ps.content_margin_bottom = 14
+	panel.add_theme_stylebox_override("panel", ps)
+	bag_overlay.add_child(panel)
 
-	dynamic_actions = VBoxContainer.new()
-	dynamic_actions.add_theme_constant_override("separation", 6)
-	root.add_child(dynamic_actions)
+	var bv := VBoxContainer.new()
+	bv.add_theme_constant_override("separation", 8)
+	panel.add_child(bv)
+	var bt := Label.new()
+	bt.text = "背包与线索"
+	bt.add_theme_font_size_override("font_size", 18)
+	bt.add_theme_color_override("font_color", Color("#e8dfd2"))
+	bv.add_child(bt)
 
-	var inv_title := Label.new()
-	inv_title.text = "带着的东西"
-	inv_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(inv_title)
+	bag_body = Label.new()
+	bag_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	bag_body.add_theme_color_override("font_color", Color("#c8bfa8"))
+	bv.add_child(bag_body)
 
-	inventory_label = Label.new()
-	inventory_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	inventory_label.add_theme_color_override("font_color", Color("#c8bfa8"))
-	root.add_child(inventory_label)
+	var close_b := Button.new()
+	close_b.text = "关闭"
+	close_b.pressed.connect(func(): bag_overlay.visible = false)
+	_style_button(close_b)
+	bv.add_child(close_b)
 
-	var know_title := Label.new()
-	know_title.text = "听来的事（线索）"
-	know_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(know_title)
+func _toggle_map() -> void:
+	map_overlay.visible = not map_overlay.visible
+	if map_overlay.visible:
+		bag_overlay.visible = false
 
-	knowledge_label = Label.new()
-	knowledge_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	knowledge_label.add_theme_color_override("font_color", Color("#c8bfa8"))
-	root.add_child(knowledge_label)
+func _toggle_bag() -> void:
+	_refresh_bag_body()
+	bag_overlay.visible = not bag_overlay.visible
+	if bag_overlay.visible:
+		map_overlay.visible = false
 
-	message_label = Label.new()
-	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	message_label.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(message_label)
+func _set_dialogue(text: String) -> void:
+	dialogue_text.text = text
 
 func _refresh_ui() -> void:
-	var mode_text: String = "日常" if mode_controller.is_daily() else "事件中"
-	status_label.text = "%s · %s" % [mode_text, economy.status_text()]
-	location_label.text = "我现在在：%s" % str(LOCATION_NAMES.get(game_state.current_location, game_state.current_location))
-	description_label.text = str(LOCATION_DESCRIPTIONS.get(game_state.current_location, ""))
-	action_state_label.text = (
-		"还可以做有重量的事。" if economy.can_spend_heavy() else "有点累了，也许该休息，让日子往前走一点。"
-	)
-	_refresh_inventory_label()
-	_refresh_knowledge_label()
-	_rebuild_dynamic_actions()
+	var mode_text: String = "日常" if mode_controller.is_daily() else "事件"
+	hud_status.text = "%s · %s" % [mode_text, economy.status_text()]
 
-func _refresh_inventory_label() -> void:
+	var loc: String = str(game_state.current_location)
+	stage_title.text = str(LOCATION_NAMES.get(loc, loc))
+	stage_hint.text = str(LOCATION_DESCRIPTIONS.get(loc, ""))
+	stage_bg.color = STAGE_COLORS.get(loc, Color("#2a2430"))
+
+	# Portrait placeholder label by location vibe
+	if loc == "HOME":
+		portrait_label.text = "老婆婆\n占位"
+	elif loc == "COMMONS":
+		portrait_label.text = "商人\n占位"
+	else:
+		portrait_label.text = "立绘\n占位"
+
+	_rebuild_actions()
+	_refresh_bag_body()
+
+func _refresh_bag_body() -> void:
 	var parts: Array = []
 	for item_id in player_inventory.items.keys():
 		var count: int = int(player_inventory.items[item_id])
 		if count > 0:
 			parts.append("%s ×%d" % [_item_display_name(str(item_id)), count])
-	inventory_label.text = "（空）" if parts.is_empty() else "、".join(parts)
-
-func _refresh_knowledge_label() -> void:
+	var inv_line: String = "（空）" if parts.is_empty() else "、".join(parts)
 	var notes: Array = knowledge.list_notes()
-	knowledge_label.text = "（还没有特别记住的事）" if notes.is_empty() else "\n".join(notes)
+	var know_line: String = "（还没有）" if notes.is_empty() else "\n".join(notes)
+	bag_body.text = "物品：\n%s\n\n线索：\n%s" % [inv_line, know_line]
 
-func _rebuild_dynamic_actions() -> void:
-	for child in dynamic_actions.get_children():
-		dynamic_actions.remove_child(child)
+func _rebuild_actions() -> void:
+	for child in action_list.get_children():
+		action_list.remove_child(child)
 		child.queue_free()
 
 	var daily: bool = bool(mode_controller.is_daily())
 	var can_heavy: bool = bool(economy.can_spend_heavy())
 
-	_add_action_button("看看周围", _observe_location, true)
-	_add_action_button("休息，让日子往前走", _rest, true)
+	_add_action("看看周围", _observe_location, true)
+	_add_action("休息", _rest, true)
 
 	if daily and str(game_state.current_location) == "HOME":
-		_add_action_button("和老婆婆聊聊", _talk_popo, can_heavy)
-		_add_action_button("去做点吃的", _open_kitchen, can_heavy)
+		_add_action("和老婆婆聊聊", _talk_popo, can_heavy)
+		_add_action("去做点吃的", _open_kitchen, can_heavy)
 
 	if daily and str(game_state.current_location) == "COMMONS":
-		_add_action_button("和外地商人聊两句", _talk_merchant, can_heavy)
-		_add_action_button("和路过的村民闲聊", _talk_villager, can_heavy)
+		_add_action("和外地商人聊两句", _talk_merchant, can_heavy)
+		_add_action("和村民闲聊", _talk_villager, can_heavy)
 
 	if daily:
 		for spot in gather_system.spots_at(str(game_state.current_location)):
@@ -239,32 +451,34 @@ func _rebuild_dynamic_actions() -> void:
 			var known: bool = true
 			var kid: String = str(spot.get("requires_knowledge_id", ""))
 			if kid != "" and not knowledge.has(kid):
-				label = label + "（还不知道）"
+				label = label + "（？）"
 				known = false
-			_add_action_button(label, _gather_spot.bind(spot), can_heavy or not known)
+			_add_action(label, _gather_spot.bind(spot), can_heavy or not known)
 
 	var food_id: String = _first_giftable_food()
 	if daily and food_id != "" and str(game_state.current_location) == "HOME":
-		_add_action_button("把%s送给老婆婆" % _item_display_name(food_id), _gift_to_popo.bind(food_id), can_heavy)
+		_add_action("送出%s" % _item_display_name(food_id), _gift_to_popo.bind(food_id), can_heavy)
 
-func _add_action_button(text: String, callable: Callable, enabled: bool) -> void:
+func _add_action(text: String, callable: Callable, enabled: bool) -> void:
 	var button := Button.new()
 	button.text = text
 	button.disabled = not enabled
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.pressed.connect(callable)
 	_style_button(button)
-	dynamic_actions.add_child(button)
+	action_list.add_child(button)
 
 func _on_location_selected(location_id: String) -> void:
 	if mode_controller.is_event_focus():
-		message_label.text = "现在心里有别的事，走不开。"
+		_set_dialogue("现在心里有别的事，走不开。")
 		return
 	game_state.current_location = location_id
-	message_label.text = "我来到了%s。" % str(LOCATION_NAMES.get(location_id, location_id))
+	map_overlay.visible = false
+	_set_dialogue("我来到了%s。" % str(LOCATION_NAMES.get(location_id, location_id)))
 	_refresh_ui()
 
 func _observe_location() -> void:
-	message_label.text = str(LOCATION_DESCRIPTIONS.get(game_state.current_location, "我看了看周围。"))
+	_set_dialogue(str(LOCATION_DESCRIPTIONS.get(game_state.current_location, "我看了看周围。")))
 	_refresh_ui()
 
 func _rest() -> void:
@@ -275,12 +489,12 @@ func _rest() -> void:
 		msg += "\n" + str(passive.get("message", ""))
 	if bool(info.get("festival_hint", false)):
 		msg += "\n空气里开始有节庆前的忙乱——丰收节快到了。"
-	message_label.text = msg
+	_set_dialogue(msg)
 	_refresh_ui()
 
 func _talk_popo() -> void:
 	if not economy.spend_heavy():
-		message_label.text = "有点累了，先休息吧。"
+		_set_dialogue("有点累了，先休息吧。")
 		_refresh_ui()
 		return
 	var msg: String = "老婆婆问我有没有好好吃饭，又把窗边的花瓶摆正。"
@@ -288,12 +502,12 @@ func _talk_popo() -> void:
 		msg += "她说门前园子里的叶子可以摘一些回来备用。"
 	else:
 		msg += "我们又说了些家常。"
-	message_label.text = msg
+	_set_dialogue(msg)
 	_refresh_ui()
 
 func _talk_merchant() -> void:
 	if not economy.spend_heavy():
-		message_label.text = "有点累了，先休息吧。"
+		_set_dialogue("有点累了，先休息吧。")
 		_refresh_ui()
 		return
 	var msg: String = "外地商人正在收摊，语气很快。"
@@ -301,15 +515,15 @@ func _talk_merchant() -> void:
 		msg += "他随口说林子里有种叶子带清香，懂的人会采一点调味。"
 	else:
 		msg += "他没有多说什么新的。"
-	message_label.text = msg
+	_set_dialogue(msg)
 	_refresh_ui()
 
 func _talk_villager() -> void:
 	if not economy.spend_heavy():
-		message_label.text = "有点累了，先休息吧。"
+		_set_dialogue("有点累了，先休息吧。")
 		_refresh_ui()
 		return
-	message_label.text = "村民笑着说今年的丰收节会比往年更热闹，让我记得去公共场。"
+	_set_dialogue("村民笑着说今年的丰收节会比往年更热闹，让我记得去公共场。")
 	_refresh_ui()
 
 func _gather_spot(spot: Dictionary) -> void:
@@ -317,45 +531,42 @@ func _gather_spot(spot: Dictionary) -> void:
 		spot, knowledge, player_inventory, mode_controller.allows_free_gather()
 	)
 	if bool(result.get("locked", false)):
-		message_label.text = str(result.get("message", ""))
+		_set_dialogue(str(result.get("message", "")))
 		_refresh_ui()
 		return
 	if not bool(result.get("ok", false)):
-		message_label.text = str(result.get("message", "没能采集。"))
+		_set_dialogue(str(result.get("message", "没能采集。")))
 		_refresh_ui()
 		return
 	if not economy.spend_heavy():
 		player_inventory.remove_item(str(result.get("item_id", "")), int(result.get("amount", 1)))
-		message_label.text = "有点累了，没能继续。"
+		_set_dialogue("有点累了，没能继续。")
 		_refresh_ui()
 		return
-	message_label.text = str(result.get("message", ""))
+	_set_dialogue(str(result.get("message", "")))
 	_refresh_ui()
 
 func _open_kitchen() -> void:
-	if not mode_controller.is_daily():
-		message_label.text = "现在不适合进厨房。"
-		return
-	if str(game_state.current_location) != "HOME":
+	if not mode_controller.is_daily() or str(game_state.current_location) != "HOME":
 		return
 	if not economy.can_spend_heavy():
-		message_label.text = "有点累了，先休息吧。"
+		_set_dialogue("有点累了，先休息吧。")
 		return
 	kitchen_controller.bootstrap_with(player_inventory, game_state, null)
 	kitchen_controller.open()
-	message_label.text = "我走进厨房。"
+	_set_dialogue("我走进厨房。")
 
 func _on_kitchen_cooking_completed(result) -> void:
 	if result == null:
 		return
 	if not result.success:
-		message_label.text = "厨房：%s" % result.message
+		_set_dialogue("厨房：%s" % result.message)
 		_refresh_ui()
 		return
 	if economy.spend_heavy():
-		message_label.text = "我做了%s。" % _item_display_name(str(result.output_item_id))
+		_set_dialogue("我做了%s。" % _item_display_name(str(result.output_item_id)))
 	else:
-		message_label.text = "料理好了，可人已经很累了。"
+		_set_dialogue("料理好了，可人已经很累了。")
 	_refresh_ui()
 
 func _on_kitchen_closed() -> void:
@@ -363,11 +574,11 @@ func _on_kitchen_closed() -> void:
 
 func _gift_to_popo(food_id: String) -> void:
 	if not economy.spend_heavy():
-		message_label.text = "有点累了，先休息吧。"
+		_set_dialogue("有点累了，先休息吧。")
 		_refresh_ui()
 		return
 	var gift_result = gift_service.gift_food(player_inventory, "caregiver", food_id, game_state)
-	message_label.text = gift_result.message
+	_set_dialogue(gift_result.message)
 	_refresh_ui()
 
 func _first_giftable_food() -> String:
@@ -378,22 +589,14 @@ func _first_giftable_food() -> String:
 
 func _item_display_name(item_id: String) -> String:
 	match item_id:
-		"honey_bread":
-			return "蜂蜜面包"
-		"herb_porridge":
-			return "草药粥"
-		"flour":
-			return "面粉"
-		"honey":
-			return "蜂蜜"
-		"egg":
-			return "鸡蛋"
-		"herb":
-			return "草药"
-		"spice_moonleaf":
-			return "清香叶"
-		_:
-			return item_id
+		"honey_bread": return "蜂蜜面包"
+		"herb_porridge": return "草药粥"
+		"flour": return "面粉"
+		"honey": return "蜂蜜"
+		"egg": return "鸡蛋"
+		"herb": return "草药"
+		"spice_moonleaf": return "清香叶"
+		_: return item_id
 
 func _style_button(button: Button) -> void:
 	var normal := _make_style(Color("#29252f"), Color("#665344"))

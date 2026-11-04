@@ -7,7 +7,8 @@ const HEAVY_PER_SEGMENT: int = 3
 
 var heavy_remaining: int = HEAVY_PER_SEGMENT
 var segment_index: int = 0
-var segments_until_festival_hint: int = 2
+## After this many rests, player can enter harvest festival anchor.
+var segments_until_festival_ready: int = 3
 
 signal segment_advanced(segment_index: int)
 signal exhausted
@@ -23,15 +24,18 @@ func spend_heavy() -> bool:
 	return true
 
 func rest() -> Dictionary:
-	## Returns flags about what changed after rest.
 	segment_index += 1
 	heavy_remaining = HEAVY_PER_SEGMENT
 	var info := {
 		"segment_index": segment_index,
-		"festival_hint": segment_index >= segments_until_festival_hint,
+		"festival_hint": segment_index >= 2,
+		"festival_ready": segment_index >= segments_until_festival_ready,
 	}
 	segment_advanced.emit(segment_index)
 	return info
 
+func is_festival_ready() -> bool:
+	return segment_index >= segments_until_festival_ready
+
 func status_text() -> String:
-	return "今天还能认真做 %d 件事 · 已过 %d 段日常" % [heavy_remaining, segment_index]
+	return "还能认真做 %d 件事 · 日常第 %d 段" % [heavy_remaining, segment_index]

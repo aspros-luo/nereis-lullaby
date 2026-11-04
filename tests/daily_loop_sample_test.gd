@@ -8,6 +8,8 @@ const GatherSystemScript = preload("res://scripts/systems/daily/gather_system.gd
 const GameModeControllerScript = preload("res://scripts/systems/daily/game_mode_controller.gd")
 const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
 const NpcIntentSchedulerScript = preload("res://scripts/systems/daily/npc_intent_scheduler.gd")
+const TradeSystemScript = preload("res://scripts/systems/daily/trade_system.gd")
+const WorldSampleFlagsScript = preload("res://scripts/systems/daily/world_sample_flags.gd")
 
 var failures: int = 0
 
@@ -17,6 +19,8 @@ func _init() -> void:
 	_test_knowledge_gate()
 	_test_mode_blocks_gather()
 	_test_passive_gift()
+	_test_trade()
+	_test_festival_flags()
 	if failures == 0:
 		print("ALL DAILY LOOP SAMPLE TESTS PASSED")
 		quit(0)
@@ -40,6 +44,9 @@ func _test_economy() -> void:
 	var info: Dictionary = eco.rest()
 	_assert(int(info.get("segment_index", 0)) == 1, "segment advanced")
 	_assert(eco.can_spend_heavy(), "refreshed after rest")
+	eco.rest()
+	eco.rest()
+	_assert(eco.is_festival_ready(), "festival ready after 3 rests")
 
 func _test_knowledge_gate() -> void:
 	var knowledge = IngredientKnowledgeScript.new()
@@ -72,3 +79,21 @@ func _test_passive_gift() -> void:
 	var res: Dictionary = sched.on_rest(1, inv, "HOME")
 	_assert(res.has("message"), "passive gift message")
 	_assert(inv.get_count("herb") >= 1, "passive herb granted")
+
+func _test_trade() -> void:
+	var trade = TradeSystemScript.new()
+	trade.setup_sample_offers()
+	var inv = InventoryScript.new()
+	var offer: Dictionary = trade.offers_at("COMMONS")[0]
+	var fail: Dictionary = trade.try_trade(offer, inv)
+	_assert(not bool(fail.get("ok", true)), "trade fails without herb")
+	inv.add_item("herb", 1)
+	var ok: Dictionary = trade.try_trade(offer, inv)
+	_assert(bool(ok.get("ok", false)), "trade ok")
+	_assert(inv.get_count("flour") >= 1, "got flour")
+
+func _test_festival_flags() -> void:
+	var w = WorldSampleFlagsScript.new()
+	_assert(not w.has_flag("festival_done"), "not done yet")
+	w.after_festival()
+	_assert(w.has_flag("festival_done"), "festival done flag")

@@ -1,83 +1,83 @@
 extends Control
-## Village daily prototype: locations, talk, kitchen, gift food.
-## Streamlined restore focused on playable cooking + social loop.
+## Daily-loop sample (plan C): freedom + heavy-action cap + knowledge gather.
+## Festival event_focus is stubbed; kitchen retained.
 
 const GameStateScript = preload("res://scripts/core/game_state.gd")
 const ScheduleManagerScript = preload("res://scripts/managers/npc_schedule_manager.gd")
-const ClueJournalScript = preload("res://scripts/managers/clue_journal.gd")
-const WorldlineLedgerScript = preload("res://scripts/core/worldline_event_ledger.gd")
-const InformationNetworkScript = preload("res://scripts/managers/worldline_information_network.gd")
 const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
 const KitchenControllerScript = preload("res://scripts/systems/cooking/kitchen_controller.gd")
 const CookingGiftServiceScript = preload("res://scripts/systems/cooking/cooking_gift_service.gd")
+const GameModeControllerScript = preload("res://scripts/systems/daily/game_mode_controller.gd")
+const DailyActionEconomyScript = preload("res://scripts/systems/daily/daily_action_economy.gd")
+const IngredientKnowledgeScript = preload("res://scripts/systems/daily/ingredient_knowledge.gd")
+const GatherSystemScript = preload("res://scripts/systems/daily/gather_system.gd")
+const NpcIntentSchedulerScript = preload("res://scripts/systems/daily/npc_intent_scheduler.gd")
 
 const LOCATION_ORDER: Array[String] = [
 	"FOREST", "GROVE", "PATH", "COMMONS", "SHRINE", "HOME", "CLINIC"
 ]
-const ACTIVITY_LABELS: Dictionary = {
-	"HOME": "整理家里",
-	"COMMONS": "帮忙做些杂事",
-	"SHRINE": "整理礼拜用品",
-	"CLINIC": "分拣草药",
-	"PATH": "采些常见草叶",
-	"FOREST": "采摘野花",
-	"GROVE": "坐下休息",
+const LOCATION_NAMES: Dictionary = {
+	"HOME": "家附近",
+	"COMMONS": "公共场",
+	"SHRINE": "礼拜场所",
+	"CLINIC": "诊疗处",
+	"PATH": "村庄通路",
+	"FOREST": "林间",
+	"GROVE": "林中空地",
 }
 const LOCATION_DESCRIPTIONS: Dictionary = {
-	"HOME": "熟悉的屋子和门前小路。照料者总能把普通的一天安排得妥妥当当。",
-	"COMMONS": "村民交换食物、闲聊和帮忙的地方。这里的热闹让人觉得安心。",
-	"SHRINE": "村里公开举行礼拜和节庆准备的地方。木头、布料和花束都收拾得很整齐。",
-	"CLINIC": "草药、干净的布和药瓶摆在架子上。医生总说，休息好比胡思乱想有用。",
-	"PATH": "一条连接村庄各处的小路。有人经过，也有人把篮子暂时放在路边。",
-	"FOREST": "林子比村庄安静得多。风穿过树叶时，听起来像有人在远处轻轻说话。",
-	"GROVE": "树木围出一小片空地，阳光落在野花上。这里适合坐一会儿，也适合慢慢看看。",
+	"HOME": "熟悉的屋子和门前小路。老婆婆总把日子安排得妥妥当当。铁匠的锤声有时从棚后传来。",
+	"COMMONS": "村民交换食物、闲聊和帮忙的地方。也有外地来的商贩偶尔停脚。",
+	"SHRINE": "公开举行节庆与祈祷准备的地方。木头和花束都收拾得很整齐。",
+	"CLINIC": "草药与药瓶摆在架子上。空气里有干净的苦味。",
+	"PATH": "连接村庄各处的小路。有人把篮子放在路边。",
+	"FOREST": "林子比村庄安静。风穿过叶子时，像有人在远处说话。",
+	"GROVE": "树木围出的空地。适合坐一会儿。",
 }
 
 var game_state
-var schedule_manager
-var clue_journal
-var worldline_ledger
-var information_network
+var mode_controller
+var economy
+var knowledge
+var gather_system
+var intent_scheduler
+var player_inventory
+var kitchen_controller
+var gift_service
 
 var status_label: Label
 var location_label: Label
 var description_label: Label
 var action_state_label: Label
 var message_label: Label
-var relationship_label: Label
 var inventory_label: Label
-var npc_container: VBoxContainer
-var action_button: Button
-var observe_button: Button
-var advance_button: Button
-var cook_button: Button
+var knowledge_label: Label
+var dynamic_actions: VBoxContainer
 var location_buttons: Array[Button] = []
-
-var player_inventory
-var kitchen_controller
-var gift_service
 
 func _ready() -> void:
 	game_state = GameStateScript.new()
-	schedule_manager = ScheduleManagerScript.new()
-	clue_journal = ClueJournalScript.new()
-	worldline_ledger = WorldlineLedgerScript.new()
-	information_network = InformationNetworkScript.new()
+	mode_controller = GameModeControllerScript.new()
+	economy = DailyActionEconomyScript.new()
+	knowledge = IngredientKnowledgeScript.new()
+	gather_system = GatherSystemScript.new()
+	gather_system.setup_sample_spots()
+	intent_scheduler = NpcIntentSchedulerScript.new()
 	_setup_kitchen()
 	_apply_visual_style()
 	_build_ui()
+	message_label.text = "我在村子里住了很久。今天想做点平常的事。"
 	_refresh_ui()
 
 func _setup_kitchen() -> void:
 	player_inventory = InventoryScript.new()
-	player_inventory.add_item("flour", 3)
-	player_inventory.add_item("honey", 3)
-	player_inventory.add_item("egg", 3)
-	player_inventory.add_item("herb", 2)
+	player_inventory.add_item("flour", 2)
+	player_inventory.add_item("honey", 2)
+	player_inventory.add_item("egg", 2)
 	gift_service = CookingGiftServiceScript.new()
 	kitchen_controller = KitchenControllerScript.new()
 	add_child(kitchen_controller)
-	kitchen_controller.bootstrap_with(player_inventory, game_state, worldline_ledger)
+	kitchen_controller.bootstrap_with(player_inventory, game_state, null)
 	if not kitchen_controller.cooking_completed.is_connected(_on_kitchen_cooking_completed):
 		kitchen_controller.cooking_completed.connect(_on_kitchen_cooking_completed)
 	if not kitchen_controller.kitchen_closed.is_connected(_on_kitchen_closed):
@@ -112,7 +112,7 @@ func _build_ui() -> void:
 	scroll.add_child(root)
 
 	var title := Label.new()
-	title.text = "蜜忒之歌｜村庄日常"
+	title.text = "蜜忒之歌｜日常样板"
 	title.add_theme_font_size_override("font_size", 28)
 	title.add_theme_color_override("font_color", Color("#e8dfd2"))
 	root.add_child(title)
@@ -123,7 +123,7 @@ func _build_ui() -> void:
 	root.add_child(status_label)
 
 	var map_title := Label.new()
-	map_title.text = "村庄与林地地图 · 选择一个地点"
+	map_title.text = "地点"
 	map_title.add_theme_color_override("font_color", Color("#e8dfd2"))
 	root.add_child(map_title)
 
@@ -134,7 +134,7 @@ func _build_ui() -> void:
 	root.add_child(map_grid)
 	for location_id in LOCATION_ORDER:
 		var button := Button.new()
-		button.text = schedule_manager.get_location_name(location_id)
+		button.text = str(LOCATION_NAMES.get(location_id, location_id))
 		button.custom_minimum_size = Vector2(150, 38)
 		button.pressed.connect(_on_location_selected.bind(location_id))
 		_style_button(button)
@@ -151,38 +151,19 @@ func _build_ui() -> void:
 	description_label.add_theme_color_override("font_color", Color("#c8bfa8"))
 	root.add_child(description_label)
 
-	var action_row := HBoxContainer.new()
-	action_row.add_theme_constant_override("separation", 8)
-	root.add_child(action_row)
-
-	observe_button = Button.new()
-	observe_button.text = "看看周围"
-	observe_button.pressed.connect(_observe_location)
-	_style_button(observe_button)
-	action_row.add_child(observe_button)
-
-	action_button = Button.new()
-	action_button.pressed.connect(_do_daily_activity)
-	_style_button(action_button)
-	action_row.add_child(action_button)
-
-	cook_button = Button.new()
-	cook_button.text = "去做点吃的"
-	cook_button.visible = false
-	cook_button.pressed.connect(_open_kitchen)
-	_style_button(cook_button)
-	action_row.add_child(cook_button)
-
-	advance_button = Button.new()
-	advance_button.text = "等到下一个时段"
-	advance_button.pressed.connect(_advance_time)
-	_style_button(advance_button)
-	action_row.add_child(advance_button)
-
 	action_state_label = Label.new()
 	action_state_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	action_state_label.add_theme_color_override("font_color", Color("#c8bfa8"))
 	root.add_child(action_state_label)
+
+	var act_title := Label.new()
+	act_title.text = "可以做的事"
+	act_title.add_theme_color_override("font_color", Color("#e8dfd2"))
+	root.add_child(act_title)
+
+	dynamic_actions = VBoxContainer.new()
+	dynamic_actions.add_theme_constant_override("separation", 6)
+	root.add_child(dynamic_actions)
 
 	var inv_title := Label.new()
 	inv_title.text = "带着的东西"
@@ -194,66 +175,34 @@ func _build_ui() -> void:
 	inventory_label.add_theme_color_override("font_color", Color("#c8bfa8"))
 	root.add_child(inventory_label)
 
-	var npc_title := Label.new()
-	npc_title.text = "现在在这里的人"
-	npc_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(npc_title)
+	var know_title := Label.new()
+	know_title.text = "听来的事（线索）"
+	know_title.add_theme_color_override("font_color", Color("#e8dfd2"))
+	root.add_child(know_title)
 
-	npc_container = VBoxContainer.new()
-	npc_container.add_theme_constant_override("separation", 6)
-	root.add_child(npc_container)
+	knowledge_label = Label.new()
+	knowledge_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	knowledge_label.add_theme_color_override("font_color", Color("#c8bfa8"))
+	root.add_child(knowledge_label)
 
 	message_label = Label.new()
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	message_label.add_theme_color_override("font_color", Color("#e8dfd2"))
-	message_label.text = "我想先在村子里走走。"
 	root.add_child(message_label)
 
-	var rel_title := Label.new()
-	rel_title.text = "我和熟人的关系"
-	rel_title.add_theme_color_override("font_color", Color("#e8dfd2"))
-	root.add_child(rel_title)
-
-	relationship_label = Label.new()
-	relationship_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	relationship_label.add_theme_color_override("font_color", Color("#c8bfa8"))
-	root.add_child(relationship_label)
-
 func _refresh_ui() -> void:
-	var phase_label := "日常" if game_state.world_state["phase"] == "ordinary" else "村庄发生了变化"
-	if game_state.world_state["phase"] == "demo_complete":
-		phase_label = "序章结束"
-	status_label.text = "第 %d 天 · %s · %s" % [
-		game_state.day_index, game_state.get_slot_label(), phase_label
-	]
-	location_label.text = "我现在在：%s" % schedule_manager.get_location_name(game_state.current_location)
+	var mode_text := "日常" if mode_controller.is_daily() else "事件中"
+	status_label.text = "%s · %s" % [mode_text, economy.status_text()]
+	location_label.text = "我现在在：%s" % str(LOCATION_NAMES.get(game_state.current_location, game_state.current_location))
 	description_label.text = str(LOCATION_DESCRIPTIONS.get(game_state.current_location, ""))
-	action_button.text = str(ACTIVITY_LABELS.get(game_state.current_location, "做点日常的事"))
-
-	var can_act := game_state.can_take_action()
-	action_button.disabled = not can_act
-	observe_button.disabled = not can_act and game_state.world_state["phase"] == "ordinary"
 	action_state_label.text = (
-		"这个时段还可以做一件事。" if can_act else "这个时段我已经忙完了。"
+		"还可以做有重量的事。" if economy.can_spend_heavy() else "有点累了，也许该休息，让日子往前走一点。"
 	)
-
-	if cook_button != null:
-		var can_cook := (
-			str(game_state.current_location) == "HOME"
-			and game_state.world_state["phase"] == "ordinary"
-			and can_act
-		)
-		cook_button.visible = can_cook
-		cook_button.disabled = not can_cook
-
 	_refresh_inventory_label()
-	_refresh_npc_list()
-	_refresh_relationship_label()
+	_refresh_knowledge_label()
+	_rebuild_dynamic_actions()
 
 func _refresh_inventory_label() -> void:
-	if player_inventory == null:
-		inventory_label.text = "（空）"
-		return
 	var parts: Array = []
 	for item_id in player_inventory.items.keys():
 		var count := int(player_inventory.items[item_id])
@@ -261,164 +210,169 @@ func _refresh_inventory_label() -> void:
 			parts.append("%s ×%d" % [_item_display_name(str(item_id)), count])
 	inventory_label.text = "（空）" if parts.is_empty() else "、".join(parts)
 
-func _refresh_npc_list() -> void:
-	for child in npc_container.get_children():
-		npc_container.remove_child(child)
+func _refresh_knowledge_label() -> void:
+	var notes: Array = knowledge.list_notes()
+	knowledge_label.text = "（还没有特别记住的事）" if notes.is_empty() else "\n".join(notes)
+
+func _rebuild_dynamic_actions() -> void:
+	for child in dynamic_actions.get_children():
+		dynamic_actions.remove_child(child)
 		child.queue_free()
 
-	var present: Array = schedule_manager.get_npcs_at(
-		game_state.current_location, game_state.day_index, game_state.slot_index
-	)
-	if present.is_empty():
-		var empty := Label.new()
-		empty.text = "这里暂时没有熟悉的村民。"
-		empty.add_theme_color_override("font_color", Color("#c8bfa8"))
-		npc_container.add_child(empty)
-		return
+	var daily := mode_controller.is_daily()
+	var can_heavy := economy.can_spend_heavy()
 
-	for npc_id in present:
-		var npc_button := Button.new()
-		npc_button.text = "和%s聊聊" % schedule_manager.get_npc_name(npc_id)
-		npc_button.disabled = not game_state.can_take_action()
-		npc_button.pressed.connect(_talk_to_npc.bind(str(npc_id)))
-		_style_button(npc_button)
-		npc_container.add_child(npc_button)
+	_add_action_button("看看周围", _observe_location, true)
+	_add_action_button("休息，让日子往前走", _rest, true)
 
-		var food_id := _first_giftable_food()
-		if food_id != "":
-			var gift_button := Button.new()
-			gift_button.text = "把%s送给%s" % [_item_display_name(food_id), schedule_manager.get_npc_name(npc_id)]
-			gift_button.disabled = not game_state.can_take_action()
-			gift_button.pressed.connect(_gift_food_to_npc.bind(str(npc_id), food_id))
-			_style_button(gift_button)
-			npc_container.add_child(gift_button)
+	if daily and str(game_state.current_location) == "HOME":
+		_add_action_button("和老婆婆聊聊", _talk_popo, can_heavy)
+		_add_action_button("去做点吃的", _open_kitchen, can_heavy)
 
-func _refresh_relationship_label() -> void:
-	var parts: Array = []
-	for npc_id in ["caregiver", "worship_leader", "doctor"]:
-		var value: int = int(game_state.relationship_state.get(npc_id, 0))
-		var tone := "平常"
-		if value >= 3:
-			tone = "更亲近些"
-		elif value <= -1:
-			tone = "有些疏远"
-		parts.append("%s：%s" % [schedule_manager.get_npc_name(npc_id), tone])
-	relationship_label.text = "\n".join(parts)
+	if daily and str(game_state.current_location) == "COMMONS":
+		_add_action_button("和外地商人聊两句", _talk_merchant, can_heavy)
+		_add_action_button("和路过的村民闲聊", _talk_villager, can_heavy)
+
+	if daily:
+		for spot in gather_system.spots_at(str(game_state.current_location)):
+			var label := str(spot.get("label", "采集"))
+			var known := true
+			var kid := str(spot.get("requires_knowledge_id", ""))
+			if kid != "" and not knowledge.has(kid):
+				label = label + "（还不知道）"
+				known = false
+			# Allow click even if unknown to show locked text; still costs heavy only on success path handled inside.
+			_add_action_button(label, _gather_spot.bind(spot), can_heavy or not known)
+
+	var food_id := _first_giftable_food()
+	if daily and food_id != "" and str(game_state.current_location) == "HOME":
+		_add_action_button("把%s送给老婆婆" % _item_display_name(food_id), _gift_to_popo.bind(food_id), can_heavy)
+
+func _add_action_button(text: String, callable: Callable, enabled: bool) -> void:
+	var button := Button.new()
+	button.text = text
+	button.disabled = not enabled
+	button.pressed.connect(callable)
+	_style_button(button)
+	dynamic_actions.add_child(button)
 
 func _on_location_selected(location_id: String) -> void:
+	if mode_controller.is_event_focus():
+		message_label.text = "现在心里有别的事，走不开。"
+		return
 	game_state.current_location = location_id
-	message_label.text = "我来到了%s。" % schedule_manager.get_location_name(location_id)
+	message_label.text = "我来到了%s。" % str(LOCATION_NAMES.get(location_id, location_id))
 	_refresh_ui()
 
 func _observe_location() -> void:
-	if game_state.world_state["phase"] == "ordinary" and not game_state.can_take_action():
-		message_label.text = "这个时段我已经忙完了。"
-		return
 	message_label.text = str(LOCATION_DESCRIPTIONS.get(game_state.current_location, "我看了看周围。"))
 	_refresh_ui()
 
-func _do_daily_activity() -> void:
-	if not game_state.can_take_action():
-		message_label.text = "这个时段我已经忙完了。"
-		return
-	var action_id: String = "activity_" + str(game_state.current_location).to_lower()
-	var text := "我在%s%s。" % [
-		schedule_manager.get_location_name(game_state.current_location),
-		str(ACTIVITY_LABELS.get(game_state.current_location, "做了些琐事")),
-	]
-	if game_state.take_action(action_id, text):
-		message_label.text = text
-		# Soft material reward for path/forest chores.
-		if str(game_state.current_location) == "PATH":
-			player_inventory.add_item("herb", 1)
-			message_label.text += " 路上采到一点草叶。"
-		elif str(game_state.current_location) == "CLINIC":
-			player_inventory.add_item("herb", 1)
-			message_label.text += " 分拣时留下一小把可用的草药。"
+func _rest() -> void:
+	var info: Dictionary = economy.rest()
+	var msg := "我休息了一会儿。日子悄悄往前走了一点。"
+	var passive: Dictionary = intent_scheduler.on_rest(int(info.get("segment_index", 0)), player_inventory, str(game_state.current_location))
+	if not passive.is_empty():
+		msg += "\n" + str(passive.get("message", ""))
+	if bool(info.get("festival_hint", false)):
+		msg += "\n空气里开始有节庆前的忙乱——丰收节快到了。"
+	message_label.text = msg
 	_refresh_ui()
 
-func _advance_time() -> void:
-	if game_state.world_state["phase"] != "ordinary":
-		message_label.text = "时间已经不太一样了。"
+func _talk_popo() -> void:
+	if not economy.spend_heavy():
+		message_label.text = "有点累了，先休息吧。"
 		_refresh_ui()
 		return
-	game_state.advance_time()
-	message_label.text = "时间往前走了一点。现在是第 %d 天的%s。" % [
-		game_state.day_index, game_state.get_slot_label()
-	]
+	var msg := "老婆婆问我有没有好好吃饭，又把窗边的花瓶摆正。"
+	if knowledge.learn("know_home_herb_patch", "家门前小园里的草药可以收取。"):
+		msg += "她说门前园子里的叶子可以摘一些回来备用。"
+	else:
+		msg += "我们又说了些家常。"
+	message_label.text = msg
 	_refresh_ui()
 
-func _talk_to_npc(npc_id: String) -> void:
-	if not game_state.can_take_action():
+func _talk_merchant() -> void:
+	if not economy.spend_heavy():
+		message_label.text = "有点累了，先休息吧。"
+		_refresh_ui()
 		return
-	var reply := "%s和我随意聊了几句日常的事。" % schedule_manager.get_npc_name(npc_id)
-	match npc_id:
-		"caregiver":
-			reply = "照料者问我有没有好好吃饭，又把窗边的花瓶摆正了一点。"
-		"worship_leader":
-			reply = "礼拜主持者说最近大家都在为公共事务忙碌，语气很平稳。"
-		"doctor":
-			reply = "医生让我别想太多，说休息比胡思乱想有用。"
-	if game_state.take_action("talk_" + npc_id, reply):
-		game_state.increase_relationship(npc_id, 1)
-		message_label.text = reply
+	var msg := "外地商人正在收摊，语气很快。"
+	if knowledge.learn("know_moonleaf", "林间有一种清香的叶子，可以当香料。"):
+		msg += "他随口说林子里有种叶子带清香，懂的人会采一点调味。"
+	else:
+		msg += "他没有多说什么新的。"
+	message_label.text = msg
+	_refresh_ui()
+
+func _talk_villager() -> void:
+	if not economy.spend_heavy():
+		message_label.text = "有点累了，先休息吧。"
+		_refresh_ui()
+		return
+	message_label.text = "村民笑着说今年的丰收节会比往年更热闹，让我记得去公共场。"
+	_refresh_ui()
+
+func _gather_spot(spot: Dictionary) -> void:
+	var result: Dictionary = gather_system.try_gather(
+		spot, knowledge, player_inventory, mode_controller.allows_free_gather()
+	)
+	if bool(result.get("locked", false)):
+		message_label.text = str(result.get("message", ""))
+		_refresh_ui()
+		return
+	if not bool(result.get("ok", false)):
+		message_label.text = str(result.get("message", "没能采集。"))
+		_refresh_ui()
+		return
+	if not economy.spend_heavy():
+		# Refund items if we cannot spend (edge case).
+		player_inventory.remove_item(str(result.get("item_id", "")), int(result.get("amount", 1)))
+		message_label.text = "有点累了，没能继续。"
+		_refresh_ui()
+		return
+	message_label.text = str(result.get("message", ""))
 	_refresh_ui()
 
 func _open_kitchen() -> void:
-	if kitchen_controller == null:
+	if not mode_controller.is_daily():
+		message_label.text = "现在不适合进厨房。"
 		return
 	if str(game_state.current_location) != "HOME":
-		message_label.text = "只有回到家里才能进厨房。"
 		return
-	if not game_state.can_take_action():
-		message_label.text = "这个时段我已经忙完了。"
+	if not economy.can_spend_heavy():
+		message_label.text = "有点累了，先休息吧。"
 		return
-	kitchen_controller.bootstrap_with(player_inventory, game_state, worldline_ledger)
+	kitchen_controller.bootstrap_with(player_inventory, game_state, null)
 	kitchen_controller.open()
-	message_label.text = "我走进厨房，准备做一点简单的食物。"
+	message_label.text = "我走进厨房。"
 
 func _on_kitchen_cooking_completed(result) -> void:
 	if result == null:
 		return
 	if not result.success:
 		message_label.text = "厨房：%s" % result.message
+		_refresh_ui()
 		return
-	var action_id: String = "activity_home_cooking"
-	var activity_text: String = "我在厨房做了%s。" % _item_display_name(str(result.output_item_id))
-	if game_state.take_action(action_id, activity_text):
-		message_label.text = activity_text + "（获得 %s）" % _item_display_name(str(result.output_item_id))
+	if economy.spend_heavy():
+		message_label.text = "我做了%s。" % _item_display_name(str(result.output_item_id))
 	else:
-		message_label.text = "料理做好了，可这个时段已经没有行动机会了。"
+		message_label.text = "料理好了，可人已经很累了。"
 	_refresh_ui()
 
 func _on_kitchen_closed() -> void:
-	if str(game_state.current_location) == "HOME":
-		message_label.text = "我离开厨房，回到家里熟悉的光线里。"
 	_refresh_ui()
 
-func _gift_food_to_npc(npc_id: String, food_id: String) -> void:
-	if gift_service == null:
-		return
-	if not game_state.can_take_action():
-		message_label.text = "这个时段我已经忙完了。"
-		return
-	var gift_result = gift_service.gift_food(player_inventory, npc_id, food_id, game_state)
-	if not gift_result.success:
-		message_label.text = gift_result.message
+func _gift_to_popo(food_id: String) -> void:
+	if not economy.spend_heavy():
+		message_label.text = "有点累了，先休息吧。"
 		_refresh_ui()
 		return
-	var action_id: String = "activity_gift_%s_%s" % [npc_id, food_id]
-	if game_state.take_action(action_id, gift_result.message):
-		message_label.text = gift_result.message
-	else:
-		# Action failed after gift consumed — restore food.
-		player_inventory.add_item(food_id, 1)
-		message_label.text = "想送出食物，但这个时段已经没有行动机会了。"
+	var gift_result = gift_service.gift_food(player_inventory, "caregiver", food_id, game_state)
+	message_label.text = gift_result.message
 	_refresh_ui()
 
 func _first_giftable_food() -> String:
-	if player_inventory == null:
-		return ""
 	for food_id in ["honey_bread", "herb_porridge"]:
 		if player_inventory.has_item(food_id, 1):
 			return food_id
@@ -438,6 +392,8 @@ func _item_display_name(item_id: String) -> String:
 			return "鸡蛋"
 		"herb":
 			return "草药"
+		"spice_moonleaf":
+			return "清香叶"
 		_:
 			return item_id
 

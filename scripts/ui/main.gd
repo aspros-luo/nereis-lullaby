@@ -191,7 +191,7 @@ func _build_ui() -> void:
 	root.add_child(message_label)
 
 func _refresh_ui() -> void:
-	var mode_text := "日常" if mode_controller.is_daily() else "事件中"
+	var mode_text: String = "日常" if mode_controller.is_daily() else "事件中"
 	status_label.text = "%s · %s" % [mode_text, economy.status_text()]
 	location_label.text = "我现在在：%s" % str(LOCATION_NAMES.get(game_state.current_location, game_state.current_location))
 	description_label.text = str(LOCATION_DESCRIPTIONS.get(game_state.current_location, ""))
@@ -205,7 +205,7 @@ func _refresh_ui() -> void:
 func _refresh_inventory_label() -> void:
 	var parts: Array = []
 	for item_id in player_inventory.items.keys():
-		var count := int(player_inventory.items[item_id])
+		var count: int = int(player_inventory.items[item_id])
 		if count > 0:
 			parts.append("%s ×%d" % [_item_display_name(str(item_id)), count])
 	inventory_label.text = "（空）" if parts.is_empty() else "、".join(parts)
@@ -219,8 +219,8 @@ func _rebuild_dynamic_actions() -> void:
 		dynamic_actions.remove_child(child)
 		child.queue_free()
 
-	var daily := mode_controller.is_daily()
-	var can_heavy := economy.can_spend_heavy()
+	var daily: bool = bool(mode_controller.is_daily())
+	var can_heavy: bool = bool(economy.can_spend_heavy())
 
 	_add_action_button("看看周围", _observe_location, true)
 	_add_action_button("休息，让日子往前走", _rest, true)
@@ -235,16 +235,15 @@ func _rebuild_dynamic_actions() -> void:
 
 	if daily:
 		for spot in gather_system.spots_at(str(game_state.current_location)):
-			var label := str(spot.get("label", "采集"))
-			var known := true
-			var kid := str(spot.get("requires_knowledge_id", ""))
+			var label: String = str(spot.get("label", "采集"))
+			var known: bool = true
+			var kid: String = str(spot.get("requires_knowledge_id", ""))
 			if kid != "" and not knowledge.has(kid):
 				label = label + "（还不知道）"
 				known = false
-			# Allow click even if unknown to show locked text; still costs heavy only on success path handled inside.
 			_add_action_button(label, _gather_spot.bind(spot), can_heavy or not known)
 
-	var food_id := _first_giftable_food()
+	var food_id: String = _first_giftable_food()
 	if daily and food_id != "" and str(game_state.current_location) == "HOME":
 		_add_action_button("把%s送给老婆婆" % _item_display_name(food_id), _gift_to_popo.bind(food_id), can_heavy)
 
@@ -270,7 +269,7 @@ func _observe_location() -> void:
 
 func _rest() -> void:
 	var info: Dictionary = economy.rest()
-	var msg := "我休息了一会儿。日子悄悄往前走了一点。"
+	var msg: String = "我休息了一会儿。日子悄悄往前走了一点。"
 	var passive: Dictionary = intent_scheduler.on_rest(int(info.get("segment_index", 0)), player_inventory, str(game_state.current_location))
 	if not passive.is_empty():
 		msg += "\n" + str(passive.get("message", ""))
@@ -284,7 +283,7 @@ func _talk_popo() -> void:
 		message_label.text = "有点累了，先休息吧。"
 		_refresh_ui()
 		return
-	var msg := "老婆婆问我有没有好好吃饭，又把窗边的花瓶摆正。"
+	var msg: String = "老婆婆问我有没有好好吃饭，又把窗边的花瓶摆正。"
 	if knowledge.learn("know_home_herb_patch", "家门前小园里的草药可以收取。"):
 		msg += "她说门前园子里的叶子可以摘一些回来备用。"
 	else:
@@ -297,7 +296,7 @@ func _talk_merchant() -> void:
 		message_label.text = "有点累了，先休息吧。"
 		_refresh_ui()
 		return
-	var msg := "外地商人正在收摊，语气很快。"
+	var msg: String = "外地商人正在收摊，语气很快。"
 	if knowledge.learn("know_moonleaf", "林间有一种清香的叶子，可以当香料。"):
 		msg += "他随口说林子里有种叶子带清香，懂的人会采一点调味。"
 	else:
@@ -326,7 +325,6 @@ func _gather_spot(spot: Dictionary) -> void:
 		_refresh_ui()
 		return
 	if not economy.spend_heavy():
-		# Refund items if we cannot spend (edge case).
 		player_inventory.remove_item(str(result.get("item_id", "")), int(result.get("amount", 1)))
 		message_label.text = "有点累了，没能继续。"
 		_refresh_ui()

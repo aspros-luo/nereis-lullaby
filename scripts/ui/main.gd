@@ -1,5 +1,5 @@
 extends Control
-## Daily shell + trade + harvest festival event_focus sample.
+## Daily shell + pre-festival LN events + harvest festival focus.
 
 const GameStateScript = preload("res://scripts/core/game_state.gd")
 const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
@@ -12,6 +12,7 @@ const GatherSystemScript = preload("res://scripts/systems/daily/gather_system.gd
 const NpcIntentSchedulerScript = preload("res://scripts/systems/daily/npc_intent_scheduler.gd")
 const TradeSystemScript = preload("res://scripts/systems/daily/trade_system.gd")
 const WorldSampleFlagsScript = preload("res://scripts/systems/daily/world_sample_flags.gd")
+const PreFestivalEventsScript = preload("res://scripts/systems/daily/pre_festival_events.gd")
 
 const LOCATION_ORDER: Array[String] = [
 	"HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"
@@ -43,11 +44,13 @@ var gather_system
 var intent_scheduler
 var trade_system
 var world_flags
+var pre_events
 var player_inventory
 var kitchen_controller
 var gift_service
 var festival_helped: bool = false
 var festival_offered_food: bool = false
+var observe_home_count: int = 0
 
 var hud_status: Label
 var stage_bg: ColorRect
@@ -72,6 +75,7 @@ func _ready() -> void:
 	trade_system = TradeSystemScript.new()
 	trade_system.setup_sample_offers()
 	world_flags = WorldSampleFlagsScript.new()
+	pre_events = PreFestivalEventsScript.new()
 	_setup_kitchen()
 	_build_shell()
 	_set_dialogue("我在村子里住了很久。今天想做点平常的事。")
@@ -98,7 +102,6 @@ func _build_shell() -> void:
 	root_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root_bg)
-
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 16)
@@ -106,11 +109,9 @@ func _build_shell() -> void:
 	margin.add_theme_constant_override("margin_top", 12)
 	margin.add_theme_constant_override("margin_bottom", 12)
 	add_child(margin)
-
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 10)
 	margin.add_child(vbox)
-
 	var hud := HBoxContainer.new()
 	hud.add_theme_constant_override("separation", 10)
 	vbox.add_child(hud)
@@ -129,12 +130,10 @@ func _build_shell() -> void:
 	bag_btn.pressed.connect(_toggle_bag)
 	_style_button(bag_btn)
 	hud.add_child(bag_btn)
-
 	var mid := HBoxContainer.new()
 	mid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	mid.add_theme_constant_override("separation", 12)
 	vbox.add_child(mid)
-
 	var stage_wrap := Control.new()
 	stage_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stage_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -195,7 +194,6 @@ func _build_shell() -> void:
 	art_note.add_theme_font_size_override("font_size", 11)
 	art_note.add_theme_color_override("font_color", Color("#665f6a"))
 	stage_col.add_child(art_note)
-
 	var rail := PanelContainer.new()
 	rail.custom_minimum_size = Vector2(230, 0)
 	rail.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -225,9 +223,8 @@ func _build_shell() -> void:
 	action_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	action_list.add_theme_constant_override("separation", 6)
 	action_scroll.add_child(action_list)
-
 	var dialogue_panel := PanelContainer.new()
-	dialogue_panel.custom_minimum_size = Vector2(0, 128)
+	dialogue_panel.custom_minimum_size = Vector2(0, 150)
 	var dstyle := StyleBoxFlat.new()
 	dstyle.bg_color = Color("#1c1822")
 	dstyle.border_color = Color("#c09a6a")
@@ -239,12 +236,15 @@ func _build_shell() -> void:
 	dstyle.content_margin_bottom = 12
 	dialogue_panel.add_theme_stylebox_override("panel", dstyle)
 	vbox.add_child(dialogue_panel)
+	var dialogue_scroll := ScrollContainer.new()
+	dialogue_scroll.custom_minimum_size = Vector2(0, 130)
+	dialogue_panel.add_child(dialogue_scroll)
 	dialogue_text = Label.new()
 	dialogue_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dialogue_text.add_theme_font_size_override("font_size", 17)
+	dialogue_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dialogue_text.add_theme_font_size_override("font_size", 16)
 	dialogue_text.add_theme_color_override("font_color", Color("#f0e6d8"))
-	dialogue_panel.add_child(dialogue_text)
-
+	dialogue_scroll.add_child(dialogue_text)
 	_build_map_overlay()
 	_build_bag_overlay()
 
@@ -384,7 +384,6 @@ func _refresh_ui() -> void:
 		map_btn.disabled = true
 	else:
 		map_btn.disabled = false
-
 	var loc: String = str(game_state.current_location)
 	if mode_controller.is_event_focus():
 		stage_title.text = "丰收节 · 公共场"
@@ -397,6 +396,8 @@ func _refresh_ui() -> void:
 		stage_bg.color = STAGE_COLORS.get(loc, Color("#2a2430"))
 		if loc == "HOME":
 			portrait_label.text = "老婆婆\n占位"
+		elif loc == "PATH":
+			portrait_label.text = "铁匠\n占位"
 		elif loc == "COMMONS":
 			portrait_label.text = "商人\n占位"
 		else:
@@ -419,7 +420,6 @@ func _rebuild_actions() -> void:
 	for child in action_list.get_children():
 		action_list.remove_child(child)
 		child.queue_free()
-
 	if mode_controller.is_event_focus():
 		_add_action("帮忙布置桌台", _festival_help, true)
 		var food_id: String = _first_giftable_food()
@@ -428,28 +428,28 @@ func _rebuild_actions() -> void:
 		_add_action("安静地看着", _festival_watch, true)
 		_add_action("节庆散了，回家去", _festival_end, true)
 		return
-
-	var daily: bool = true
 	var can_heavy: bool = bool(economy.can_spend_heavy())
 	_add_action("看看周围", _observe_location, true)
 	_add_action("休息", _rest, true)
-
-	if str(game_state.current_location) == "HOME":
+	var loc: String = str(game_state.current_location)
+	if loc == "HOME":
 		_add_action("和老婆婆聊聊", _talk_popo, can_heavy)
 		_add_action("去做点吃的", _open_kitchen, can_heavy)
-	var food_home: String = _first_giftable_food()
-	if str(game_state.current_location) == "HOME" and food_home != "":
-		_add_action("送出%s" % _item_display_name(food_home), _gift_to_popo.bind(food_home), can_heavy)
-
-	if str(game_state.current_location) == "COMMONS":
+		var food_home: String = _first_giftable_food()
+		if food_home != "":
+			_add_action("把%s送给老婆婆" % _item_display_name(food_home), _gift_to_popo.bind(food_home), can_heavy)
+	if loc == "HOME" or loc == "PATH":
+		if economy.segment_index >= 2:
+			var smith_label: String = "帮铁匠提一桶水" if not pre_events.has_seen("PF09") else "看看铁匠那边"
+			_add_action(smith_label, _smith_water, can_heavy or pre_events.has_seen("PF09"))
+	if loc == "COMMONS":
 		_add_action("和外地商人聊两句", _talk_merchant, can_heavy)
 		_add_action("和村民闲聊", _talk_villager, can_heavy)
 		for offer in trade_system.offers_at("COMMONS"):
 			_add_action(str(offer.get("label", "交换")), _do_trade.bind(offer), can_heavy)
 		if economy.is_festival_ready() and not world_flags.has_flag("festival_done"):
 			_add_action("参加丰收节", _start_festival, true)
-
-	for spot in gather_system.spots_at(str(game_state.current_location)):
+	for spot in gather_system.spots_at(loc):
 		var label: String = str(spot.get("label", "采集"))
 		var known: bool = true
 		var kid: String = str(spot.get("requires_knowledge_id", ""))
@@ -477,21 +477,46 @@ func _on_location_selected(location_id: String) -> void:
 	_refresh_ui()
 
 func _observe_location() -> void:
-	_set_dialogue(_location_desc(str(game_state.current_location)))
+	var loc: String = str(game_state.current_location)
+	var text: String = _location_desc(loc)
+	if loc == "HOME":
+		obsave_home_count_fix()
+		if observe_home_count == 1:
+			text = pre_events.text_observe_home_vase()
+		elif observe_home_count >= 2:
+			text = pre_events.text_observe_home_hammer()
+	elif loc == "COMMONS" and not pre_events.has_seen("obs_commons"):
+		pre_events.mark("obs_commons")
+		text = pre_events.text_observe_commons_basket()
+	elif loc == "SHRINE" and economy.segment_index >= 3:
+		text = pre_events.text_observe_shrine_paper()
+	elif loc == "COMMONS" and economy.is_festival_ready() and not world_flags.has_flag("festival_done"):
+		text = pre_events.text_pf20_drum()
+	_set_dialogue(text)
 	_refresh_ui()
+
+func obs_home_count_fix() -> void:
+	obsave_home_count_add()
+
+func observe_home_count_add() -> void:
+	obsave_home_count += 1
 
 func _rest() -> void:
 	if mode_controller.is_event_focus():
 		return
 	var info: Dictionary = economy.rest()
+	var seg: int = int(info.get("segment_index", 0))
 	var msg: String = "我休息了一会儿。日子悄悄往前走了一点。"
-	var passive: Dictionary = intent_scheduler.on_rest(int(info.get("segment_index", 0)), player_inventory, str(game_state.current_location))
+	if seg >= 4 and not pre_events.has_seen("rest_sweet"):
+		pre_events.mark("rest_sweet")
+		msg = pre_events.text_rest_sweet_night()
+	var passive: Dictionary = intent_scheduler.on_rest(seg, player_inventory, str(game_state.current_location))
 	if not passive.is_empty():
-		msg += "\n" + str(passive.get("message", ""))
+		msg += "\n\n" + str(passive.get("message", ""))
 	if bool(info.get("festival_ready", false)) and not world_flags.has_flag("festival_done"):
-		msg += "\n鼓声从公共场那边隐隐传来——丰收节开始了。可以过去。"
+		msg += "\n\n" + pre_events.text_pf20_drum()
 	elif bool(info.get("festival_hint", false)) and not world_flags.has_flag("festival_done"):
-		msg += "\n空气里开始有节庆前的忙乱。"
+		msg += "\n\n空气里开始有节庆前的忙乱。"
 	_set_dialogue(msg)
 	_refresh_ui()
 
@@ -500,16 +525,25 @@ func _talk_popo() -> void:
 		_set_dialogue("有点累了，先休息吧。")
 		_refresh_ui()
 		return
-	var msg: String = ""
-	if world_flags.has_flag("festival_done"):
-		msg = "老婆婆把我头发上一点碎花瓣拈掉，说：办完就好，别想太多。她的手很稳，笑却浅了一点。"
-	else:
-		msg = "老婆婆问我有没有好好吃饭，又把窗边的花瓶摆正。"
-		if knowledge.learn("know_home_herb_patch", "家门前小园里的草药可以收取。"):
-			msg += "她说门前园子里的叶子可以摘一些回来备用。"
-		else:
-			msg += "我们又说了些家常。"
-	_set_dialogue(msg)
+	var result: Dictionary = pre_events.resolve_popo_talk(
+		economy.segment_index, world_flags.has_flag("festival_done")
+	)
+	if bool(result.get("learn_herb", false)):
+		knowledge.learn("know_home_herb_patch", "家门前小园里的草药可以收取。")
+	_set_dialogue(str(result.get("text", "")))
+	_refresh_ui()
+
+func _smith_water() -> void:
+	if pre_events.has_seen("PF09"):
+		_set_dialogue(pre_events.text_pf09_smith_done())
+		_refresh_ui()
+		return
+	if not economy.spend_heavy():
+		_set_dialogue("有点累了，先休息吧。")
+		_refresh_ui()
+		return
+	pre_events.mark("PF09")
+	_set_dialogue(pre_events.text_pf09_smith_water())
 	_refresh_ui()
 
 func _talk_merchant() -> void:
@@ -519,9 +553,9 @@ func _talk_merchant() -> void:
 		return
 	var msg: String = "外地商人正在收摊，语气很快。"
 	if knowledge.learn("know_moonleaf", "林间有一种清香的叶子，可以当香料。"):
-		msg += "他随口说林子里有种叶子带清香，懂的人会采一点调味。"
+		msg += "\n\n他随口说林子里有种叶子带清香，懂的人会采一点调味。"
 	else:
-		msg += "他说有草叶也可以拿来换面粉。"
+		msg += "\n\n他说有草叶也可以拿来换面粉。"
 	_set_dialogue(msg)
 	_refresh_ui()
 
@@ -626,7 +660,7 @@ func _on_kitchen_cooking_completed(result) -> void:
 		_refresh_ui()
 		return
 	if economy.spend_heavy():
-		_set_dialogue("我做了%s。" % _item_display_name(str(result.output_item_id)))
+		_set_dialogue("我做了%s。面、手温，还有一点刚出锅的热气。" % _item_display_name(str(result.output_item_id)))
 	else:
 		_set_dialogue("料理好了，可人已经很累了。")
 	_refresh_ui()
@@ -640,7 +674,15 @@ func _gift_to_popo(food_id: String) -> void:
 		_refresh_ui()
 		return
 	var gift_result = gift_service.gift_food(player_inventory, "caregiver", food_id, game_state)
-	_set_dialogue(gift_result.message)
+	if not gift_result.success:
+		_set_dialogue(gift_result.message)
+		_refresh_ui()
+		return
+	if not pre_events.has_seen("PF06"):
+		pre_events.mark("PF06")
+		_set_dialogue(pre_events.text_pf06_gift_popo())
+	else:
+		_set_dialogue(gift_result.message)
 	_refresh_ui()
 
 func _first_giftable_food() -> String:

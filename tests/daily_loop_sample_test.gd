@@ -10,6 +10,7 @@ const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
 const NpcIntentSchedulerScript = preload("res://scripts/systems/daily/npc_intent_scheduler.gd")
 const TradeSystemScript = preload("res://scripts/systems/daily/trade_system.gd")
 const WorldSampleFlagsScript = preload("res://scripts/systems/daily/world_sample_flags.gd")
+const PreFestivalEventsScript = preload("res://scripts/systems/daily/pre_festival_events.gd")
 
 var failures: int = 0
 
@@ -21,6 +22,7 @@ func _init() -> void:
 	_test_passive_gift()
 	_test_trade()
 	_test_festival_flags()
+	_test_pre_events_popo()
 	if failures == 0:
 		print("ALL DAILY LOOP SAMPLE TESTS PASSED")
 		quit(0)
@@ -44,9 +46,9 @@ func _test_economy() -> void:
 	var info: Dictionary = eco.rest()
 	_assert(int(info.get("segment_index", 0)) == 1, "segment advanced")
 	_assert(eco.can_spend_heavy(), "refreshed after rest")
-	eco.rest()
-	eco.rest()
-	_assert(eco.is_festival_ready(), "festival ready after 3 rests")
+	for _i in range(5):
+		eco.rest()
+	_assert(eco.is_festival_ready(), "festival ready after 6 rests")
 
 func _test_knowledge_gate() -> void:
 	var knowledge = IngredientKnowledgeScript.new()
@@ -97,3 +99,14 @@ func _test_festival_flags() -> void:
 	_assert(not w.has_flag("festival_done"), "not done yet")
 	w.after_festival()
 	_assert(w.has_flag("festival_done"), "festival done flag")
+
+func _test_pre_events_popo() -> void:
+	var pe = PreFestivalEventsScript.new()
+	var first: Dictionary = pe.resolve_popo_talk(0, false)
+	_assert(str(first.get("id", "")) == "PF02", "first talk PF02")
+	_assert(bool(first.get("learn_herb", false)), "learns herb")
+	var second: Dictionary = pe.resolve_popo_talk(1, false)
+	_assert(str(second.get("id", "")) == "PF21", "repeat PF21")
+	var late: Dictionary = pe.resolve_popo_talk(4, false)
+	# PF17 only if not yet seen; after PF02/21, segment>=4 triggers PF17
+	_assert(str(late.get("id", "")) == "PF17", "segment4 PF17")

@@ -1,7 +1,7 @@
 class_name WorldSampleFlags
 extends RefCounted
 
-## Lightweight flags for sample dark-thread after harvest festival.
+## Sample flags: festival + post-festival traces + refusals.
 
 var flags: Dictionary = {}
 

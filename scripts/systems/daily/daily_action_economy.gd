@@ -7,8 +7,8 @@ const HEAVY_PER_SEGMENT: int = 3
 
 var heavy_remaining: int = HEAVY_PER_SEGMENT
 var segment_index: int = 0
-## After this many rests, player can enter harvest festival anchor.
-var segments_until_festival_ready: int = 3
+## Canon pacing: enough daily text before harvest festival.
+var segments_until_festival_ready: int = 6
 
 signal segment_advanced(segment_index: int)
 signal exhausted
@@ -28,7 +28,7 @@ func rest() -> Dictionary:
 	heavy_remaining = HEAVY_PER_SEGMENT
 	var info := {
 		"segment_index": segment_index,
-		"festival_hint": segment_index >= 2,
+		"festival_hint": segment_index >= 4,
 		"festival_ready": segment_index >= segments_until_festival_ready,
 	}
 	segment_advanced.emit(segment_index)

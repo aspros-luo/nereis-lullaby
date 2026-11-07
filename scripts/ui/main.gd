@@ -1,1 +1,1 @@
-@/tmp/main_fixed.gd
+PLACEHOLDER_WILL_FAIL

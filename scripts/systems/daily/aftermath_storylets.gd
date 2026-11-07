@@ -1,7 +1,7 @@
 class_name AftermathStorylets
 extends RefCounted
-## Post-festival branches + Hero AF09 meet + AF10 second rendezvous.
-## Chain: AF02 → AF06 → AF09 meet/talk → (rest echo) → AF10 第二次约见
+## Post-festival branches + Hero AF09/AF10 + AF11 soft ending threshold.
+## Chain: AF02 → AF06 → AF09 → AF10 → AF11 soft ending threshold
 
 var seen: Dictionary = {}
 
@@ -156,6 +156,25 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 				+ "我分不清哪一边才是真的在朝我靠近。"
 			),
 		}
+	if not has_seen("AF11_ending_soft") and (has_seen("AF07_threshold") or has_seen("AF10_hero_after") or _aftermath_depth() >= 6):
+		mark("AF11_ending_soft")
+		var dims: Dictionary = EndingResolver.estimate_dims(flags, 0, _aftermath_depth())
+		var result: Dictionary = EndingResolver.resolve(dims)
+		var preview: String = EndingResolver.soft_preview_line(dims)
+		var body := (
+			"夜里有一段时间什么声音都没有。\n"
+			+ "像有人把两种结局都放在枕边，等我选一个先拿起来。\n\n"
+			+ "——此刻更近的是：「" + preview + "」\n\n"
+			+ str(result.get("text", ""))
+			+ "\n\n（这是 demo 软结算。完整结局页可在此基础上换皮。）"
+		)
+		return {
+			"id": "AF11_ending_soft",
+			"text": body,
+			"ending": str(result.get("id", "")),
+			"ending_label": str(result.get("label", "")),
+			"set_flag": "ending_soft_seen",
+		}
 	return {}
 
 func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
@@ -259,6 +278,24 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 		else:
 			shrine += "名单仍不在桌上。翻纸的声音也没有回来。"
 		return {"id": "AF08_shrine_reread", "text": shrine}
+	if loc == "HOME" and not has_seen("AF11_ending_soft") and (has_seen("AF07_threshold") or has_seen("AF10_hero_after") or _aftermath_depth() >= 5):
+		mark("AF11_ending_soft")
+		var dims2: Dictionary = EndingResolver.estimate_dims(flags, 0, _aftermath_depth())
+		var result2: Dictionary = EndingResolver.resolve(dims2)
+		var preview2: String = EndingResolver.soft_preview_line(dims2)
+		return {
+			"id": "AF11_ending_soft",
+			"text": (
+				"我把这一段日子在心里过了一遍。\n"
+				+ "灶、公共场、名单、林缘——它们不再只是地点。\n\n"
+				+ "——此刻更近的是：「" + preview2 + "」\n\n"
+				+ str(result2.get("text", ""))
+				+ "\n\n（demo 软结算）"
+			),
+			"ending": str(result2.get("id", "")),
+			"ending_label": str(result2.get("label", "")),
+			"set_flag": "ending_soft_seen",
+		}
 	return {}
 
 func _hero_talk_beat(flags: Dictionary) -> Dictionary:
@@ -464,4 +501,6 @@ func available_action_label(loc: String, flags: Dictionary) -> String:
 		return "推开半掩的门看看"
 	if loc == "SHRINE" and bool(flags.get("trace_shrine_flowers", false)) and not has_seen("AF08_shrine_reread"):
 		return "再看一次旧花束"
+	if loc == "HOME" and bool(flags.get("festival_done", false)) andnot has_seen("AF11_ending_soft") and (has_seen("AF07_threshold") or has_seen("AF10_hero_after") or _aftermath_depth() >= 5):
+		return "整理这一段日子"
 	return ""

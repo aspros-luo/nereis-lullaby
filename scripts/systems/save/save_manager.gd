@@ -1,11 +1,14 @@
 class_name SaveManager
 extends RefCounted
 ## Multi-slot JSON save for the daily shell demo.
-## slots: 0, 1, 2  →  user://saves/slot_0.json etc.
+## Slots: 0, 1, 2  →  user://saves/slot_0.json etc.
 
 const SLOT_COUNT: int = 3
 const SAVE_DIR: String = "user://saves"
 const VERSION: int = 1
+
+## Set by title screen before changing to main scene; main.gd consumes and clears.
+static var pending_load_slot: int = -1
 
 static func _slot_path(slot: int) -> String:
 	return "%s/slot_%d.json" % [SAVE_DIR, slot]
@@ -29,7 +32,6 @@ static func delete_save(slot: int) -> bool:
 	return err == OK
 
 static func get_slot_meta(slot: int) -> Dictionary:
-	## Lightweight summary for UI (no full load).
 	if not has_save(slot):
 		return {"empty": true, "slot": slot}
 	var file := FileAccess.open(_slot_path(slot), FileAccess.READ)
@@ -84,7 +86,6 @@ static func save_game(slot: int, payload: Dictionary) -> bool:
 	return true
 
 static func load_game(slot: int) -> Dictionary:
-	## Returns {} on failure; otherwise the inner payload dict.
 	if not has_save(slot):
 		return {}
 	var file := FileAccess.open(_slot_path(slot), FileAccess.READ)

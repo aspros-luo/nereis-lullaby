@@ -23,4 +23,4 @@ func after_festival(helped: bool, offered_food: bool, refused: bool) -> void:
 	if helped or offered_food:
 		set_flag("tendency_p_soft")
 	if refused and not helped and not offered_food:
-		("tendency_t_soft")
+		set_flag("tendency_t_soft")

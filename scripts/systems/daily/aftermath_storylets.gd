@@ -1,7 +1,7 @@
 class_name AftermathStorylets
 extends RefCounted
-## Post-festival narrative branches + Hero face-to-face short event (AF09).
-## Chain: AF02 rumor → AF06 tracks → AF09 meet/talk at GROVE → AF03 may reference him
+## Post-festival branches + Hero AF09 meet + AF10 second rendezvous.
+## Chain: AF02 → AF06 → AF09 meet/talk → (rest echo) → AF10 第二次约见
 
 var seen: Dictionary = {}
 
@@ -30,6 +30,9 @@ func _aftermath_depth() -> int:
 		if bool(seen[k]):
 			n += 1
 	return n
+
+func _hero_ready_for_second() -> bool:
+	return has_seen("AF09_hero_talk") and (has_seen("AF09_hero_echo") or _aftermath_depth() >= 5)
 
 func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 	if not bool(flags.get("festival_done", false)):
@@ -72,7 +75,8 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 				"text": (
 					"闭上眼时，还能看见那人站在树影里的样子。\n"
 					+ "他没有要我跟上去。\n"
-					+ "只是把「还可以再问一次」这种感觉，留在了空地的空气里。"
+					+ "只是把「还可以再问一次」这种感觉，留在了空地的空气里。\n\n"
+					+ "——若他还来，会在更深一点的林缘。"
 				),
 			}
 		if _t(flags) and not _p(flags):
@@ -81,14 +85,44 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 				"text": (
 					"闭上眼时，那人的脸比树影更清楚一点。\n"
 					+ "他没有要我跟上去。\n"
-					+ "可「你已经被看见了」这件事，比任何嘱咐都难推开。"
+					+ "可「你已经被看见了」这件事，比任何嘱咐都难推开。\n\n"
+					+ "——他说过：来找我。林缘会有记号。"
 				),
 			}
 		return {
 			"id": "AF09_hero_echo",
 			"text": (
 				"闭上眼时，树影和那人的轮廓叠了一会儿。\n"
-				+ "像有人把门推开一条缝，又没有真正走进来。"
+				+ "像有人把门推开一条缝，又没有真正走进来。\n\n"
+				+ "风里像有一句未说完的：还会来。"
+			),
+		}
+	if has_seen("AF10_hero_second") and not has_seen("AF10_hero_after"):
+		mark("AF10_hero_after")
+		if bool(flags.get("hero_offer_leave", false)):
+			return {
+				"id": "AF10_hero_after",
+				"text": (
+					"夜里很安静。\n"
+					+ "他给过的方向还在——不是路标，是一种「可以不站在桌子这边」的可能。\n\n"
+					+ "村子的灯仍亮着。两件事同时为真，让人睡不沉，也并不想立刻醒来。"
+				),
+			}
+		if bool(flags.get("hero_ask_name", false)):
+			return {
+				"id": "AF10_hero_after",
+				"text": (
+					"名字没有换到手。\n"
+					+ "他只说：名字是最后才该交换的东西。\n\n"
+					+ "可被拒绝的感觉并不空。像有人把一只碗倒扣着放下，说里面以后会有。"
+				),
+			}
+		return {
+			"id": "AF10_hero_after",
+			"text": (
+				"第二次见面之后，林缘的风都像经过对质。\n"
+				+ "我仍住在村里。他仍在外面。\n"
+				+ "中间那条线，比任何名单都清楚一点了。"
 			),
 		}
 	if not has_seen("AF07_threshold") and _aftermath_depth() >= 3:
@@ -174,6 +208,12 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 	if loc == "GROVE" and has_seen("AF09_hero_meet") and not has_seen("AF09_hero_talk"):
 		mark("AF09_hero_talk")
 		return _hero_talk_beat(flags)
+	if loc == "FOREST" and _hero_ready_for_second() and not has_seen("AF10_hero_second"):
+		mark("AF10_hero_second")
+		return _hero_second_beat(flags)
+	if loc == "FOREST" and has_seen("AF10_hero_second") and not has_seen("AF10_hero_choice"):
+		mark("AF10_hero_choice")
+		return _hero_second_choice(flags)
 	if loc == "GROVE" and not has_seen("AF03_grove_signal"):
 		if bool(flags.get("trace_path_scrap", false)) or _t(flags) or has_seen("AF06_hero_glimpse"):
 			mark("AF03_grove_signal")
@@ -289,6 +329,119 @@ func _hero_talk_beat(flags: Dictionary) -> Dictionary:
 		"set_flag": "hero_met",
 	}
 
+func _hero_second_beat(flags: Dictionary) -> Dictionary:
+	var open := (
+		"林缘比空地更深一寸。树把天割成细条。\n\n"
+		+ "他已经在那里。\n"
+		+ "像知道我会来，又像无论谁来他都会站到天黑。\n\n"
+		+ "外来人\n"
+		+ "「你来了。」\n\n"
+		+ "不是惊喜。是点名。\n\n"
+	)
+	if _trace_count(flags) >= 3:
+		open += (
+			"外来人\n"
+			+ "「痕迹你看得够多了。再多，就会有人开始问你为什么看。」\n\n"
+			+ "他抬了抬下巴，指向村子反方向一条几乎看不见的缝。\n\n"
+			+ "外来人\n"
+			+ "「有一条不登记的路。不是逃跑。是换一种站法。」\n\n"
+			+ "外来人\n"
+			+ "「我不能替你选。我只能把缝指给你。」\n\n"
+			+ "风停了一拍。他仍看着我，等我开口——或不开口。"
+		)
+	elif _t(flags) and not _p(flags):
+		open += (
+			"外来人\n"
+			+ "「整理还在继续。名单会越来越薄。」\n\n"
+			+ "外来人\n"
+			+ "「你若要走，现在比以后干净。」\n\n"
+			+ "他没有伸手。只把一条不被踩实的土路，用目光量了一遍。\n\n"
+			+ "外来人\n"
+			+ "「跟不跟，你说。」"
+		)
+	elif _p(flags) and not _t(flags):
+		open += (
+			"外来人\n"
+			+ "「他们还愿意为你留灯。这不是坏事。」\n\n"
+			+ "外来人\n"
+			+ "「可灯也有罩。罩会让你看不清谁在外面等。」\n\n"
+			+ "他难得停顿得更长一点。\n\n"
+			+ "外来人\n"
+			+ "「你仍可留下。我只问：留下的时候，眼睛要不要还睁着。」"
+		)
+	else:
+		open += (
+			"外来人\n"
+			+ "「第二次见面，就该谈一点真的。」\n\n"
+			+ "外来人\n"
+			+ "「村子用节庆把人按进位子。有人适合位子。有人适合缝。」\n\n"
+			+ "外来人\n"
+			+ "「你站在中间太久了。中间最容易被两边同时使用。」\n\n"
+			+ "他等待。像把选择权完整地放在我手里。"
+		)
+	return {
+		"id": "AF10_hero_second",
+		"portrait": "外来人",
+		"text": open,
+		"learn": {"id": "hero_second", "note": "在林缘再次见到外来人，他谈到路与选择。"},
+		"set_flag": "hero_second_met",
+	}
+
+func _hero_second_choice(flags: Dictionary) -> Dictionary:
+	var text := ""
+	var flag := ""
+	var note := ""
+	if _trace_count(flags) >= 3 or (_t(flags) and not _p(flags)):
+		flag = "hero_offer_leave"
+		note = "外来人为我指出一条不登记的路；去留仍由我定。"
+		text = (
+			"「那条缝，我记住了。」\n\n"
+			+ "外来人\n"
+			+ "「记住就够。走的那天，不必跟任何人告别得太完整。」\n\n"
+			+ "他第一次几乎像笑了一下，又收住。\n\n"
+			+ "外来人\n"
+			+ "「若你留下，也把缝留在心里。有人会来擦掉它。」\n\n"
+			+ "外来人\n"
+			+ "「我的名字——等你不再需要靠它才站稳时，再换。」\n\n"
+			+ "人影没入更深的林。土路上只剩我们的两种脚印，有一阵风，又只剩一种。"
+		)
+	elif _p(flags) and not _t(flags):
+		flag = "hero_stay_watch"
+		note = "我选择暂时留下；外来人要我把眼睛睁着。"
+		text = (
+			"「我还不能走。家里还有灯。」\n\n"
+			+ "外来人\n"
+			+ "「那就留下。把灯看清楚是谁点的。」\n\n"
+			+ "外来人\n"
+			+ "「被需要，和被使用，有时共用同一张笑脸。」\n\n"
+			+ "他退半步，把林缘重新让给夜色。\n\n"
+			+ "外来人\n"
+			+ "「你若哪天分清了，林缘还在。我也会在——不一定总在同一棵树下。」\n\n"
+			+ "这一次他走得更慢。像留给我追问的余地，又像确信我暂时不会追。"
+		)
+	else:
+		flag = "hero_ask_name"
+		note = "我问了名字；他说名字是最后才交换的东西。"
+		text = (
+			"「你叫什么？」\n\n"
+			+ "外来人\n"
+			+ "「名字是最后才该交换的东西。」\n\n"
+			+ "外来人\n"
+			+ "「你还在用别人的称呼活着。先把自己的位子看穿。」\n\n"
+			+ "并不算拒绝。更像延期。\n\n"
+			+ "外来人\n"
+			+ "「下次若还见，带一件你自己选的东西来。不是礼物。是证据。」\n\n"
+			+ "「证据你还在问自己的问题。」\n\n"
+			+ "林重新合上。我手里空着，却比来时重一点。"
+		)
+	return {
+		"id": "AF10_hero_choice",
+		"portrait": "外来人",
+		"text": text,
+		"learn": {"id": "hero_second_choice", "note": note},
+		"set_flag": flag,
+	}
+
 func available_action_label(loc: String, flags: Dictionary) -> String:
 	if not bool(flags.get("festival_done", false)):
 		return ""
@@ -300,6 +453,10 @@ func available_action_label(loc: String, flags: Dictionary) -> String:
 		return "沿着脚印走进空地"
 	if loc == "GROVE" and has_seen("AF09_hero_meet") and not has_seen("AF09_hero_talk"):
 		return "上前说话"
+	if loc == "FOREST" and _hero_ready_for_second() and not has_seen("AF10_hero_second"):
+		return "赴林缘之约"
+	if loc == "FOREST" and has_seen("AF10_hero_second") and not has_seen("AF10_hero_choice"):
+		return "回应他"
 	if loc == "GROVE" and not has_seen("AF03_grove_signal"):
 		if bool(flags.get("trace_path_scrap", false)) or _t(flags) or has_seen("AF06_hero_glimpse"):
 			return "在空地里走走"

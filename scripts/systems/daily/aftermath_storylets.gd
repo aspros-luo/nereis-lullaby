@@ -37,7 +37,6 @@ func _aftermath_depth() -> int:
 func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 	if not bool(flags.get("festival_done", false)):
 		return {}
-	# AF01 — first morning after festival
 	if not has_seen("AF01_morning"):
 		mark("AF01_morning")
 		var tail := ""
@@ -56,7 +55,6 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 				+ tail
 			),
 		}
-	# AF05 — night weight after seeing at least one object trace
 	if not has_seen("AF05_night_weight"):
 		if _trace_count(flags) >= 1:
 			mark("AF05_night_weight")
@@ -69,7 +67,6 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 					+ "可一旦排成一列，就很难假装没有看见。"
 				),
 			}
-	# AF07 — threshold fork after enough aftermath depth (soft ending preview)
 	if not has_seen("AF07_threshold") and _aftermath_depth() >= 3:
 		mark("AF07_threshold")
 		if _p(flags) and not _t(flags):
@@ -106,7 +103,6 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 	if not bool(flags.get("festival_done", false)):
 		return {}
-	# AF02 — visitor rumor (COMMONS)
 	if loc == "COMMONS" and not has_seen("AF02_visitor_rumor"):
 		mark("AF02_visitor_rumor")
 		return {
@@ -119,7 +115,6 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 			),
 			"learn": {"id": "visitor_rumor", "note": "有人说节后见过生人，不是商贩。"},
 		}
-	# AF06 — hero glimpse (PATH), needs AF02
 	if loc == "PATH" and has_seen("AF02_visitor_rumor") and not has_seen("AF06_hero_glimpse"):
 		mark("AF06_hero_glimpse")
 		var body := (
@@ -137,7 +132,6 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 			"text": body,
 			"learn": {"id": "hero_tracks", "note": "通路有往林缘去的生人脚印。"},
 		}
-	# AF03 — grove signal (branch gate)
 	if loc == "GROVE" and not has_seen("AF03_grove_signal"):
 		if bool(flags.get("trace_path_scrap", false)) or _t(flags) or has_seen("AF06_hero_glimpse"):
 			mark("AF03_grove_signal")
@@ -153,14 +147,14 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 				"text": grove,
 				"learn": {"id": "grove_signal", "note": "林中空地有新折的细枝记号。"},
 			}
-	# AF04 — clinic quiet
 	if loc == "CLINIC" and not has_seen("AF04_clinic_quiet"):
 		mark("AF04_clinic_quiet")
 		var clinic := (
 			"诊疗处的门半掩着。药瓶排得很齐。\n"
 			+ "架子上多了一卷新纱布，封口还没拆。\n\n"
 			+ "里面没有人。\n"
-n		if _t(flags) and not _p(flags):
+		)
+		if _t(flags) and not _p(flags):
 			clinic += "空气凉一点。像有人刚处理完什么，又把痕迹擦得很干净。"
 		elif _p(flags) and not _t(flags):
 			clinic += "窗边放着一只洗过的碗，还没干。像有人会回来。"
@@ -171,7 +165,6 @@ n		if _t(flags) and not _p(flags):
 			"text": clinic,
 			"learn": {"id": "clinic_quiet", "note": "诊疗处有未拆封的新纱布，人却不在。"},
 		}
-	# AF08 — shrine re-read after traces (optional deepen)
 	if loc == "SHRINE" and bool(flags.get("trace_shrine_flowers", false)) and not has_seen("AF08_shrine_reread"):
 		mark("AF08_shrine_reread")
 		var shrine := "角落那束旧花还在。绳子勒出的印比昨天更深一点——或者只是我看久了。\n\n"

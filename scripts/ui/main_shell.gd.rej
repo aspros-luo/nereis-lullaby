@@ -1,0 +1,69 @@
+--- scripts/ui/main_shell.gd
++++ scripts/ui/main_shell.gd
+@@ -472,12 +472,19 @@
+ 	_rebuild_actions()
+ 	_refresh_bag_body()
+ 
++func _item_display_name(item_id: String) -> String:
++	var names := {
++		"flour": "面粉", "honey": "蜂蜜", "egg": "鸡蛋", "herb": "草药",
++		"spice_moonleaf": "月叶香料", "bread": "面包", "stew": "炖菜",
++	}
++	return str(names.get(item_id, item_id))
++
+ func _refresh_bag_body() -> void:
+ 	var parts: Array = []
+ 	for item_id in player_inventory.items.keys():
+ 		var count: int = int(player_inventory.items[item_id])
+ 		if count > 0:
+-			parts.append("%s ×%d" % [str(item_id), count])
++			parts.append("%s ×%d" % [_item_display_name(str(item_id)), count])
+ 	var inv_line: String = "（空）" if parts.is_empty() else "、".join(parts)
+ 	var notes: Array = knowledge.list_notes()
+ 	var know_line: String = "（还没有）" if notes.is_empty() else "\n".join(notes)
+@@ -489,6 +496,7 @@
+ 		child.queue_free()
+ 	if mode_controller.is_event_focus():
+ 		_add_action("帮忙布置桌台", _festival_help, true)
++		_add_action("把食物端上桌", _festival_offer_food, true)
+ 		_add_action("安静地看着", _festival_watch, true)
+ 		if not world_flags.has_flag("festival_refused"):
+ 			_add_action("今天先回去，不参与安排", _festival_refuse, true)
+@@ -514,6 +522,8 @@
+ 		_add_action("和老婆婆聊聊", _talk_popo, can_heavy)
+ 		_add_action("做饭", _open_kitchen, can_heavy)
+ 		_add_action("收取园里的草药", _gather_home_herbs, can_heavy)
++		if world_flags.has_flag("ending_soft_seen") and not aftermath.has_seen("AF12_after_ending"):
++			_add_action("把碗收好，继续过日子", _aftermath_location_beat, true)
+ 	if loc == "COMMONS":
+ 		_add_action("和外地商人聊聊", _talk_merchant, can_heavy)
+ 		_add_action("用草药换面粉", _trade_herb_flour, can_heavy)
+@@ -592,10 +602,11 @@
+ func _talk_popo() -> void:
+ 	if not economy.spend_heavy():
+ 		return
+-	if world_flags.has_flag("festival_done"):
+-		_set_dialogue("老婆婆：「办完就好，别想太多。」她的手很稳，笑却浅了一点。")
+-	else:
+-		_set_dialogue("老婆婆说灶还热着。若要出门，记得天黑前回来。")
++	var beat: Dictionary = pre_events.resolve_popo_talk(int(economy.segment_index), world_flags.has_flag("festival_done"))
++	var text: String = str(beat.get("text", "老婆婆看了看我，没多说。"))
++	if bool(beat.get("learn_herb", false)) and knowledge != null:
++		knowledge.learn("know_home_herb_patch", "老婆婆说门前园子里的草可以摘来用。")
++	_set_dialogue(text)
+ 	_refresh_ui()
+ 
+ func _enter_festival() -> void:
+@@ -738,6 +749,12 @@
+ 	)
+ 	_refresh_ui()
+ 
++
++func _festival_offer_food() -> void:
++	festival_offered_food = true
++	_set_dialogue("我把带来的食物放上长桌。有人闻了闻，没有问是谁做的。")
++	_refresh_ui()
++
+ func _on_kitchen_cooking_completed(_result) -> void:
+ 	_refresh_ui()
+ 

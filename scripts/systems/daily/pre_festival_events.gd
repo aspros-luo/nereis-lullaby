@@ -83,6 +83,27 @@ func text_observe_shrine_paper() -> String:
 func text_rest_sweet_night() -> String:
 	return "我休息了一会儿。日子悄悄往前走了一点。\n风里似有一点甜味，安心，又像略略过饱。"
 
+
+func text_observe_clinic() -> String:
+	return (
+		"诊疗处的门半掩着。架子上药瓶排得很齐，\n"
+		+ "空气里有干净的苦味。\n\n"
+		+ "里间有人轻咳了一声，又很快止住。\n"
+		+ "柜台边放着一卷未拆封的纱布。"
+	)
+
+func text_observe_path() -> String:
+	return (
+		"通路上有人匆匆走过，怀里抱着还没展开的布。\n"
+		+ "鞋底带起一点尘土，很快又落回去。"
+	)
+
+func text_observe_forest_pre() -> String:
+	return (
+		"林子比村子安静。风穿过叶子，像有人在远处试着开口，\n"
+		+ "又把话咽了回去。"
+	)
+
 ## Returns dialogue for talking to 老婆婆 based on segment and flags.
 func resolve_popo_talk(segment: int, festival_done: bool) -> Dictionary:
 	if festival_done:

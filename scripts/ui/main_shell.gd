@@ -101,6 +101,9 @@ func _ready() -> void:
 			_set_dialogue("存档读取失败，从新的一天开始。")
 			_refresh_ui()
 	else:
+		# Day-1：默认知道门前有草药，避免采集永久锁死
+		if knowledge != null and not knowledge.has("know_home_herb_patch"):
+			knowledge.learn("know_home_herb_patch", "门前园子里有些草药可以摘。")
 		_set_dialogue("我在村子里住了很久。今天想做点平常的事。")
 		_refresh_ui()
 
@@ -509,6 +512,13 @@ func _rebuild_actions() -> void:
 			_add_action(af_label, _aftermath_location_beat, true)
 	if loc == "HOME":
 		_add_action("和老婆婆聊聊", _talk_popo, can_heavy)
+		_add_action("做饭", _open_kitchen, can_heavy)
+		_add_action("收取园里的草药", _gather_home_herbs, can_heavy)
+	if loc == "COMMONS":
+		_add_action("和外地商人聊聊", _talk_merchant, can_heavy)
+		_add_action("用草药换面粉", _trade_herb_flour, can_heavy)
+	if loc == "PATH" and int(economy.segment_index) >= 2:
+		_add_action("帮铁匠打下手", _help_smith, can_heavy)
 	if not world_flags.has_flag("festival_done") and economy.segment_index >= 4:
 		_add_action("前往丰收节（公共场）", _enter_festival, true)
 
@@ -663,6 +673,70 @@ func _apply_save_payload(data: Dictionary) -> bool:
 	festival_helped = bool(data.get("festival_helped", false))
 	festival_offered_food = bool(data.get("festival_offered_food", false))
 	return true
+
+
+func _open_kitchen() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("今天已经做了不少事，先休息一下再进厨房吧。")
+		_refresh_ui()
+		return
+	if kitchen_controller == null:
+		_set_dialogue("灶台还没准备好。")
+		return
+	kitchen_controller.open()
+	_set_dialogue("我卷起袖子，开始准备食材。")
+
+func _gather_home_herbs() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("手有点酸。改天再采吧。")
+		_refresh_ui()
+		return
+	var spots: Array = gather_system.spots_at("HOME")
+	if spots.is_empty():
+		_set_dialogue("园里一时没什么可摘的。")
+		return
+	var result: Dictionary = gather_system.try_gather(spots[0], knowledge, player_inventory, true)
+	_set_dialogue(str(result.get("message", "")))
+	_refresh_ui()
+
+func _talk_merchant() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("懒得再开口了。")
+		_refresh_ui()
+		return
+	_set_dialogue(
+		"外地商人把布摊掀开一角，说：\n"
+		+ "「草叶新鲜的话，可以换面粉。村里节前都这样换。」\n\n"
+		+ "他看了看我的手：\n「有就拿来。没有也无，我在这儿停到鼓响。」"
+	)
+	if knowledge != null and not knowledge.has("know_home_herb_patch"):
+		knowledge.learn("know_home_herb_patch", "商人说门前园子的草也能换东西。")
+	_refresh_ui()
+
+func _trade_herb_flour() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("今天先不换了。")
+		_refresh_ui()
+		return
+	var offers: Array = trade_system.offers_at("COMMONS")
+	if offers.is_empty():
+		_set_dialogue("商人这会儿不在。")
+		return
+	var result: Dictionary = trade_system.try_trade(offers[0], player_inventory)
+	_set_dialogue(str(result.get("message", "")))
+	_refresh_ui()
+
+func _help_smith() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("臂膀还酸着，改天再帮吧。")
+		_refresh_ui()
+		return
+	_set_dialogue(
+		"铁匠把一根还烫的铁条丢进水桶，蒸汽直冒。\n"
+		+ "「扶一下风箱。对，就这样。」\n\n"
+		+ "忙完他丢给我一块干饼：\n「手还行。节前要是闲，再来。」"
+	)
+	_refresh_ui()
 
 func _on_kitchen_cooking_completed(_result) -> void:
 	_refresh_ui()

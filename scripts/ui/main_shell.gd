@@ -517,22 +517,22 @@ func _observe_location() -> void:
 	if world_flags.has_flag("festival_done"):
 		if loc == "HOME" and not world_flags.has_flag("trace_home_bowl"):
 			world_flags.set_flag("trace_home_bowl")
-			_set_dialogue(traces.text_home_bowl())
+			_set_dialogue(traces.text_home_object_petals())
 			_refresh_ui()
 			return
 		if loc == "COMMONS" and not world_flags.has_flag("trace_commons_seat"):
 			world_flags.set_flag("trace_commons_seat")
-			_set_dialogue(traces.text_commons_seat())
+			_set_dialogue(traces.text_commons_place())
 			_refresh_ui()
 			return
 		if loc == "SHRINE" and not world_flags.has_flag("trace_shrine_flowers"):
 			world_flags.set_flag("trace_shrine_flowers")
-			_set_dialogue(traces.text_shrine_flowers())
+			_set_dialogue(traces.text_shrine_place())
 			_refresh_ui()
 			return
 		if loc == "PATH" and not world_flags.has_flag("trace_path_scrap"):
 			world_flags.set_flag("trace_path_scrap")
-			_set_dialogue(traces.text_path_scrap())
+			_set_dialogue(traces.text_faceless_path_scrap())
 			_refresh_ui()
 			return
 	_set_dialogue("我看了看周围。没什么特别的。")

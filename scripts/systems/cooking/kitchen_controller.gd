@@ -12,8 +12,9 @@ const CookingResourceLoaderScript = preload("res://scripts/systems/cooking/cooki
 const CookingMenuUIScript = preload("res://scripts/ui/cooking_menu_ui.gd")
 const InventoryScript = preload("res://scripts/systems/item/inventory.gd")
 
-@onready var cooking_station = $CookingStation
-@onready var player_spawn = $PlayerSpawn
+# Optional scene nodes (null when spawned from main_shell without kitchen.tscn)
+@onready var cooking_station = get_node_or_null("CookingStation")
+@onready var player_spawn = get_node_or_null("PlayerSpawn")
 
 var flow_controller
 var cooking_manager

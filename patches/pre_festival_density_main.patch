@@ -1,0 +1,134 @@
+--- a/scripts/ui/main_shell.gd
++++ b/scripts/ui/main_shell.gd
+@@ -529,6 +529,13 @@
+ 		_add_action("用草药换面粉", _trade_herb_flour, can_heavy)
+ 	if loc == "PATH" and int(economy.segment_index) >= 2:
+ 		_add_action("帮铁匠打下手", _help_smith, can_heavy)
++	if not world_flags.has_flag("festival_done"):
++		if loc == "SHRINE":
++			_add_action("在礼拜场所站一会儿", _visit_shrine_pre, can_heavy)
++		if loc == "CLINIC":
++			_add_action("推开诊疗处的门看看", _visit_clinic_pre, can_heavy)
++		if loc == "COMMONS" and int(economy.segment_index) >= 3:
++			_add_action("听听远处的鼓声", _listen_drum_pre, true)
+ 	if not world_flags.has_flag("festival_done") and economy.segment_index >= 4:
+ 		_add_action("前往丰收节（公共场）", _enter_festival, true)
+ 
+@@ -555,6 +562,44 @@
+ 			_set_dialogue(traces.text_faceless_path_scrap())
+ 			_refresh_ui()
+ 			return
++	# 节前观察：按地点给一次有味道的细节
++	if not world_flags.has_flag("festival_done"):
++		if loc == "HOME":
++			if not pre_events.has_seen("OBS_HOME_VASE"):
++				pre_events.mark("OBS_HOME_VASE")
++				_set_dialogue(pre_events.text_observe_home_vase())
++				_refresh_ui()
++				return
++			if not pre_events.has_seen("OBS_HOME_HAMMER"):
++				pre_events.mark("OBS_HOME_HAMMER")
++				_set_dialogue(pre_events.text_observe_home_hammer())
++				_refresh_ui()
++				return
++		if loc == "COMMONS" and not pre_events.has_seen("OBS_COMMONS_BASKET"):
++			pre_events.mark("OBS_COMMONS_BASKET")
++			_set_dialogue(pre_events.text_observe_commons_basket())
++			_refresh_ui()
++			return
++		if loc == "SHRINE" and not pre_events.has_seen("OBS_SHRINE_PAPER"):
++			pre_events.mark("OBS_SHRINE_PAPER")
++			_set_dialogue(pre_events.text_observe_shrine_paper())
++			_refresh_ui()
++			return
++		if loc == "CLINIC" and not pre_events.has_seen("OBS_CLINIC"):
++			pre_events.mark("OBS_CLINIC")
++			_set_dialogue(pre_events.text_observe_clinic())
++			_refresh_ui()
++			return
++		if loc == "PATH" and not pre_events.has_seen("OBS_PATH"):
++			pre_events.mark("OBS_PATH")
++			_set_dialogue(pre_events.text_observe_path())
++			_refresh_ui()
++			return
++		if loc in ["FOREST", "GROVE"] and not pre_events.has_seen("OBS_FOREST_PRE"):
++			pre_events.mark("OBS_FOREST_PRE")
++			_set_dialogue(pre_events.text_observe_forest_pre())
++			_refresh_ui()
++			return
+ 	_set_dialogue("我看了看周围。没什么特别的。")
+ 	_refresh_ui()
+ 
+@@ -568,9 +613,14 @@
+ 		else:
+ 			_set_dialogue("我休息了一会儿。节后的夜里，鼓声已经听不见了。")
+ 	else:
+-		_set_dialogue("我休息了一会儿。")
+-		if int(info.get("segment_index", 0)) >= 4 and not mode_controller.is_event_focus():
++		var seg: int = int(info.get("segment_index", 0))
++		if seg >= 4 and not mode_controller.is_event_focus():
+ 			_set_dialogue("休息之后，远处隐约有鼓声。或许该去公共场看看丰收节。")
++		elif seg >= 2 and not pre_events.has_seen("REST_SWEET"):
++			pre_events.mark("REST_SWEET")
++			_set_dialogue(pre_events.text_rest_sweet_night())
++		else:
++			_set_dialogue("我休息了一会儿。日子悄悄往前走了一点。")
+ 	_refresh_ui()
+ 
+ func _apply_storylet_learn(beat: Dictionary) -> void:
+@@ -740,14 +790,54 @@
+ 	if not economy.spend_heavy():
+ 		_set_dialogue("臂膀还酸着，改天再帮吧。")
+ 		_refresh_ui()
+ 		return
+-	_set_dialogue(
+-		"铁匠把一根还烫的铁条丢进水桶，蒸汽直冒。\n"
+-		+ "「扶一下风箱。对，就这样。」\n\n"
+-		+ "忙完他丢给我一块干饼：\n「手还行。节前要是闲，再来。」"
+-	)
++	if not world_flags.has_flag("festival_done") and not pre_events.has_seen("PF09"):
++		pre_events.mark("PF09")
++		_set_dialogue(pre_events.text_pf09_smith_water())
++	else:
++		_set_dialogue(
++			"铁匠把一根还烫的铁条丢进水桶，蒸汽直冒。\n"
++			+ "「扶一下风箱。对，就这样。」\n\n"
++			+ "忙完他丢给我一块干饼：\n「手还行。节前要是闲，再来。」"
++		)
+ 	_refresh_ui()
+ 
++
++func _visit_shrine_pre() -> void:
++	if not economy.spend_heavy():
++		_set_dialogue("腿有点沉。改天再来吧。")
++		_refresh_ui()
++		return
++	if not pre_events.has_seen("OBS_SHRINE_PAPER"):
++		pre_events.mark("OBS_SHRINE_PAPER")
++	_set_dialogue(
++		pre_events.text_observe_shrine_paper()
++		+ "\n\n我站了一会儿。翻纸的人没有抬头。"
++	)
++	_refresh_ui()
++
++func _visit_clinic_pre() -> void:
++	if not economy.spend_heavy():
++		_set_dialogue("不太想再推门了。")
++		_refresh_ui()
++		return
++	if not pre_events.has_seen("OBS_CLINIC"):
++		pre_events.mark("OBS_CLINIC")
++	_set_dialogue(pre_events.text_observe_clinic())
++	_refresh_ui()
++
++func _listen_drum_pre() -> void:
++	if not pre_events.has_seen("PF20"):
++		pre_events.mark("PF20")
++		_set_dialogue(pre_events.text_pf20_drum())
++	else:
++		_set_dialogue("鼓声又试了一下。一下，又一下。像在数还有多久开节。")
++	_refresh_ui()
++
+ func _festival_offer_food() -> void:
+ 	festival_offered_food = true
+ 	_set_dialogue("我把带来的食物放上长桌。有人闻了闻，没有问是谁做的。")

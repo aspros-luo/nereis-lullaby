@@ -11,20 +11,21 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Apply patches
+      - name: Apply all patches
         run: |
           set -e
-          patch -p1 < patches/main_shell_experience.patch
-          patch -p1 < patches/aftermath_af12.patch
-          echo "patches applied"
+          for f in $(ls patches/*.patch | sort); do
+            echo "Applying $f"
+            patch -p1 -N < "$f" || true
+          done
       - name: Commit if changed
         run: |
           git config user.name "playable-bot"
           git config user.email "playable-bot@users.noreply.github.com"
-          git add scripts/ui/main_shell.gd scripts/systems/daily/aftermath_storylets.gd
+          git add -A
           if git diff --cached --quiet; then
             echo "no changes"
           else
-            git commit -m "Apply experience patches: festival food, CN items, popo chain, AF12"
+            git commit -m "Apply experience patches from patches/"
             git push
           fi

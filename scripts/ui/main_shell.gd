@@ -17,5 +17,6 @@ const PreFestivalEventsScript = preload("res://scripts/systems/daily/pre_festiva
 const PostFestivalTracesScript = preload("res://scripts/systems/daily/post_festival_traces.gd")
 const SaveManagerScript = preload("res://scripts/systems/save/save_manager.gd")
 const AftermathStoryletsScript = preload("res://scripts/systems/daily/aftermath_storylets.gd")
+const NpcBehaviorLogicScript = preload("res://scripts/systems/daily/npc_behavior_logic.gd")
 
 const LOCATION_ORDER: Array[String] = ["HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"]

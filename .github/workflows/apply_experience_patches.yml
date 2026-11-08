@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "patches/**"
+      - "scripts/tools/apply_*.py"
   workflow_dispatch:
 jobs:
   apply:
@@ -11,21 +12,21 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Apply all patches
+      - name: Run Python appliers
         run: |
           set -e
-          for f in $(ls patches/*.patch | sort); do
-            echo "Applying $f"
-            patch -p1 -N < "$f" || true
+          for f in scripts/tools/apply_*.py; do
+            echo "Running $f"
+            python3 "$f"
           done
       - name: Commit if changed
         run: |
           git config user.name "playable-bot"
           git config user.email "playable-bot@users.noreply.github.com"
-          git add -A
+          git add scripts/ui/main_shell.gd scripts/systems/daily/pre_festival_events.gd || true
           if git diff --cached --quiet; then
             echo "no changes"
           else
-            git commit -m "Apply experience patches from patches/"
+            git commit -m "Apply experience wiring via scripts/tools"
             git push
           fi

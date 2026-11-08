@@ -589,7 +589,7 @@ func _talk_popo() -> void:
 	_refresh_ui()
 
 func _enter_festival() -> void:
-	mode_controller.enter_event_focus()
+	mode_controller.enter_event("harvest_festival")
 	game_state.current_location = "COMMONS"
 	_set_dialogue("鼓声近了。公共场已经摆好了长桌。")
 	_refresh_ui()

@@ -1,0 +1,30 @@
+name: Apply playable experience patches
+on:
+  push:
+    paths:
+      - "patches/**"
+  workflow_dispatch:
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patches
+        run: |
+          set -e
+          patch -p1 < patches/main_shell_experience.patch
+          patch -p1 < patches/aftermath_af12.patch
+          echo "patches applied"
+      - name: Commit if changed
+        run: |
+          git config user.name "playable-bot"
+          git config user.email "playable-bot@users.noreply.github.com"
+          git add scripts/ui/main_shell.gd scripts/systems/daily/aftermath_storylets.gd
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "Apply experience patches: festival food, CN items, popo chain, AF12"
+            git push
+          fi

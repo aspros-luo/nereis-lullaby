@@ -476,6 +476,7 @@ func _item_display_name(item_id: String) -> String:
 	var names := {
 		"flour": "面粉", "honey": "蜂蜜", "egg": "鸡蛋", "herb": "草药",
 		"spice_moonleaf": "月叶香料", "bread": "面包", "stew": "炖菜",
+		"honey_bread": "蜂蜜面包", "herb_porridge": "药草粥",
 	}
 	return str(names.get(item_id, item_id))
 
@@ -522,6 +523,7 @@ func _rebuild_actions() -> void:
 		_add_action("和老婆婆聊聊", _talk_popo, can_heavy)
 		_add_action("做饭", _open_kitchen, can_heavy)
 		_add_action("收取园里的草药", _gather_home_herbs, can_heavy)
+		_add_action("把食物给老婆婆", _gift_popo, can_heavy)
 		if world_flags.has_flag("ending_soft_seen") and not aftermath.has_seen("AF12_after_ending"):
 			_add_action("把碗收好，继续过日子", _aftermath_location_beat, true)
 	if loc == "COMMONS":
@@ -692,9 +694,12 @@ func _save_slot(slot: int) -> void:
 		"location": game_state.current_location,
 		"flags": world_flags.flags.duplicate(true),
 		"aftermath_seen": aftermath.seen.duplicate(true),
+		"pre_events_seen": pre_events.seen.duplicate(true),
 		"knowledge": knowledge.known.duplicate(true),
 		"notes": knowledge.notes.duplicate(true),
 		"segment": economy.segment_index,
+		"heavy_remaining": economy.heavy_remaining,
+		"inventory": player_inventory.items.duplicate(true),
 		"festival_helped": festival_helped,
 		"festival_offered_food": festival_offered_food,
 	}
@@ -733,8 +738,46 @@ func _apply_save_payload(data: Dictionary) -> bool:
 		knowledge.notes = notes.duplicate(true)
 	festival_helped = bool(data.get("festival_helped", false))
 	festival_offered_food = bool(data.get("festival_offered_food", false))
+	if data.has("segment"):
+		economy.segment_index = int(data.get("segment", 0))
+	if data.has("heavy_remaining"):
+		economy.heavy_remaining = int(data.get("heavy_remaining", economy.heavy_remaining))
+	var inv = data.get("inventory", {})
+	if inv is Dictionary and player_inventory != null:
+		player_inventory.items = inv.duplicate(true)
+	var pre_seen = data.get("pre_events_seen", {})
+	if pre_seen is Dictionary:
+		pre_events.seen = pre_seen.duplicate(true)
 	return true
 
+
+
+func _gift_popo() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("今天已经送过一次了，先歇歇。")
+		_refresh_ui()
+		return
+	var food_id := ""
+	for id in ["honey_bread", "herb_porridge", "stew", "bread", "honey"]:
+		if player_inventory != null and player_inventory.has_item(str(id), 1):
+			food_id = str(id)
+			break
+	if food_id == "":
+		_set_dialogue("手里没什么能拿得出手的。先做点吃的，或带一点蜂蜜。")
+		_refresh_ui()
+		return
+	player_inventory.remove_item(food_id, 1)
+	world_flags.set_flag("gifted_popo")
+	if not pre_events.has_seen("PF06"):
+		pre_events.mark("PF06")
+		_set_dialogue(pre_events.text_pf06_gift_popo())
+	else:
+		_set_dialogue(
+			"老婆婆接过去，吹了吹：\n"
+			+ "「还热。」\n\n"
+			+ "她没再多说。碗沿的温度却像一句夸奖。"
+		)
+	_refresh_ui()
 
 func _open_kitchen() -> void:
 	if not economy.spend_heavy():
@@ -841,6 +884,7 @@ func _festival_offer_food() -> void:
 	_refresh_ui()
 
 func _on_kitchen_cooking_completed(_result) -> void:
+	_set_dialogue("炉火歇了。做好的东西可以放进背包，也可以拿去给老婆婆。")
 	_refresh_ui()
 
 func _on_kitchen_closed() -> void:

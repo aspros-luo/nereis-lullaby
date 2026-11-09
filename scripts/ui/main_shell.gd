@@ -17,6 +17,7 @@ const PreFestivalEventsScript = preload("res://scripts/systems/daily/pre_festiva
 const PostFestivalTracesScript = preload("res://scripts/systems/daily/post_festival_traces.gd")
 const SaveManagerScript = preload("res://scripts/systems/save/save_manager.gd")
 const AftermathStoryletsScript = preload("res://scripts/systems/daily/aftermath_storylets.gd")
+const VisualLibraryScript = preload("res://scripts/ui/visual_library.gd")
 
 const LOCATION_ORDER: Array[String] = ["HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"]
 const LOCATION_NAMES: Dictionary = {
@@ -57,8 +58,10 @@ var festival_offered_food: bool = false
 var observe_home_count: int = 0
 var hud_status: Label
 var stage_bg: ColorRect
+var stage_image: TextureRect
 var stage_title: Label
 var stage_hint: Label
+var portrait_image: TextureRect
 var portrait_label: Label
 var action_list: VBoxContainer
 var dialogue_text: Label
@@ -197,6 +200,13 @@ func _build_shell() -> void:
 	stage_bg = ColorRect.new()
 	stage_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	stage_wrap.add_child(stage_bg)
+	stage_image = TextureRect.new()
+	stage_image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	stage_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	stage_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	stage_image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_image.visible = false
+	stage_wrap.add_child(stage_image)
 	var sm := MarginContainer.new()
 	sm.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for k in [["margin_left", 16], ["margin_right", 16], ["margin_top", 14], ["margin_bottom", 14]]:
@@ -213,6 +223,12 @@ func _build_shell() -> void:
 	stage_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	stage_hint.add_theme_color_override("font_color", Color("#c8bfa8"))
 	sc.add_child(stage_hint)
+	portrait_image = TextureRect.new()
+	portrait_image.custom_minimum_size = Vector2(120, 160)
+	portrait_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait_image.visible = false
+	sc.add_child(portrait_image)
 	portrait_label = Label.new()
 	portrait_label.add_theme_color_override("font_color", Color("#77717b"))
 	sc.add_child(portrait_label)
@@ -462,13 +478,13 @@ func _refresh_ui() -> void:
 	if mode_controller.is_event_focus():
 		stage_title.text = "丰收节 · 公共场"
 		stage_hint.text = "鼓声与笑声叠在一起。"
-		stage_bg.color = Color("#3a2e28")
-		portrait_label.text = "节庆"
+		VisualLibraryScript.apply_location(stage_bg, stage_image, "FESTIVAL")
+		VisualLibraryScript.apply_portrait(portrait_image, portrait_label, "festival")
 	else:
 		stage_title.text = str(LOCATION_NAMES.get(loc, loc))
 		stage_hint.text = _location_desc(loc)
-		stage_bg.color = STAGE_COLORS.get(loc, Color("#2a2430"))
-		portrait_label.text = "立绘占位"
+		VisualLibraryScript.apply_location(stage_bg, stage_image, loc)
+		VisualLibraryScript.apply_portrait(portrait_image, portrait_label, "placeholder")
 	_rebuild_actions()
 	_refresh_bag_body()
 
@@ -649,7 +665,8 @@ func _aftermath_location_beat() -> void:
 	_set_dialogue(str(beat.get("text", "")))
 	_refresh_ui()
 	if beat.has("portrait"):
-		portrait_label.text = str(beat.get("portrait"))
+		var pid: String = str(beat.get("portrait"))
+		VisualLibraryScript.apply_portrait(portrait_image, portrait_label, pid)
 
 func _talk_popo() -> void:
 	if not economy.spend_heavy():

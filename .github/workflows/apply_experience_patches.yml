@@ -15,6 +15,7 @@ jobs:
       - name: Run Python appliers
         run: |
           set -e
+          shopt -s nullglob
           for f in scripts/tools/apply_*.py; do
             echo "Running $f"
             python3 "$f"

@@ -18,6 +18,7 @@ const PostFestivalTracesScript = preload("res://scripts/systems/daily/post_festi
 const SaveManagerScript = preload("res://scripts/systems/save/save_manager.gd")
 const AftermathStoryletsScript = preload("res://scripts/systems/daily/aftermath_storylets.gd")
 const VisualLibraryScript = preload("res://scripts/ui/visual_library.gd")
+const SoftEndingPageScript = preload("res://scripts/ui/soft_ending_page.gd")
 
 const LOCATION_ORDER: Array[String] = ["HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"]
 const LOCATION_NAMES: Dictionary = {
@@ -75,6 +76,7 @@ var save_panel: Control
 var load_panel: Control
 var play_seconds: float = 0.0
 var last_save_msg: String = ""
+var ending_page
 
 func _ready() -> void:
 	game_state = GameStateScript.new()
@@ -93,6 +95,7 @@ func _ready() -> void:
 	_setup_kitchen()
 	_build_shell()
 	_build_system_overlay()
+	_setup_ending_page()
 	var pending: int = SaveManagerScript.pending_load_slot
 	SaveManagerScript.pending_load_slot = -1
 	if pending >= 0:
@@ -655,6 +658,7 @@ func _apply_storylet_learn(beat: Dictionary) -> void:
 		world_flags.set_flag(str(flag_key))
 	if str(beat.get("ending", "")) != "":
 		world_flags.set_flag("ending_soft_" + str(beat.get("ending")))
+		_show_soft_ending(beat)
 
 func _aftermath_location_beat() -> void:
 	var beat: Dictionary = aftermath.beat_at_location(str(game_state.current_location), world_flags.flags)
@@ -768,6 +772,50 @@ func _apply_save_payload(data: Dictionary) -> bool:
 	return true
 
 
+
+
+func _setup_ending_page() -> void:
+	ending_page = SoftEndingPageScript.new()
+	add_child(ending_page)
+	if not ending_page.continued.is_connected(_on_ending_continued):
+		ending_page.continued.connect(_on_ending_continued)
+	if not ending_page.back_to_title.is_connected(_on_ending_back_to_title):
+		ending_page.back_to_title.connect(_on_ending_back_to_title)
+	if not ending_page.tie_chosen.is_connected(_on_ending_tie_chosen):
+		ending_page.tie_chosen.connect(_on_ending_tie_chosen)
+
+func _show_soft_ending(beat: Dictionary) -> void:
+	var result := {
+		"id": str(beat.get("ending", "")),
+		"label": str(beat.get("ending_label", "软结局")),
+		"text": str(beat.get("text", "")),
+	}
+	var preview := str(beat.get("preview", ""))
+	if ending_page != null:
+		ending_page.open_ending(result, preview)
+	else:
+		_set_dialogue(str(beat.get("text", "")))
+
+func _on_ending_continued() -> void:
+	_set_dialogue("结局页合上了。日子还在，只是有些路已经知道自己不会再走第二次。")
+	_refresh_ui()
+
+func _on_ending_back_to_title() -> void:
+	var title_path := "res://scenes/title.tscn"
+	if ResourceLoader.exists(title_path):
+		get_tree().change_scene_to_file(title_path)
+	elif ResourceLoader.exists("res://title.tscn"):
+		get_tree().change_scene_to_file("res://title.tscn")
+	else:
+		_set_dialogue("找不到标题场景。请从编辑器重新运行。")
+
+func _on_ending_tie_chosen(choice_id: String) -> void:
+	var dims: Dictionary = EndingResolver.estimate_dims(world_flags.flags, 0, aftermath._aftermath_depth())
+	var result: Dictionary = EndingResolver.resolve(dims, choice_id)
+	world_flags.set_flag("ending_soft_" + str(result.get("id", "")))
+	world_flags.set_flag("ending_soft_seen")
+	if ending_page != null:
+		ending_page.open_ending(result, EndingResolver.soft_preview_line(dims))
 
 func _gift_popo() -> void:
 	if not economy.spend_heavy():

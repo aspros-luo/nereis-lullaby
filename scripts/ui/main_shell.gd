@@ -556,11 +556,15 @@ func _rebuild_actions() -> void:
 	if loc == "PATH" and int(economy.segment_index) >= 2:
 		_add_action("帮铁匠打下手", _help_smith, can_heavy)
 		_add_action("把食物留给铁匠", _gift_smith, can_heavy)
-	if not world_flags.has_flag("festival_done"):
-		if loc == "SHRINE":
+	if loc == "SHRINE":
+		if not world_flags.has_flag("festival_done"):
 			_add_action("在礼拜场所站一会儿", _visit_shrine_pre, can_heavy)
-		if loc == "CLINIC":
+		_add_action("和礼拜主持说几句", _talk_worship, can_heavy)
+	if loc == "CLINIC":
+		if not world_flags.has_flag("festival_done"):
 			_add_action("推开诊疗处的门看看", _visit_clinic_pre, can_heavy)
+		_add_action("向诊疗处的人打听", _talk_doctor, can_heavy)
+	if not world_flags.has_flag("festival_done"):
 		if loc == "COMMONS" and int(economy.segment_index) >= 3:
 			_add_action("听听远处的鼓声", _listen_drum_pre, true)
 	if not world_flags.has_flag("festival_done") and economy.segment_index >= 4:
@@ -1003,17 +1007,52 @@ func _help_smith() -> void:
 		_set_dialogue(line)
 	_refresh_ui()
 
+
+func _talk_worship() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("不太想再开口了。")
+		_refresh_ui()
+		return
+	_apply_portrait_key("worship")
+	var line: String = npc_bridge.talk_line("worship", _npc_ctx())
+	if line == "":
+		line = npc_bridge.talk_line("worship_leader", _npc_ctx())
+	if line == "":
+		line = "礼拜主持点了点头，没有多说。花束的影子在木桌上轻轻晃。"
+	var note: String = npc_bridge.presence_note("worship", "SHRINE", world_flags.has_flag("festival_done"), false)
+	if note != "":
+		line = note + "\n\n" + line
+	_set_dialogue(line)
+	_refresh_ui()
+
+func _talk_doctor() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("不太想再问了。")
+		_refresh_ui()
+		return
+	_apply_portrait_key("doctor")
+	var line: String = npc_bridge.talk_line("doctor", _npc_ctx())
+	if line == "":
+		line = "诊疗处很安静。药瓶反射着一点冷光。"
+	var note: String = npc_bridge.presence_note("doctor", "CLINIC", world_flags.has_flag("festival_done"), false)
+	if note != "":
+		line = note + "\n\n" + line
+	_set_dialogue(line)
+	_refresh_ui()
+
 func _visit_shrine_pre() -> void:
 	if not economy.spend_heavy():
 		_set_dialogue("腿有点沉。改天再来吧。")
 		_refresh_ui()
 		return
+	_apply_portrait_key("worship")
 	if not pre_events.has_seen("OBS_SHRINE_PAPER"):
 		pre_events.mark("OBS_SHRINE_PAPER")
-	_set_dialogue(
-		pre_events.text_observe_shrine_paper()
-		+ "\n\n我站了一会儿。翻纸的人没有抬头。"
-	)
+	var extra: String = npc_bridge.routine_line("worship", _npc_ctx())
+	var body: String = pre_events.text_observe_shrine_paper() + "\n\n我站了一会儿。翻纸的人没有抬头。"
+	if extra != "":
+		body += "\n\n" + extra
+	_set_dialogue(body)
 	_refresh_ui()
 
 func _visit_clinic_pre() -> void:
@@ -1021,9 +1060,14 @@ func _visit_clinic_pre() -> void:
 		_set_dialogue("不太想再推门了。")
 		_refresh_ui()
 		return
+	_apply_portrait_key("doctor")
 	if not pre_events.has_seen("OBS_CLINIC"):
 		pre_events.mark("OBS_CLINIC")
-	_set_dialogue(pre_events.text_observe_clinic())
+	var extra2: String = npc_bridge.routine_line("doctor", _npc_ctx())
+	var body2: String = pre_events.text_observe_clinic()
+	if extra2 != "":
+		body2 += "\n\n" + extra2
+	_set_dialogue(body2)
 	_refresh_ui()
 
 func _listen_drum_pre() -> void:

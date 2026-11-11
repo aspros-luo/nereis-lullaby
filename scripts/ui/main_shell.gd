@@ -19,6 +19,7 @@ const SaveManagerScript = preload("res://scripts/systems/save/save_manager.gd")
 const AftermathStoryletsScript = preload("res://scripts/systems/daily/aftermath_storylets.gd")
 const VisualLibraryScript = preload("res://scripts/ui/visual_library.gd")
 const SoftEndingPageScript = preload("res://scripts/ui/soft_ending_page.gd")
+const NpcShellBridgeScript = preload("res://scripts/systems/daily/npc_shell_bridge.gd")
 
 const LOCATION_ORDER: Array[String] = ["HOME", "COMMONS", "PATH", "SHRINE", "CLINIC", "FOREST", "GROVE"]
 const LOCATION_NAMES: Dictionary = {
@@ -77,6 +78,8 @@ var load_panel: Control
 var play_seconds: float = 0.0
 var last_save_msg: String = ""
 var ending_page
+var npc_bridge
+var smith_helped_segment: bool = false
 
 func _ready() -> void:
 	game_state = GameStateScript.new()
@@ -92,6 +95,7 @@ func _ready() -> void:
 	pre_events = PreFestivalEventsScript.new()
 	traces = PostFestivalTracesScript.new()
 	aftermath = AftermathStoryletsScript.new()
+	npc_bridge = NpcShellBridgeScript.new()
 	_setup_kitchen()
 	_build_shell()
 	_build_system_overlay()
@@ -548,8 +552,10 @@ func _rebuild_actions() -> void:
 	if loc == "COMMONS":
 		_add_action("和外地商人聊聊", _talk_merchant, can_heavy)
 		_add_action("用草药换面粉", _trade_herb_flour, can_heavy)
+		_add_action("把食物分给过路人", _share_food_commons, can_heavy)
 	if loc == "PATH" and int(economy.segment_index) >= 2:
 		_add_action("帮铁匠打下手", _help_smith, can_heavy)
+		_add_action("把食物留给铁匠", _gift_smith, can_heavy)
 	if not world_flags.has_flag("festival_done"):
 		if loc == "SHRINE":
 			_add_action("在礼拜场所站一会儿", _visit_shrine_pre, can_heavy)
@@ -626,6 +632,7 @@ func _observe_location() -> void:
 
 func _rest() -> void:
 	var info = economy.rest()
+	smith_helped_segment = false
 	if world_flags.has_flag("festival_done"):
 		var beat: Dictionary = aftermath.on_rest(int(info.get("segment_index", 0)), world_flags.flags)
 		if not beat.is_empty():
@@ -675,11 +682,22 @@ func _aftermath_location_beat() -> void:
 func _talk_popo() -> void:
 	if not economy.spend_heavy():
 		return
-	var beat: Dictionary = pre_events.resolve_popo_talk(int(economy.segment_index), world_flags.has_flag("festival_done"))
-	var text: String = str(beat.get("text", "老婆婆看了看我，没多说。"))
-	if bool(beat.get("learn_herb", false)) and knowledge != null:
-		knowledge.learn("know_home_herb_patch", "老婆婆说门前园子里的草可以摘来用。")
-	_set_dialogue(text)
+	_apply_portrait_key("popo")
+	var festival_done: bool = world_flags.has_flag("festival_done")
+	if not festival_done:
+		var beat: Dictionary = pre_events.resolve_popo_talk(int(economy.segment_index), false)
+		var text: String = str(beat.get("text", "老婆婆看了看我，没多说。"))
+		if bool(beat.get("learn_herb", false)) and knowledge != null:
+			knowledge.learn("know_home_herb_patch", "老婆婆说门前园子里的草可以摘来用。")
+		_set_dialogue(text)
+	else:
+		var line: String = npc_bridge.talk_line("popo", _npc_ctx())
+		if line == "":
+			line = "老婆婆把我头发上一点碎花瓣拈掉，说：办完就好，别想太多。她的手很稳，笑却浅了一点。"
+		var note: String = npc_bridge.presence_note("popo", "HOME", true, false)
+		if note != "":
+			line = note + "\n\n" + line
+		_set_dialogue(line)
 	_refresh_ui()
 
 func _enter_festival() -> void:
@@ -774,6 +792,22 @@ func _apply_save_payload(data: Dictionary) -> bool:
 
 
 
+
+func _npc_ctx(authored_active: bool = false) -> Dictionary:
+	return npc_bridge.make_ctx(
+		str(game_state.current_location),
+		world_flags.has_flag("festival_done"),
+		mode_controller.is_event_focus(),
+		world_flags.flags,
+		int(economy.segment_index),
+		authored_active,
+		smith_helped_segment
+	)
+
+func _apply_portrait_key(key: String) -> void:
+	if portrait_image != null and portrait_label != null:
+		VisualLibraryScript.apply_portrait(portrait_image, portrait_label, key)
+
 func _setup_ending_page() -> void:
 	ending_page = SoftEndingPageScript.new()
 	add_child(ending_page)
@@ -816,6 +850,52 @@ func _on_ending_tie_chosen(choice_id: String) -> void:
 	world_flags.set_flag("ending_soft_seen")
 	if ending_page != null:
 		ending_page.open_ending(result, EndingResolver.soft_preview_line(dims))
+
+
+func _pick_giftable_food() -> String:
+	for id in ["honey_bread", "herb_porridge", "stew", "bread", "honey"]:
+		if player_inventory != null and player_inventory.has_item(str(id), 1):
+			return str(id)
+	return ""
+
+func _gift_smith() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("手空着，改天再带一份。")
+		_refresh_ui()
+		return
+	_apply_portrait_key("smith")
+	var food_id := _pick_giftable_food()
+	if food_id == "":
+		_set_dialogue("没有能留下的食物。先做一份，或带一点蜂蜜。")
+		_refresh_ui()
+		return
+	player_inventory.remove_item(food_id, 1)
+	world_flags.set_flag("gifted_smith")
+	if not pre_events.has_seen("PF07"):
+		pre_events.mark("PF07")
+		_set_dialogue(pre_events.text_pf07_gift_smith())
+	else:
+		_set_dialogue("铁匠接过去，锤声只乱了一拍，又稳回去。")
+	_refresh_ui()
+
+func _share_food_commons() -> void:
+	if not economy.spend_heavy():
+		_set_dialogue("今天已经分过一次了。")
+		_refresh_ui()
+		return
+	var food_id := _pick_giftable_food()
+	if food_id == "":
+		_set_dialogue("手里没有能分出去的东西。")
+		_refresh_ui()
+		return
+	player_inventory.remove_item(food_id, 1)
+	world_flags.set_flag("shared_food_commons")
+	if not pre_events.has_seen("PF08"):
+		pre_events.mark("PF08")
+		_set_dialogue(pre_events.text_pf08_share_commons())
+	else:
+		_set_dialogue("又一份热气融进公共场的噪声里。有人点头，有人只是笑。")
+	_refresh_ui()
 
 func _gift_popo() -> void:
 	if not economy.spend_heavy():
@@ -873,13 +953,20 @@ func _talk_merchant() -> void:
 		_set_dialogue("懒得再开口了。")
 		_refresh_ui()
 		return
-	_set_dialogue(
-		"外地商人把布摊掀开一角，说：\n"
-		+ "「草叶新鲜的话，可以换面粉。村里节前都这样换。」\n\n"
-		+ "他看了看我的手：\n「有就拿来。没有也无，我在这儿停到鼓响。」"
-	)
+	_apply_portrait_key("merchant")
+	var line: String = npc_bridge.talk_line("merchant", _npc_ctx())
+	if line == "":
+		line = (
+			"外地商人把布摊掀开一角，说：\n"
+			+ "「草叶新鲜的话，可以换面粉。村里节前都这样换。」\n\n"
+			+ "他看了看我的手：\n「有就拿来。没有也行，我在这儿停到鼓响。」"
+		)
 	if knowledge != null and not knowledge.has("know_home_herb_patch"):
 		knowledge.learn("know_home_herb_patch", "商人说门前园子的草也能换东西。")
+	var note: String = npc_bridge.presence_note("merchant", "COMMONS", world_flags.has_flag("festival_done"), false)
+	if note != "":
+		line = note + "\n\n" + line
+	_set_dialogue(line)
 	_refresh_ui()
 
 func _trade_herb_flour() -> void:
@@ -900,17 +987,21 @@ func _help_smith() -> void:
 		_set_dialogue("臂膀还酸着，改天再帮吧。")
 		_refresh_ui()
 		return
+	_apply_portrait_key("smith")
+	smith_helped_segment = true
 	if not world_flags.has_flag("festival_done") and not pre_events.has_seen("PF09"):
 		pre_events.mark("PF09")
 		_set_dialogue(pre_events.text_pf09_smith_water())
 	else:
-		_set_dialogue(
-			"铁匠把一根还烫的铁条丢进水桶，蒸汽直冒。\n"
-			+ "「扶一下风箱。对，就这样。」\n\n"
-			+ "忙完他丢给我一块干饼：\n「手还行。节前要是闲，再来。」"
-		)
+		var line: String = npc_bridge.talk_line("smith", _npc_ctx())
+		if line == "":
+			line = (
+				"铁匠把一根还烫的铁条丢进水桶，蒸汽直冒。\n"
+				+ "「扶一下风箱。对，就这样。」\n\n"
+				+ "忙完他丢给我一块干饼：\n「手还行。节前要是闲，再来。」"
+			)
+		_set_dialogue(line)
 	_refresh_ui()
-
 
 func _visit_shrine_pre() -> void:
 	if not economy.spend_heavy():

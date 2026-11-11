@@ -104,6 +104,23 @@ func text_observe_forest_pre() -> String:
 		+ "又把话咽了回去。"
 	)
 
+
+func text_pf07_gift_smith() -> String:
+	return (
+		"锤声停了一拍。铁匠接过还热的东西，只点了点头。\n\n"
+		+ "铁匠\n「嗯。」\n\n"
+		+ "油污的手指在布边蹭了一下，又回到钳柄上。\n"
+		+ "棚里仍是热的。像这句谢意早就锻进节奏里了。"
+	)
+
+func text_pf08_share_commons() -> String:
+	return (
+		"我把一小份递过去。对方先是愣，随即笑开：\n\n"
+		+ "「还热呢。」\n\n"
+		+ "有人接，有人客气地摇手。公共场的声音没有因此乱，\n"
+		+ "只是多了一点可以闻见的温度。"
+	)
+
 ## Returns dialogue for talking to 老婆婆 based on segment and flags.
 func resolve_popo_talk(segment: int, festival_done: bool) -> Dictionary:
 	if festival_done:

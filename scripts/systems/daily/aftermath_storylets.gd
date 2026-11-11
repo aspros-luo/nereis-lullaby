@@ -173,6 +173,7 @@ func on_rest(segment_index: int, flags: Dictionary) -> Dictionary:
 			"text": body,
 			"ending": str(result.get("id", "")),
 			"ending_label": str(result.get("label", "")),
+			"preview": preview,
 			"set_flag": "ending_soft_seen",
 		}
 	if has_seen("AF11_ending_soft") and not has_seen("AF12_after_ending"):
@@ -305,6 +306,7 @@ func beat_at_location(loc: String, flags: Dictionary) -> Dictionary:
 			),
 			"ending": str(result2.get("id", "")),
 			"ending_label": str(result2.get("label", "")),
+			"preview": preview2,
 			"set_flag": "ending_soft_seen",
 		}
 	if loc == "HOME" and has_seen("AF11_ending_soft") and not has_seen("AF12_after_ending"):

@@ -34,6 +34,8 @@ const PORTRAIT_PATHS: Dictionary = {
 	"smith": "res://assets/portraits/smith.png",
 	"festival": "res://assets/portraits/festival.png",
 	"visitor": "res://assets/portraits/hero.png",
+	"worship": "res://assets/portraits/worship.png",
+	"doctor": "res://assets/portraits/doctor.png",
 }
 
 const PORTRAIT_LABELS: Dictionary = {
@@ -45,6 +47,8 @@ const PORTRAIT_LABELS: Dictionary = {
 	"smith": "铁匠",
 	"festival": "节庆",
 	"visitor": "外来人",
+	"worship": "礼拜主持",
+	"doctor": "诊疗处",
 }
 
 static func load_texture(path: String) -> Texture2D:
